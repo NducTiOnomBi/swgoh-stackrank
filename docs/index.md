@@ -1,4 +1,4 @@
-## WGOH Stack Rank Tool Documentation
+## SWGOH Stack Rank Tool Documentation
 
 The purpose of this tool is to analyze your entire collection of characters, and rank them in order of priority for the purpose of modding within [Grandivory's Mods Optimizer for Star Wars: Galaxy of Heroes™](https://mods-optimizer.swgoh.grandivory.com/). Characters are ranked based on several criteria such as their standing within "the meta", gearing, relics, abilities levels (e.g. zetas), character synergies that exist within the collection, and more.
 
