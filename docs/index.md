@@ -1,4 +1,8 @@
-## Welcome to GitHub Pages
+## FOO
+
+## Welcome to the SWGOH Stack Rank Tool Documentation
+
+The purpose of this tool is to analyze your entire collection of characters, and rank them in order of priority for the purpose of modding within Grandivory's Mods Optimizer for Star Wars: Galaxy of Heroes™. Characters are ranked based on several criteria such as their standing within "the meta", gearing, relics, abilities levels (e.g. zetas), character synergies that exist within the collection, and more.
 
 You can use the [editor on GitHub](https://github.com/NducTiOnomBi/swgoh-stackrank/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
 
