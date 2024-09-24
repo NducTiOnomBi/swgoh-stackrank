@@ -1,4 +1,4 @@
 # swgoh-stackrank
-The purpose of this tool is to analyze your entire collection of swgoh characters, and rank them in order of priority for the purpose of modding within Grandivory's Mods Optimizer for Star Wars: Galaxy of Heroes™
+The purpose of this repo is to enable contributions to the data file that supports the StackRank ranking algorithm.
 
 Please see the [Tools documentation](./Tools/index) for guidance
