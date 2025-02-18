@@ -54,7 +54,7 @@ The ReadBaseDataSynergyToXLS.ps1 PowerShell script will read the characterBaseDa
 ##### Output
 `Output saved successfully to c:\output\characterBaseDataMaxSynergy.xlsx!`
 
-### ReadBaseDataToXLS.ps1
+### ReadXLSBaseDataJson.ps1
 
 The ReadBaseDataToXLS.ps1 PowerShell script will read the characterBaseData.xlsx file and update the baseTier values in the characterBaseData.json based upon any tier changes made within this file.
 
