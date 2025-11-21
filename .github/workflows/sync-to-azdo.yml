@@ -1,0 +1,36 @@
+name: Sync characterBaseData to AzDevOps
+
+on:
+  push:
+    paths:
+      - "Data/characterBaseData.json"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v3
+
+      - name: Checkout Azure DevOps repo
+        uses: actions/checkout@v3
+        with:
+          repository: xAgentSoftware/swgoh-stackrank
+          token: ${{ secrets.AZDO_PAT }}
+          path: azdo_repo
+          ref: dev
+
+      - name: Copy updated file
+        run: |
+          cp Data/characterBaseData.json azdo_repo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+
+      - name: Commit and push changes to AzDO
+        run: |
+          cd azdo_repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+          git commit -m "Update characterBaseData.json from GitHub"
+          git push origin dev
+        env:
+          AZDO_PAT: ${{ secrets.AZDO_PAT }}
