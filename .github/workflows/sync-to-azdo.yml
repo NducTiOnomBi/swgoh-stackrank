@@ -21,19 +21,13 @@ jobs:
           path: azdo_repo
           ref: dev
 
-      - name: Configure git
+      - name: Commit and push changes to AzDO if any
         run: |
           cd azdo_repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      - name: Force update JSON from GitHub
-        run: |
-          cd azdo_repo
-          # Overwrite the file with GitHub version
-          cp ../Data/characterBaseData.json swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+          git remote set-url origin https://${AZDO_PAT}@dev.azure.com/xAgentSoftware/xas/_git/swgoh-stackrank
           git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-          # Only commit if there are changes
           if ! git diff --cached --quiet; then
             git commit -m "Sync characterBaseData.json from GitHub (authoritative)"
             git push origin dev --force
