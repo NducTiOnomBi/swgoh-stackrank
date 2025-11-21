@@ -30,7 +30,11 @@ jobs:
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
           git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-          git commit -m "Update characterBaseData.json from GitHub"
-          git push origin dev
+          if ! git diff --cached --quiet; then
+            git commit -m "Update characterBaseData.json from GitHub"
+            git push origin dev
+          else
+            echo "No changes detected, skipping commit."
+          fi
         env:
           AZDO_PAT: ${{ secrets.AZDO_PAT }}
