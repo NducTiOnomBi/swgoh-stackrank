@@ -1,0 +1,43 @@
+name: Sync JSON to AzDO
+
+on:
+  push:
+    paths:
+      - "Data/characterBaseData.json"
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout GitHub repo
+        uses: actions/checkout@v3
+
+      - name: Checkout Azure DevOps repo
+        uses: actions/checkout@v3
+        with:
+          repository: xAgentSoftware/swgoh-stackrank
+          token: ${{ secrets.AZDO_PAT }}
+          path: azdo_repo
+          ref: dev
+
+      - name: Configure git
+        run: |
+          cd azdo_repo
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Force update JSON from GitHub
+        run: |
+          cd azdo_repo
+          # Overwrite the file with GitHub version
+          cp ../Data/characterBaseData.json swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+          git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+          # Only commit if there are changes
+          if ! git diff --cached --quiet; then
+            git commit -m "Sync characterBaseData.json from GitHub (authoritative)"
+            git push origin dev --force
+          else
+            echo "No changes detected, skipping commit."
+          fi
+        env:
+          AZDO_PAT: ${{ secrets.AZDO_PAT }}
