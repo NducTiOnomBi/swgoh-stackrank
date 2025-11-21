@@ -1,6 +1,7 @@
 name: Sync JSON to AzDO
 
 on:
+  workflow_dispatch:
   push:
     branches: [main]
     paths:
