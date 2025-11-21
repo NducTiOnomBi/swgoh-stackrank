@@ -9,7 +9,7 @@ resources:
     - repository: githubRepo
       type: github
       name: NducTiOnomBi/swgoh-stackrank
-      endpoint: github.com_NducTiOnomBi
+      endpoint: NducTiOnomBi
 
 pool:
   vmImage: ubuntu-latest
