@@ -2,6 +2,7 @@ name: Sync JSON to AzDO
 
 on:
   push:
+    branches: [main]
     paths:
       - "Data/characterBaseData.json"
 
