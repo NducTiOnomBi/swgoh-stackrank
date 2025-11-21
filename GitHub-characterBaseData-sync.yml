@@ -1,0 +1,56 @@
+# --------------------------------------------------------
+# Sync File(s) From GitHub -> Azure DevOps dev Branch
+# --------------------------------------------------------
+
+trigger: none      # Pipeline is triggered ONLY by GitHub webhook
+
+resources:
+  repositories:
+    - repository: githubRepo
+      type: github
+      name: NducTiOnomBi/swgoh-stackrank
+      endpoint: github-connection   # <-- UPDATE THIS TO YOUR SERVICE CONNECTION NAME
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+  # 1. Checkout the GitHub repo using the service connection
+  - checkout: githubRepo
+    persistCredentials: true
+
+  # 2. Clone the Azure DevOps repo dev branch
+  - script: |
+      echo "Cloning AzDO repo..."
+      git clone --branch dev https://$(System.AccessToken)@dev.azure.com/xAgentSoftware/xas/_git/swgoh-stackrank azdo
+    displayName: "Clone Azure DevOps dev branch"
+
+  # 3. Copy the file(s) you want synced
+  #    👉 Update path(s) below appropriately
+  - script: |
+      echo "Copying updated file(s)..."
+      cp Data/characterBaseData.json azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+    displayName: "Copy files from GitHub to AzDO"
+
+  # 4. Commit only if changes exist
+  - script: |
+      cd azdo
+      git config user.email "build@azuredevops"
+      git config user.name "Azure DevOps Pipeline"
+
+      echo "Checking for changes..."
+      if git diff --quiet; then
+        echo "No changes found. Exiting."
+        exit 0
+      fi
+
+      echo "Changes detected. Committing..."
+      git add .
+      git commit -m "Sync from GitHub ($(Build.SourceVersion))"
+
+      echo "Pushing to dev branch..."
+      git push origin dev
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+    displayName: "Commit + Push if changed"
