@@ -1,0 +1,37 @@
+trigger: none   # We use GitHub webhook, not AzDO triggers
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+  # 1. Checkout GitHub repo using the service connection
+  - checkout: gitHubRepo
+    persistCredentials: true
+
+  # 2. Checkout Azure DevOps repo dev branch
+  - script: |
+      git clone --branch dev https://$(System.AccessToken)@dev.azure.com/xAgentSoftware/xas/_git/swgoh-stackrank azdo
+    displayName: "Clone AzDO swgoh-stackrank dev branch"
+
+  # 3. Copy updated file from GitHub to AzDO repo
+  - script: |
+      cp Data/characterBaseData.json azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+    displayName: "Copy updated JSON"
+
+  # 4. Commit only if file changed
+  - script: |
+      cd azdo
+      git config user.email "build@azuredevops"
+      git config user.name "Azure DevOps Pipeline"
+      
+      if git diff --quiet; then
+        echo "No changes detected. Skipping commit."
+        exit 0
+      fi
+
+      git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+      git commit -m "Sync JSON file from GitHub ($(Build.SourceVersion))"
+      git push origin dev
+    displayName: "Commit and push if changed"
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
