@@ -1,4 +1,4 @@
-name: Sync characterBaseData to AzDevOps
+name: Sync JSON to AzDO
 
 on:
   push:
@@ -20,19 +20,22 @@ jobs:
           path: azdo_repo
           ref: dev
 
-      - name: Copy updated file
-        run: |
-          cp Data/characterBaseData.json azdo_repo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-
-      - name: Commit and push changes to AzDO
+      - name: Configure git
         run: |
           cd azdo_repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
+
+      - name: Force update JSON from GitHub
+        run: |
+          cd azdo_repo
+          # Overwrite the file with GitHub version
+          cp ../Data/characterBaseData.json swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
           git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+          # Only commit if there are changes
           if ! git diff --cached --quiet; then
-            git commit -m "Update characterBaseData.json from GitHub"
-            git push origin dev
+            git commit -m "Sync characterBaseData.json from GitHub (authoritative)"
+            git push origin dev --force
           else
             echo "No changes detected, skipping commit."
           fi
