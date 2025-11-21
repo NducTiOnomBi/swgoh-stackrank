@@ -1166,7 +1166,40 @@
         },
         {
             "id": "CAPTAINENOCH",
-            "baseTier": 10
+            "baseTier": 10,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "NIGHTTROOPER",
+                        "DEATHTROOPERPERIDEA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 4,
+                    "characters": [
+                        "MOFFGIDEONS3",
+                        "NIGHTTROOPER",
+                        "DEATHTROOPERPERIDEA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                }
+            ]
         },
         {
             "id": "CAPTAINREX",
@@ -2197,19 +2230,59 @@
         },
         {
             "id": "DEATHTROOPERPERIDEA",
-            "baseTier": 11,
-            "synergySets":[
+            "baseTier": 10,
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "characters": [
                         "GREATMOTHERS",
                         "MORGANELSBETH",
-                        "MERRIN"
+                        "NIGHTTROOPER"
                     ],
                     "categoryDefinitions": [
                         {
                             "include": [
                                 "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 4,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MORGANELSBETH",
+                        "NIGHTTROOPER",
+                        "MERRIN"
+                    ]
+                },
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "CAPTAINENOCH",
+                        "NIGHTTROOPER"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MOFFGIDEONS3",
+                        "CAPTAINENOCH",
+                        "NIGHTTROOPER"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
                             ],
                             "numberMatchesRequired": 1
                         }
@@ -5040,19 +5113,59 @@
         },
         {
             "id": "NIGHTTROOPER",
-            "baseTier": 11,
-            "synergySets":[
+            "baseTier": 10,
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "characters": [
                         "GREATMOTHERS",
                         "MORGANELSBETH",
-                        "MERRIN"
+                        "DEATHTROOPERPERIDEA"
                     ],
                     "categoryDefinitions": [
                         {
                             "include": [
                                 "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 4,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MORGANELSBETH",
+                        "DEATHTROOPERPERIDEA",
+                        "MERRIN"
+                    ]
+                },
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "CAPTAINENOCH",
+                        "DEATHTROOPERPERIDEA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MOFFGIDEONS3",
+                        "CAPTAINENOCH",
+                        "DEATHTROOPERPERIDEA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Imperial Remnant"
                             ],
                             "numberMatchesRequired": 1
                         }
