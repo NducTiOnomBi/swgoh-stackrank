@@ -1,39 +1,56 @@
-name: Sync JSON to AzDO
+name: Sync characterBaseData.json to Azure DevOps
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # allows manual triggering
+    inputs:
+      branch:
+        description: 'AzDO branch to sync'
+        default: 'dev'
   push:
-    branches: [main]
+    branches:
+      - main       # only trigger on main
     paths:
-      - "Data/characterBaseData.json"
+      - 'Data/characterBaseData.json'
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+
     steps:
+      # Step 1: Checkout the GitHub repo (source of truth)
       - name: Checkout GitHub repo
         uses: actions/checkout@v3
 
-      - name: Checkout Azure DevOps repo
+      # Step 2: Checkout the Azure DevOps repo
+      - name: Checkout AzDO repo
         uses: actions/checkout@v3
         with:
           repository: xAgentSoftware/swgoh-stackrank
           token: ${{ secrets.AZDO_PAT }}
           path: azdo_repo
-          ref: dev
+          ref: ${{ github.event.inputs.branch || 'dev' }}
 
-      - name: Commit and push changes to AzDO if any
+      # Step 3: Configure Git for commit
+      - name: Configure Git
         run: |
           cd azdo_repo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git remote set-url origin https://${AZDO_PAT}@dev.azure.com/xAgentSoftware/xas/_git/swgoh-stackrank
+
+      # Step 4: Copy the authoritative JSON file from GitHub
+      - name: Copy JSON file to AzDO
+        run: |
+          cp Data/characterBaseData.json azdo_repo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+
+      # Step 5: Commit and push only if changes exist
+      - name: Commit and push changes to AzDO
+        run: |
+          cd azdo_repo
           git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
           if ! git diff --cached --quiet; then
             git commit -m "Sync characterBaseData.json from GitHub (authoritative)"
-            git push origin dev --force
+            git push origin ${{ github.event.inputs.branch || 'dev' }} --force
           else
-            echo "No changes detected, skipping commit."
-          fi
+            echo "No changes detected; skipping commit."
         env:
           AZDO_PAT: ${{ secrets.AZDO_PAT }}
