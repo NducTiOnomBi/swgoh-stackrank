@@ -546,6 +546,10 @@
             ]
         },
         {
+            "id": "BAYLANSKOLL",
+            "baseTier": 5
+        },
+        {
             "id": "BAZEMALBUS",
             "baseTier": 14,
             "synergySets": [
@@ -821,7 +825,7 @@
                     ]
                 },
                 {
-                    "synergyEnhancement": 2,
+                    "synergyEnhancement": 3,
                     "characters": [
                         "MANDALORBOKATAN"
                     ],
@@ -830,6 +834,37 @@
                             "include": [
                                 "Light Side",
                                 "Mandalorian"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "BOOMADIER",
+            "baseTier": 11,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 1,
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "JARJARBINKS"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
                             ],
                             "numberMatchesRequired": 3
                         }
@@ -853,6 +888,37 @@
                                 "Bounty Hunter"
                             ],
                             "numberMatchesRequired": 2
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "BOSSNASS",
+            "baseTier": 11,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 1,
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "JARJARBINKS"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
                         }
                     ]
                 }
@@ -1099,6 +1165,10 @@
             ]
         },
         {
+            "id": "CAPTAINENOCH",
+            "baseTier": 10
+        },
+        {
             "id": "CAPTAINREX",
             "baseTier": 10,
             "omicronEnhancement": 1,
@@ -1153,6 +1223,37 @@
                     "synergyEnhancementOmicron": 2,
                     "characters": [
                         "SABINEWRENS3"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "CAPTAINTARPALS",
+            "baseTier": 14,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 1,
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "JARJARBINKS"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
                     ]
                 }
             ]
@@ -1762,6 +1863,10 @@
             ]
         },
         {
+            "id": "DARKREY",
+            "baseTier": 7
+        },
+        {
             "id": "DARKTROOPER",
             "baseTier": 9,
             "synergySets": [
@@ -2083,6 +2188,28 @@
                             ],
                             "exclude": [
                                 "Leader"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "DEATHTROOPERPERIDEA",
+            "baseTier": 11,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MORGANELSBETH",
+                        "MERRIN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister"
                             ],
                             "numberMatchesRequired": 1
                         }
@@ -2456,6 +2583,10 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "EZRAEXILE",
+            "baseTier": 7
         },
         {
             "id": "FENNECSHAND",
@@ -2864,6 +2995,10 @@
             ]
         },
         {
+            "id": "GENERALSYNDULLA",
+            "baseTier": 7
+        },
+        {
             "id": "GEONOSIANBROODALPHA",
             "baseTier": 8,
             "synergySets": [
@@ -2913,6 +3048,10 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "GLAHSOKATANO",
+            "baseTier": 2
         },
         {
             "baseTier": 2,
@@ -2972,11 +3111,50 @@
         },
         {
             "id": "GRANDMOFFTARKIN",
-            "baseTier": 14,
-            "requiresAllZetas": false,
-            "requiredZetas": [
-                "uniqueskill_GRANDMOFFTARKIN01"
+            "baseTier": 13,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Dark Side",
+                                "Clone Trooper"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                }
             ]
+        },
+        {
+            "id": "GREATMOTHERS",
+            "baseTier": 10,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MORGANELSBETH",
+                        "MERRIN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister",
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 1
+                        },
+                        {
+                            "include": [
+                                "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                }
+            ]
+
         },
         {
             "id": "GREEDO",
@@ -3074,6 +3252,37 @@
                             "include": [
                                 "Separatist",
                                 "Droid"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "GUNGANPHALANX",
+            "baseTier": 11,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 1,
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "JARJARBINKS"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Gungan"
                             ],
                             "numberMatchesRequired": 3
                         }
@@ -3403,6 +3612,10 @@
             ]
         },
         {
+            "id": "HUYANG",
+            "baseTier": 12
+        },
+        {
             "id": "IDENVERSIOEMPIRE",
             "baseTier": 11,
             "ignoreSynergyRequirements": {
@@ -3462,7 +3675,7 @@
             ]
         },
         {
-            "baseTier": 14,
+            "baseTier": 11,
             "id": "IG12",
             "synergySets": [
                 {
@@ -3489,6 +3702,22 @@
                                 "Mandalorian"
                             ],
                             "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MANDALORBOKATAN",
+                        "BOKATAN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Light Side",
+                                "Mandalorian"
+                            ],
+                            "numberMatchesRequired": 2
                         }
                     ]
                 }
@@ -3660,6 +3889,10 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "JARJARBINKS",
+            "baseTier": 7
         },
         {
             "id": "JAWA",
@@ -4307,6 +4540,10 @@
             ]
         },
         {
+            "id": "LUTHENRAEL",
+            "baseTier": 11
+        },
+        {
             "id": "MACEWINDU",
             "baseTier": 12,
             "synergySets": [
@@ -4461,6 +4698,46 @@
             ]
         },
         {
+            "id": "MARROK",
+            "baseTier": 9,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "BAYLANSKOLL"
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "MASTERQUIGON",
+            "baseTier": 10,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "PADAWANOBIWAN"
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "PADAWANOBIWAN",
+                        "QUEENAMIDALA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Galactic Republic",
+                                "Jedi"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "MAUL",
             "baseTier": 12,
             "synergySets": [
@@ -4496,6 +4773,28 @@
                         "NIGHTSISTERZOMBIE"
                     ],
                     "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 4,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MORGANELSBETH"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister",
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 1
+                        },
                         {
                             "include": [
                                 "Nightsister"
@@ -4587,6 +4886,48 @@
                                 "Rebel Fighter"
                             ],
                             "numberMatchesRequired": 4
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 4,
+                    "characters": [
+                        "LUTHENRAEL"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Rebel Fighter"
+                            ],
+                            "numberMatchesRequired": 3
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "MORGANELSBETH",
+            "baseTier": 8,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MERRIN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister",
+                                "Imperial Remnant"
+                            ],
+                            "numberMatchesRequired": 1
+                        },
+                        {
+                            "include": [
+                                "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
                         }
                     ]
                 }
@@ -4698,6 +5039,28 @@
             ]
         },
         {
+            "id": "NIGHTTROOPER",
+            "baseTier": 11,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "GREATMOTHERS",
+                        "MORGANELSBETH",
+                        "MERRIN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Nightsister"
+                            ],
+                            "numberMatchesRequired": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
             "id": "NINTHSISTER",
             "baseTier": 11,
             "requiresAllZetas": false,
@@ -4796,6 +5159,42 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "OMEGAS3",
+            "baseTier": 10
+        },
+        {
+            "id": "PADAWANOBIWAN",
+            "baseTier": 10,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "MASTERQUIGON"
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MASTERQUIGON",
+                        "QUEENAMIDALA"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Galactic Republic",
+                                "Jedi"
+                            ],
+                            "numberMatchesRequired": 2
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "PADAWANSABINE",
+            "baseTier": 8
         },
         {
             "id": "PADMEAMIDALA",
@@ -4953,6 +5352,22 @@
                                 "Mandalorian"
                             ],
                             "numberMatchesRequired": 3
+                        }
+                    ]
+                },
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MANDALORBOKATAN",
+                        "BOKATAN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Light Side",
+                                "Mandalorian"
+                            ],
+                            "numberMatchesRequired": 2
                         }
                     ]
                 }
@@ -5138,6 +5553,28 @@
                                 "Prepared"
                             ],
                             "numberMatchesRequired": 1
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "QUEENAMIDALA",
+            "baseTier": 9,
+            "synergySets":[
+                {
+                    "synergyEnhancement": 3,
+                    "characters": [
+                        "MASTERQUIGON",
+                        "PADAWANOBIWAN"
+                    ],
+                    "categoryDefinitions": [
+                        {
+                            "include": [
+                                "Galactic Republic",
+                                "Jedi"
+                            ],
+                            "numberMatchesRequired": 2
                         }
                     ]
                 }
@@ -5755,6 +6192,18 @@
                             ],
                             "numberMatchesRequired": 4
                         }
+                    ]
+                }
+            ]
+        },
+        {
+            "id": "SHINHATI",
+            "baseTier": 9,
+            "synergySets": [
+                {
+                    "synergyEnhancement": 2,
+                    "characters": [
+                        "BAYLANSKOLL"
                     ]
                 }
             ]
