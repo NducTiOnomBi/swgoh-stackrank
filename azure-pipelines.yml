@@ -1,3 +1,11 @@
+resources:
+  repositories:
+    - repository: gitHubRepo
+      type: github
+      name: NducTiOnomBi/swgoh-stackrank
+      endpoint: github.com_NducTiOnomBi
+
+
 trigger: none   # We use GitHub webhook, not AzDO triggers
 
 pool:
