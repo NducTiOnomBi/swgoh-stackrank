@@ -1,56 +1,50 @@
 name: Sync characterBaseData.json to Azure DevOps
 
 on:
-  workflow_dispatch: # allows manual triggering
-    inputs:
-      branch:
-        description: 'AzDO branch to sync'
-        default: 'dev'
   push:
     branches:
-      - main       # only trigger on main
+      - main
     paths:
-      - 'Data/characterBaseData.json'
+      - "Data/characterBaseData.json"
 
 jobs:
   sync:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the GitHub repo (source of truth)
       - name: Checkout GitHub repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      # Step 2: Checkout the Azure DevOps repo
-      - name: Checkout AzDO repo
-        uses: actions/checkout@v3
-        with:
-          repository: xAgentSoftware/swgoh-stackrank
-          token: ${{ secrets.AZDO_PAT }}
-          path: azdo_repo
-          ref: ${{ github.event.inputs.branch || 'dev' }}
-
-      # Step 3: Configure Git for commit
-      - name: Configure Git
+      - name: Setup SSH for Azure DevOps
         run: |
-          cd azdo_repo
+          mkdir -p ~/.ssh
+          echo "${{ secrets.AZDO_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan ssh.dev.azure.com >> ~/.ssh/known_hosts
+
+      - name: Clone Azure DevOps repo (dev branch)
+        run: |
+          git clone \
+            --branch dev \
+            git@ssh.dev.azure.com:v3/xAgentSoftware/xas/swgoh-stackrank \
+            azdo
+
+      - name: Copy updated file
+        run: |
+          cp Data/characterBaseData.json \
+             azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/
+
+      - name: Commit & Push changes
+        run: |
+          cd azdo
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-
-      # Step 4: Copy the authoritative JSON file from GitHub
-      - name: Copy JSON file to AzDO
-        run: |
-          cp Data/characterBaseData.json azdo_repo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-
-      # Step 5: Commit and push only if changes exist
-      - name: Commit and push changes to AzDO
-        run: |
-          cd azdo_repo
-          git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-          if ! git diff --cached --quiet; then
-            git commit -m "Sync characterBaseData.json from GitHub (authoritative)"
-            git push origin ${{ github.event.inputs.branch || 'dev' }} --force
-          else
-            echo "No changes detected; skipping commit."
-        env:
-          AZDO_PAT: ${{ secrets.AZDO_PAT }}
+          
+          if git diff --quiet; then
+            echo "No changes."
+            exit 0
+          fi
+          
+          git add .
+          git commit -m "Sync characterBaseData.json from GitHub main"
+          git push origin dev
