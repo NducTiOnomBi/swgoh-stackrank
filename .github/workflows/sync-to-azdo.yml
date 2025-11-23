@@ -1,6 +1,7 @@
 name: Sync characterBaseData.json to Azure DevOps
 
 on:
+  workflow_dispatch:       # <-- enables manual execution
   push:
     branches:
       - main
