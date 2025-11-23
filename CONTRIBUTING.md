@@ -29,7 +29,7 @@ This makes changes easy to parse from just reading the commit log.
 
 ## Pull requests
 Once you think that your changes are ready to be merged, open a pull request back to
-the `main` branch on `NducTiOnomBi/swgoh-stackrank`. This will notify me that the
+the `main` branch on `NducTiOnomBi/swgoh-stackrank`. This will notify the repo admin that the
 changes are ready, and will start the review process.
 
 Once a change has been committed, any changes to the characterBaseData.json will be migrated to the main repo, and a new dev build/deployment will be initiated.
