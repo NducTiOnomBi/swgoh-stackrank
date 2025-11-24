@@ -55,42 +55,39 @@ jobs:
       id: poll
       env:
         AZDO_PAT: ${{ secrets.AZDO_PAT }}
+        AZDO_ORG: ${{ secrets.AZDO_ORG }}
+        AZDO_PROJECT: ${{ secrets.AZDO_PROJECT }}
       run: |
-        echo "Polling Azure DevOps build for latest dev pipeline..."
-
-        ORG="${{ secrets.AZDO_ORG }}"
-        PROJ="${{ secrets.AZDO_PROJECT }}"
-        REPO="${{ secrets.AZDO_REPO }}"
-
-        AUTH=$(printf ":%s" "$AZDO_PAT" | base64)
-
-        # Query latest build for the dev branch
+        echo "Polling Azure DevOps build for dev branch..."
+        MAX_RETRIES=30
+        SLEEP=15
         BUILD_ID=""
-        for i in {1..30}; do
-          echo "Checking build status (attempt $i)..."
-          RESULT=$(curl -s \
-            -H "Authorization: Basic $AUTH" \
-            "https://dev.azure.com/$ORG/$PROJ/_apis/build/builds?branchName=refs/heads/dev&api-version=7.1-preview.7")
-
-          BUILD_ID=$(echo "$RESULT" | jq -r '.value[0].id')
-          STATUS=$(echo "$RESULT"  | jq -r '.value[0].status')
-          RESULT_TEXT=$(echo "$RESULT" | jq -r '.value[0].result')
-
-          echo "Build ID: $BUILD_ID status: $STATUS result: $RESULT_TEXT"
-
-          if [[ "$STATUS" == "completed" ]]; then
-            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
-            echo "build_result=$RESULT_TEXT" >> $GITHUB_OUTPUT
-            break
+        for i in $(seq 1 $MAX_RETRIES); do
+          echo "Attempt $i..."
+          RESULT=$(curl -s -u ":$AZDO_PAT" \
+            "https://dev.azure.com/$AZDO_ORG/$AZDO_PROJECT/_apis/build/builds?branchName=refs/heads/dev&$top=1&api-version=7.1-preview.7")
+    
+          echo "Raw response: $RESULT"
+    
+          BUILD_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
+          STATUS=$(echo "$RESULT" | jq -r '.value[0].status // empty')
+          RESULT_TEXT=$(echo "$RESULT" | jq -r '.value[0].result // empty')
+    
+          if [[ -n "$BUILD_ID" ]]; then
+            echo "Build ID: $BUILD_ID Status: $STATUS Result: $RESULT_TEXT"
+            if [[ "$STATUS" == "completed" ]]; then
+              echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+              echo "build_result=$RESULT_TEXT" >> $GITHUB_OUTPUT
+              exit 0
+            fi
           fi
-
-          sleep 15
+    
+          echo "Build not completed yet. Sleeping $SLEEP seconds..."
+          sleep $SLEEP
         done
-
-        if [[ -z "$BUILD_ID" ]]; then
-          echo "Timed out waiting for build to start."
-          exit 1
-        fi
+    
+        echo "Timed out waiting for build to complete"
+        exit 1
 
     # ---------------------------
     # Notify GitHub Author
