@@ -103,7 +103,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
-        COMMENT="Your update to characterBaseData.json has been deployed to the DEV environment in Azure from Build ID ${{ steps.poll.outputs.build_id }}."
+        COMMENT="Your update to characterBaseData.json has been deployed to the DEV environment in Azure from Build ID ${{ steps.poll.outputs.build_id }}. Visit https://dev-swgoh-stackrank-westus.azurewebsites.net/stackrank to validate your changes."
         curl -X POST \
           -H "Authorization: Bearer $GH_TOKEN" \
           -H "Accept: application/vnd.github+json" \
