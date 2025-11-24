@@ -3185,7 +3185,7 @@
         {
             "id": "GRANDMOFFTARKIN",
             "baseTier": 13,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "categoryDefinitions": [
@@ -3203,7 +3203,7 @@
         {
             "id": "GREATMOTHERS",
             "baseTier": 10,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "characters": [
@@ -3227,7 +3227,6 @@
                     ]
                 }
             ]
-
         },
         {
             "id": "GREEDO",
@@ -4785,7 +4784,7 @@
         {
             "id": "MASTERQUIGON",
             "baseTier": 10,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 2,
                     "characters": [
@@ -4981,7 +4980,7 @@
         {
             "id": "MORGANELSBETH",
             "baseTier": 8,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "characters": [
@@ -5280,7 +5279,7 @@
         {
             "id": "PADAWANOBIWAN",
             "baseTier": 10,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 2,
                     "characters": [
@@ -5674,7 +5673,7 @@
         {
             "id": "QUEENAMIDALA",
             "baseTier": 9,
-            "synergySets":[
+            "synergySets": [
                 {
                     "synergyEnhancement": 3,
                     "characters": [
@@ -6680,6 +6679,10 @@
                     ]
                 }
             ]
+        },
+        {
+            "id": "STORMTROOPERLUKE",
+            "baseTier": 14
         },
         {
             "id": "SUNFAC",
