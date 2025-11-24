@@ -76,6 +76,9 @@ jobs:
           BUILD_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
           STATUS=$(echo "$RESULT" | jq -r '.value[0].status // empty')
           RESULT_TEXT=$(echo "$RESULT" | jq -r '.value[0].result // empty')
+
+          echo "Current Status"
+          echo "Build ID: $BUILD_ID Status: $STATUS Result: $RESULT_TEXT"
     
           if [[ -n "$BUILD_ID" ]]; then
             echo "Build ID: $BUILD_ID Status: $STATUS Result: $RESULT_TEXT"
