@@ -302,6 +302,10 @@
             ]
         },
         {
+            "id": "ASAJJDARKDISCIPLE",
+            "baseTier": 14
+        },
+        {
             "id": "ASAJVENTRESS",
             "baseTier": 11,
             "requiresAllZetas": false,
