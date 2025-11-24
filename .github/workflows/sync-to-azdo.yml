@@ -34,24 +34,28 @@ jobs:
         cp Data/characterBaseData.json azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
 
     - name: Commit to AzDO
+      id: commit
       env:
         AZDO_PAT: ${{ secrets.AZDO_PAT }}
       run: |
         cd azdo
         git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
-
+    
         if git diff-index --quiet HEAD; then
+          echo "no_changes=true" >> $GITHUB_OUTPUT
           echo "No changes to commit"
           exit 0
         fi
-
+    
         git commit -m "Sync from GitHub commit $GITHUB_SHA by $GITHUB_ACTOR"
         git push origin dev
+        echo "no_changes=false" >> $GITHUB_OUTPUT
 
     # ---------------------------
     # Poll Azure DevOps Pipeline
     # ---------------------------
     - name: Poll AzDO pipeline
+      if: steps.commit.outputs.no_changes == 'false'
       id: poll
       env:
         AZDO_PAT: ${{ secrets.AZDO_PAT }}
@@ -93,16 +97,26 @@ jobs:
     # Notify GitHub Author
     # ---------------------------
     - name: Notify GitHub commit author
-      if: steps.poll.outputs.build_result == 'succeeded'
+      if: steps.commit.outputs.no_changes == 'false'
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         COMMENT="Your update to characterBaseData.json has been deployed to the DEV environment in Azure from Build ID ${{ steps.poll.outputs.build_id }}."
-
-        echo "$COMMENT"
-
         curl -X POST \
           -H "Authorization: Bearer $GH_TOKEN" \
           -H "Accept: application/vnd.github+json" \
           https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
           -d "{\"body\": \"$COMMENT\"}"
+    
+    - name: Notify GitHub for no changes
+      if: steps.commit.outputs.no_changes == 'true'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        COMMENT="No changes to characterBaseData.json — nothing to deploy."
+        curl -X POST \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
+          -d "{\"body\": \"$COMMENT\"}"
+
