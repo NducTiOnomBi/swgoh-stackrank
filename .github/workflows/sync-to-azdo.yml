@@ -56,7 +56,7 @@ jobs:
     # ---------------------------
     - name: Poll AzDO pipeline
       id: poll
-      # if: steps.commit.outputs.no_changes == 'false'
+      if: steps.commit.outputs.no_changes == 'false'
       env:
         AZDO_PAT: ${{ secrets.AZDO_PAT }}
         AZDO_ORG: ${{ secrets.AZDO_ORG }}
