@@ -55,7 +55,7 @@ jobs:
     # Poll Azure DevOps Pipeline
     # ---------------------------
     - name: Poll AzDO pipeline
-      if: steps.commit.outputs.no_changes == 'false'
+      # if: steps.commit.outputs.no_changes == 'false'
       id: poll
       env:
         AZDO_PAT: ${{ secrets.AZDO_PAT }}
