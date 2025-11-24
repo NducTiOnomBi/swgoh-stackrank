@@ -7305,6 +7305,10 @@
             ]
         },
         {
+            "id": "YODACHEWBACCA",
+            "baseTier": 14
+        },
+        {
             "id": "YOUNGCHEWBACCA",
             "baseTier": 11,
             "categories": [
