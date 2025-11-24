@@ -1,10 +1,9 @@
 name: Sync characterBaseData.json to Azure DevOps
 
 on:
-  workflow_dispatch:       # <-- enables manual execution
+  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
     paths:
       - "Data/characterBaseData.json"
 
@@ -13,39 +12,100 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout GitHub repo
-        uses: actions/checkout@v4
+    - name: Checkout GitHub repo
+      uses: actions/checkout@v4
 
-      - name: Setup SSH for Azure DevOps
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.AZDO_SSH_KEY }}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan ssh.dev.azure.com >> ~/.ssh/known_hosts
+    - name: Configure Git
+      run: |
+        git config --global user.name "${GITHUB_ACTOR}"
+        git config --global user.email "${GITHUB_ACTOR}@users.noreply.github.com"
 
-      - name: Clone Azure DevOps repo (dev branch)
-        run: |
-          git clone \
-            --branch dev \
-            git@ssh.dev.azure.com:v3/xAgentSoftware/xas/swgoh-stackrank \
-            azdo
+    - name: Clone Azure DevOps dev branch
+      env:
+        AZDO_PAT: ${{ secrets.AZDO_PAT }}
+      run: |
+        git clone \
+          --branch dev \
+          https://:${AZDO_PAT}@dev.azure.com/${{ secrets.AZDO_ORG }}/${{ secrets.AZDO_PROJECT }}/_git/${{ secrets.AZDO_REPO }} \
+          azdo
 
-      - name: Copy updated file
-        run: |
-          cp Data/characterBaseData.json \
-             azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/
+    - name: Copy file into AzDO repo
+      run: |
+        cp Data/characterBaseData.json azdo/swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
 
-      - name: Commit & Push changes
-        run: |
-          cd azdo
-          git config user.name "GitHub Actions"
-          git config user.email "actions@github.com"
-          
-          if git diff --quiet; then
-            echo "No changes."
-            exit 0
+    - name: Commit to AzDO
+      env:
+        AZDO_PAT: ${{ secrets.AZDO_PAT }}
+      run: |
+        cd azdo
+        git add swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+
+        if git diff-index --quiet HEAD; then
+          echo "No changes to commit"
+          exit 0
+        fi
+
+        git commit -m "Sync from GitHub commit $GITHUB_SHA by $GITHUB_ACTOR"
+        git push origin dev
+
+    # ---------------------------
+    # Poll Azure DevOps Pipeline
+    # ---------------------------
+    - name: Poll AzDO pipeline
+      id: poll
+      env:
+        AZDO_PAT: ${{ secrets.AZDO_PAT }}
+      run: |
+        echo "Polling Azure DevOps build for latest dev pipeline..."
+
+        ORG="${{ secrets.AZDO_ORG }}"
+        PROJ="${{ secrets.AZDO_PROJECT }}"
+        REPO="${{ secrets.AZDO_REPO }}"
+
+        AUTH=$(printf ":%s" "$AZDO_PAT" | base64)
+
+        # Query latest build for the dev branch
+        BUILD_ID=""
+        for i in {1..30}; do
+          echo "Checking build status (attempt $i)..."
+          RESULT=$(curl -s \
+            -H "Authorization: Basic $AUTH" \
+            "https://dev.azure.com/$ORG/$PROJ/_apis/build/builds?branchName=refs/heads/dev&api-version=7.1-preview.7")
+
+          BUILD_ID=$(echo "$RESULT" | jq -r '.value[0].id')
+          STATUS=$(echo "$RESULT"  | jq -r '.value[0].status')
+          RESULT_TEXT=$(echo "$RESULT" | jq -r '.value[0].result')
+
+          echo "Build ID: $BUILD_ID status: $STATUS result: $RESULT_TEXT"
+
+          if [[ "$STATUS" == "completed" ]]; then
+            echo "build_id=$BUILD_ID" >> $GITHUB_OUTPUT
+            echo "build_result=$RESULT_TEXT" >> $GITHUB_OUTPUT
+            break
           fi
-          
-          git add .
-          git commit -m "Sync characterBaseData.json from GitHub main"
-          git push origin dev
+
+          sleep 15
+        done
+
+        if [[ -z "$BUILD_ID" ]]; then
+          echo "Timed out waiting for build to start."
+          exit 1
+        fi
+
+    # ---------------------------
+    # Notify GitHub Author
+    # ---------------------------
+    - name: Notify GitHub commit author
+      if: steps.poll.outputs.build_result == 'succeeded'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        COMMENT="Your update to characterBaseData.json has been deployed to the DEV environment in Azure from Build ID ${{ steps.poll.outputs.build_id }}."
+
+        echo "$COMMENT"
+
+        curl -X POST \
+          -H "Authorization: Bearer $GH_TOKEN" \
+          -H "Accept: application/vnd.github+json" \
+          https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
+          -d "{\"body\": \"$COMMENT\"}"
