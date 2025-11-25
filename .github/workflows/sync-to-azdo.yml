@@ -1,7 +1,7 @@
 name: Sync characterBaseData.json to Azure DevOps
 
 permissions:
-    contents: read
+    contents: write
 
 concurrency:
     group: sync-azdo-main
@@ -100,12 +100,37 @@ jobs:
                   echo "no_changes=false" >> $GITHUB_OUTPUT
                   echo "::endgroup::"
 
+            - name: Notify GitHub for no changes
+              if: steps.commit.outputs.no_changes == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  COMMENT="ℹ️ No changes to characterBaseData.json — nothing to deploy."
+                  curl -X POST \
+                    -H "Authorization: Bearer $GH_TOKEN" \
+                    -H "Accept: application/vnd.github+json" \
+                    https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
+                    -d "{\"body\": \"$COMMENT\"}"
+
+        outputs:
+            no_changes: ${{ steps.commit.outputs.no_changes }}
+
+    poll-and-notify:
+        runs-on: ubuntu-latest
+        timeout-minutes: 20
+        needs: sync
+        if: needs.sync.outputs.no_changes == 'false'
+
+        env:
+            AZDO_ORG: ${{ secrets.AZDO_ORG }}
+            AZDO_PROJECT: ${{ secrets.AZDO_PROJECT }}
+
+        steps:
             # ---------------------------
             # Poll Azure DevOps Build Pipeline
             # ---------------------------
             - name: Poll AzDO Build Pipeline
               id: poll_build
-              if: steps.commit.outputs.no_changes == 'false'
               env:
                   AZDO_PAT: ${{ secrets.AZDO_PAT }}
               run: |
@@ -176,7 +201,6 @@ jobs:
             # ---------------------------
             - name: Poll AzDO Release Pipeline
               id: poll_release
-              if: steps.commit.outputs.no_changes == 'false'
               env:
                   AZDO_PAT: ${{ secrets.AZDO_PAT }}
               run: |
@@ -262,7 +286,7 @@ jobs:
             # Notify GitHub Author
             # ---------------------------
             - name: Notify GitHub commit author - Success
-              if: steps.commit.outputs.no_changes == 'false' && success()
+              if: success()
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
@@ -291,7 +315,7 @@ jobs:
                     -d "{\"body\": $(echo "$COMMENT" | jq -Rs .)}"
 
             - name: Notify GitHub commit author - Failure
-              if: steps.commit.outputs.no_changes == 'false' && failure()
+              if: failure()
               env:
                   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               run: |
@@ -326,15 +350,3 @@ jobs:
                     -H "Accept: application/vnd.github+json" \
                     https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
                     -d "{\"body\": $(echo "$COMMENT" | jq -Rs .)}"
-
-            - name: Notify GitHub for no changes
-              if: steps.commit.outputs.no_changes == 'true'
-              env:
-                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-              run: |
-                  COMMENT="ℹ️ No changes to characterBaseData.json — nothing to deploy."
-                  curl -X POST \
-                    -H "Authorization: Bearer $GH_TOKEN" \
-                    -H "Accept: application/vnd.github+json" \
-                    https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/comments \
-                    -d "{\"body\": \"$COMMENT\"}"
