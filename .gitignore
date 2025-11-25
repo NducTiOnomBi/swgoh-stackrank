@@ -1,0 +1,60 @@
+# Output folders
+c:\output/
+output/
+
+# Excel files (except those explicitly tracked)
+*.xlsx
+!Data/characterBaseData.xlsx
+~$*.xlsx
+
+# Visual Studio / VSCode
+.vs/
+.vscode/settings.json
+.vscode/.ropeproject/
+*.code-workspace
+
+# PowerShell
+*.ps1.bak
+*.psm1.bak
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# Editor temp files
+*~
+*.swp
+*.swo
+.*.swp
+.*.swo
+
+# Logs
+*.log
+
+# Node modules (if any tooling added)
+node_modules/
+package-lock.json
+
+# Python cache (if any tooling added)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Temporary files
+*.tmp
+*.temp
+
+# Backup files
+*.bak
+*.backup
