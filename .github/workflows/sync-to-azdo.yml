@@ -189,7 +189,7 @@ jobs:
                   SLEEP=15
 
                   echo "Polling for release triggered by build ID: $BUILD_ID"
-                  echo "Release URL: https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
+                  echo "Release URL: https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
@@ -198,10 +198,12 @@ jobs:
                     RESULT=$(curl -s -u ":$AZDO_PAT" \
                       "https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview")
                     
-                    echo "$RESULT"
+                    echo "Result: $RESULT"
 
                     # Get the most recent release for this build
                     RELEASE_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
+
+                    echo "Release ID: $RELEASE_ID"
                     
                     if [[ -n "$RELEASE_ID" ]]; then
                       echo "Release ID: $RELEASE_ID"
