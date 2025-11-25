@@ -189,24 +189,24 @@ jobs:
                   SLEEP=15
 
                   echo "Polling for release triggered by build ID: $BUILD_ID"
-                  echo "Release URL: https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
+                  RELEASE_DEFINITION_ID=2
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
                     
-                    # Query releases filtered by build artifact version ID
+                    # Query recent releases for the release definition, sorted by creation time descending
                     RESULT=$(curl -s -u ":$AZDO_PAT" \
-                      "https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview")
+                      "https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?definitionId=${RELEASE_DEFINITION_ID}&\$expand=environments&\$top=10&api-version=7.1-preview")
                     
-                    echo "Result: $RESULT"
-
-                    # Get the most recent release for this build
-                    RELEASE_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
-
-                    echo "Release ID: $RELEASE_ID"
+                    # Debug: Show count of releases returned
+                    RELEASE_COUNT=$(echo "$RESULT" | jq -r '.count // 0')
+                    echo "Found $RELEASE_COUNT release(s) for definition $RELEASE_DEFINITION_ID"
+                    
+                    # Find release that has our build ID in its artifacts
+                    RELEASE_ID=$(echo "$RESULT" | jq -r ".value[] | select(.artifacts[]?.definitionReference?.version?.id == \"$BUILD_ID\") | .id" | head -1)
                     
                     if [[ -n "$RELEASE_ID" ]]; then
-                      echo "Release ID: $RELEASE_ID"
+                      echo "✓ Found Release ID: $RELEASE_ID for Build ID: $BUILD_ID"
                       
                       # Check all environment statuses
                       ENV_STATUSES=$(echo "$RESULT" | jq -r '.value[0].environments[].status')
