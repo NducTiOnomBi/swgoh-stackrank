@@ -7162,6 +7162,10 @@
             ]
         },
         {
+            "id": "VADERDUELSEND",
+            "baseTier": 14
+        },
+        {
             "id": "VEERS",
             "baseTier": 11,
             "synergySets": [
