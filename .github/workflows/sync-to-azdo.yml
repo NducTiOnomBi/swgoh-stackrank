@@ -105,7 +105,7 @@ jobs:
             # ---------------------------
             - name: Poll AzDO Build Pipeline
               id: poll_build
-              # if: steps.commit.outputs.no_changes == 'false'
+              if: steps.commit.outputs.no_changes == 'false'
               env:
                   AZDO_PAT: ${{ secrets.AZDO_PAT }}
               run: |
@@ -176,7 +176,7 @@ jobs:
             # ---------------------------
             - name: Poll AzDO Release Pipeline
               id: poll_release
-              #if: steps.commit.outputs.no_changes == 'false'
+              if: steps.commit.outputs.no_changes == 'false'
               env:
                   AZDO_PAT: ${{ secrets.AZDO_PAT }}
               run: |
@@ -189,15 +189,17 @@ jobs:
                   SLEEP=15
 
                   echo "Polling for release triggered by build ID: $BUILD_ID"
-                  echo "Release URL: https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
+                  echo "Release URL: https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
                     
                     # Query releases filtered by build artifact version ID
                     RESULT=$(curl -s -u ":$AZDO_PAT" \
-                      "https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview")
+                      "https://vsrm.dev.azure.com/xAgentSoftware/xas/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview")
                     
+                    echo "$RESULT"
+
                     # Get the most recent release for this build
                     RELEASE_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
                     
