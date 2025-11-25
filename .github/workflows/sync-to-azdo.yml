@@ -189,14 +189,13 @@ jobs:
                   SLEEP=15
 
                   echo "Polling for release triggered by build ID: $BUILD_ID"
-                  RELEASE_DEFINITION_ID=2
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
                     
-                    # Query recent releases for the release definition, sorted by creation time descending
+                    # Query releases filtered by artifactVersionId (build ID) - this parameter already filters to the correct release
                     RESULT=$(curl -s -w "\nHTTP_CODE:%{http_code}" -u ":$AZDO_PAT" \
-                      "https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?definitionId=${RELEASE_DEFINITION_ID}&\$expand=environments&\$top=10&api-version=7.1-preview")
+                      "https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview")
                     
                     # Extract HTTP code and JSON response
                     HTTP_CODE=$(echo "$RESULT" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2)
@@ -204,28 +203,18 @@ jobs:
                     
                     echo "API Response Code: $HTTP_CODE"
                     
-                    # Debug: Show count of releases returned
-                    RELEASE_COUNT=$(echo "$JSON_RESULT" | jq -r '.count // "null"')
-                    VALUE_LENGTH=$(echo "$JSON_RESULT" | jq -r '.value | length // 0')
-                    echo "API returned: count=$RELEASE_COUNT, value array length=$VALUE_LENGTH"
+                    # Check if a release was found
+                    RELEASE_COUNT=$(echo "$JSON_RESULT" | jq -r '.count // 0')
+                    echo "Found $RELEASE_COUNT release(s) for build $BUILD_ID"
                     
-                    # If no releases found, show first few releases with their build IDs for debugging
-                    if [[ "$VALUE_LENGTH" -gt 0 ]]; then
-                      echo "Recent releases and their build IDs:"
-                      echo "$JSON_RESULT" | jq -r '.value[] | "  Release \(.id): Build \(.artifacts[]?.definitionReference?.version?.id // "unknown")"' | head -5
-                    fi
-                    
-                    # Find release that has our build ID in its artifacts
-                    RELEASE_ID=$(echo "$JSON_RESULT" | jq -r ".value[] | select(.artifacts[]?.definitionReference?.version?.id == \"$BUILD_ID\") | .id" | head -1)
+                    # Get the release ID (artifactVersionId parameter ensures this is the right release)
+                    RELEASE_ID=$(echo "$JSON_RESULT" | jq -r '.value[0].id // empty')
                     
                     if [[ -n "$RELEASE_ID" ]]; then
-                      echo "✓ Found Release ID: $RELEASE_ID for Build ID: $BUILD_ID"
-                      
-                      # Get the full release object that matches our release ID
-                      RELEASE_DATA=$(echo "$JSON_RESULT" | jq ".value[] | select(.id == $RELEASE_ID)")
+                      echo "✓ Found Release ID: $RELEASE_ID"
                       
                       # Check all environment statuses
-                      ENV_STATUSES=$(echo "$RELEASE_DATA" | jq -r '.environments[].status')
+                      ENV_STATUSES=$(echo "$JSON_RESULT" | jq -r '.value[0].environments[].status')
                       
                       # Check if all environments succeeded
                       ALL_SUCCEEDED=true
