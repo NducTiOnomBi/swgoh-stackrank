@@ -189,6 +189,7 @@ jobs:
                   SLEEP=15
 
                   echo "Polling for release triggered by build ID: $BUILD_ID"
+                  echo "Release URL: https://vsrm.dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/release/releases?\$expand=environments&artifactVersionId=${BUILD_ID}&api-version=7.1-preview"
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
