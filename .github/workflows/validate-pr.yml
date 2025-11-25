@@ -1,0 +1,247 @@
+name: Validate Character Base Data
+
+on:
+    pull_request:
+        branches: [main]
+        paths:
+            - "Data/characterBaseData.json"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    pull-requests: write
+
+jobs:
+    validate:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Setup Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "20"
+
+            - name: Install ajv-cli for schema validation
+              run: npm install -g ajv-cli ajv-formats
+
+            - name: Validate JSON syntax
+              run: |
+                  echo "::group::Validating JSON syntax"
+                  if ! jq empty Data/characterBaseData.json; then
+                    echo "::error::Invalid JSON syntax in characterBaseData.json"
+                    exit 1
+                  fi
+                  echo "✓ Valid JSON syntax"
+                  echo "::endgroup::"
+
+            - name: Validate against JSON schema
+              run: |
+                  echo "::group::Validating against schema"
+                  ajv validate \
+                    -s Data/characterBaseData.schema.json \
+                    -d Data/characterBaseData.json \
+                    --strict=false \
+                    --all-errors
+                  echo "✓ Schema validation passed"
+                  echo "::endgroup::"
+
+            - name: Check alphabetical sorting
+              run: |
+                  echo "::group::Checking alphabetical sorting"
+
+                  # Extract character IDs in order
+                  ACTUAL_ORDER=$(jq -r '.characterBaseData[].id' Data/characterBaseData.json)
+
+                  # Sort them alphabetically
+                  EXPECTED_ORDER=$(echo "$ACTUAL_ORDER" | sort)
+
+                  # Compare
+                  if [ "$ACTUAL_ORDER" != "$EXPECTED_ORDER" ]; then
+                    echo "::error::Characters are not sorted alphabetically by ID"
+                    echo "Expected order vs Actual order (first differences):"
+                    diff <(echo "$EXPECTED_ORDER") <(echo "$ACTUAL_ORDER") | head -20
+                    exit 1
+                  fi
+
+                  echo "✓ Characters are sorted alphabetically"
+                  echo "::endgroup::"
+
+            - name: Check for duplicate IDs
+              run: |
+                  echo "::group::Checking for duplicate character IDs"
+
+                  DUPLICATES=$(jq -r '.characterBaseData[].id' Data/characterBaseData.json | sort | uniq -d)
+
+                  if [ -n "$DUPLICATES" ]; then
+                    echo "::error::Found duplicate character IDs:"
+                    echo "$DUPLICATES"
+                    exit 1
+                  fi
+
+                  echo "✓ No duplicate character IDs found"
+                  echo "::endgroup::"
+
+            - name: Validate tier ranges
+              run: |
+                  echo "::group::Validating tier ranges (1-19)"
+
+                  INVALID_TIERS=$(jq -r '.characterBaseData[] | select(.baseTier < 1 or .baseTier > 19) | "\(.id): \(.baseTier)"' Data/characterBaseData.json)
+
+                  if [ -n "$INVALID_TIERS" ]; then
+                    echo "::error::Found characters with invalid tier values (must be 1-19):"
+                    echo "$INVALID_TIERS"
+                    exit 1
+                  fi
+
+                  echo "✓ All tier values are within valid range (1-19)"
+                  echo "::endgroup::"
+
+            - name: Validate synergy enhancements
+              run: |
+                  echo "::group::Validating synergy enhancement requirements"
+
+                  # Check that each synergy set has at least one enhancement type
+                  MISSING_ENHANCEMENTS=$(jq -r '.characterBaseData[] | select(.synergySets != null) | .id as $id | .synergySets[] | select(.synergyEnhancement == null and .synergyEnhancementOmicron == null) | $id' Data/characterBaseData.json | uniq)
+
+                  if [ -n "$MISSING_ENHANCEMENTS" ]; then
+                    echo "::error::Found synergy sets without synergyEnhancement or synergyEnhancementOmicron:"
+                    echo "$MISSING_ENHANCEMENTS"
+                    exit 1
+                  fi
+
+                  # Check synergyEnhancement ranges (0-10)
+                  INVALID_SYNERGIES=$(jq -r '.characterBaseData[] | select(.synergySets != null) | .id as $id | .synergySets[] | select(.synergyEnhancement != null) | select(.synergyEnhancement < 0 or .synergyEnhancement > 10) | "\($id): \(.synergyEnhancement)"' Data/characterBaseData.json)
+
+                  if [ -n "$INVALID_SYNERGIES" ]; then
+                    echo "::error::Found synergy sets with invalid synergyEnhancement values (must be 0-10):"
+                    echo "$INVALID_SYNERGIES"
+                    exit 1
+                  fi
+
+                  # Check synergyEnhancementOmicron ranges (0-10)
+                  INVALID_OMICRON_SYNERGIES=$(jq -r '.characterBaseData[] | select(.synergySets != null) | .id as $id | .synergySets[] | select(.synergyEnhancementOmicron != null) | select(.synergyEnhancementOmicron < 0 or .synergyEnhancementOmicron > 10) | "\($id): \(.synergyEnhancementOmicron)"' Data/characterBaseData.json)
+
+                  if [ -n "$INVALID_OMICRON_SYNERGIES" ]; then
+                    echo "::error::Found synergy sets with invalid synergyEnhancementOmicron values (must be 0-10):"
+                    echo "$INVALID_OMICRON_SYNERGIES"
+                    exit 1
+                  fi
+
+                  echo "✓ All synergy sets have required enhancement types and valid ranges (0-10)"
+                  echo "::endgroup::"
+
+            - name: Validate character cross-references
+              run: |
+                  echo "::group::Validating character cross-references"
+
+                  # Extract all valid character IDs
+                  VALID_IDS=$(jq -r '.characterBaseData[].id' Data/characterBaseData.json | sort)
+
+                  # Create a temporary file with valid IDs for lookup
+                  echo "$VALID_IDS" > /tmp/valid_character_ids.txt
+
+                  # Extract all referenced character IDs from synergy sets
+                  REFERENCED_IDS=$(jq -r '.characterBaseData[] | select(.synergySets != null) | .synergySets[] | select(.characters != null) | .characters[]' Data/characterBaseData.json | sort | uniq)
+
+                  # Check for invalid references
+                  INVALID_REFS=""
+                  for ref_id in $REFERENCED_IDS; do
+                    if ! grep -q "^${ref_id}$" /tmp/valid_character_ids.txt; then
+                      # Find which character(s) reference this invalid ID
+                      REFERENCING_CHARS=$(jq -r --arg ref "$ref_id" '.characterBaseData[] | select(.synergySets != null) | select(.synergySets[].characters[]? == $ref) | .id' Data/characterBaseData.json)
+                      INVALID_REFS="${INVALID_REFS}Invalid reference '$ref_id' found in character(s): ${REFERENCING_CHARS}\n"
+                    fi
+                  done
+
+                  if [ -n "$INVALID_REFS" ]; then
+                    echo "::error::Found invalid character references in synergy sets:"
+                    echo -e "$INVALID_REFS"
+                    exit 1
+                  fi
+
+                  echo "✓ All character references are valid"
+                  echo "::endgroup::"
+
+            - name: Check JSON formatting (2-space indentation)
+              run: |
+                  echo "::group::Checking JSON formatting"
+
+                  # Create properly formatted version
+                  jq --indent 2 --sort-keys '.' Data/characterBaseData.json > /tmp/formatted.json
+
+                  # Compare with original (ignore key sorting, just check structure)
+                  if ! jq --indent 2 '.' Data/characterBaseData.json | diff -q - <(jq --indent 2 '.' /tmp/formatted.json) > /dev/null; then
+                    echo "::warning::JSON formatting could be improved (should use 2-space indentation)"
+                    echo "Consider running: jq --indent 2 '.' Data/characterBaseData.json > temp.json && mv temp.json Data/characterBaseData.json"
+                  else
+                    echo "✓ JSON formatting looks good"
+                  fi
+
+                  echo "::endgroup::"
+
+            - name: Generate validation report
+              if: always()
+              run: |
+                  echo "::group::Validation Summary"
+
+                  TOTAL_CHARS=$(jq '.characterBaseData | length' Data/characterBaseData.json)
+                  CHARS_WITH_SYNERGIES=$(jq '[.characterBaseData[] | select(.synergySets != null)] | length' Data/characterBaseData.json)
+                  TOTAL_SYNERGY_SETS=$(jq '[.characterBaseData[].synergySets[]? ] | length' Data/characterBaseData.json)
+
+                  echo "📊 Statistics:"
+                  echo "  Total characters: $TOTAL_CHARS"
+                  echo "  Characters with synergies: $CHARS_WITH_SYNERGIES"
+                  echo "  Total synergy sets: $TOTAL_SYNERGY_SETS"
+                  echo ""
+
+                  echo "📈 Tier distribution:"
+                  jq -r '.characterBaseData | group_by(.baseTier) | .[] | "  Tier \(.[0].baseTier): \(length) characters"' Data/characterBaseData.json
+
+                  echo "::endgroup::"
+
+            - name: Comment on PR with validation results
+              if: github.event_name == 'pull_request'
+              uses: actions/github-script@v7
+              with:
+                  script: |
+                      const fs = require('fs');
+                      const data = JSON.parse(fs.readFileSync('Data/characterBaseData.json', 'utf8'));
+
+                      const totalChars = data.characterBaseData.length;
+                      const charsWithSynergies = data.characterBaseData.filter(c => c.synergySets).length;
+                      const totalSynergySets = data.characterBaseData.reduce((sum, c) => sum + (c.synergySets?.length || 0), 0);
+
+                      const tierDist = {};
+                      data.characterBaseData.forEach(c => {
+                        tierDist[c.baseTier] = (tierDist[c.baseTier] || 0) + 1;
+                      });
+
+                      const tierDistText = Object.keys(tierDist)
+                        .sort((a, b) => a - b)
+                        .map(tier => `  - Tier ${tier}: ${tierDist[tier]} character(s)`)
+                        .join('\n');
+
+                      const comment = `## ✅ Character Base Data Validation Passed
+
+                      **Validation Summary:**
+                      - Total characters: ${totalChars}
+                      - Characters with synergies: ${charsWithSynergies}
+                      - Total synergy sets: ${totalSynergySets}
+
+                      **Tier Distribution:**
+                      ${tierDistText}
+
+                      All validation checks passed! The data is ready to be merged.
+
+                      ---
+                      Once merged to \`main\`, this will trigger automatic deployment to the DEV environment in Azure.`;
+
+                      github.rest.issues.createComment({
+                        issue_number: context.issue.number,
+                        owner: context.repo.owner,
+                        repo: context.repo.repo,
+                        body: comment
+                      });
