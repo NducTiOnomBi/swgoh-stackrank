@@ -122,23 +122,30 @@ jobs:
                   SOURCE_SHA="${{ github.sha }}"
                   BUILD_DEFINITION_ID=2
 
-                  echo "Polling for build with sourceVersion: $SOURCE_SHA"
+                  echo "Polling for build triggered after push (GitHub commit: $SOURCE_SHA)"
+
+                  # Get timestamp of when we pushed (for filtering builds)
+                  PUSH_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+                  echo "Push completed at: $PUSH_TIME"
 
                   for i in $(seq 1 $MAX_RETRIES); do
                     echo "Attempt $i/$MAX_RETRIES..."
                     
-                    # Query builds filtered by definition ID and branch
+                    # Query builds filtered by definition ID and branch, ordered by queue time descending
                     RESULT=$(curl -s -u ":$AZDO_PAT" \
-                      "https://dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/build/builds?definitions=${BUILD_DEFINITION_ID}&branchName=refs/heads/dev&api-version=7.1-preview.7")
+                      "https://dev.azure.com/${AZDO_ORG}/${AZDO_PROJECT}/_apis/build/builds?definitions=${BUILD_DEFINITION_ID}&branchName=refs/heads/dev&queryOrder=queueTimeDescending&api-version=7.1-preview.7")
                     
-                    # Find build matching our commit SHA
-                    BUILD_ID=$(echo "$RESULT" | jq -r ".value[] | select(.sourceVersion == \"$SOURCE_SHA\") | .id" | head -1)
+                    # Get the most recent build (first in the list)
+                    BUILD_ID=$(echo "$RESULT" | jq -r '.value[0].id // empty')
                     
                     if [[ -n "$BUILD_ID" ]]; then
-                      STATUS=$(echo "$RESULT" | jq -r ".value[] | select(.id == $BUILD_ID) | .status")
-                      RESULT_TEXT=$(echo "$RESULT" | jq -r ".value[] | select(.id == $BUILD_ID) | .result")
+                      STATUS=$(echo "$RESULT" | jq -r '.value[0].status // empty')
+                      RESULT_TEXT=$(echo "$RESULT" | jq -r '.value[0].result // empty')
+                      SOURCE_VERSION=$(echo "$RESULT" | jq -r '.value[0].sourceVersion // empty')
+                      QUEUE_TIME=$(echo "$RESULT" | jq -r '.value[0].queueTime // empty')
                       
                       echo "Build ID: $BUILD_ID | Status: $STATUS | Result: $RESULT_TEXT"
+                      echo "  Queue Time: $QUEUE_TIME | Source Version: $SOURCE_VERSION"
                       
                       if [[ "$STATUS" == "completed" ]]; then
                         if [[ "$RESULT_TEXT" == "succeeded" ]]; then
@@ -153,7 +160,7 @@ jobs:
                         fi
                       fi
                     else
-                      echo "Build not found yet for commit $SOURCE_SHA"
+                      echo "No builds found yet for definition $BUILD_DEFINITION_ID on dev branch"
                     fi
                     
                     echo "Sleeping $SLEEP seconds..."
