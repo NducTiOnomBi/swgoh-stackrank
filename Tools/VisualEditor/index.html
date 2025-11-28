@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SWGOH StackRank - Visual Editor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1>SWGOH StackRank Visual Editor</h1>
+                <div class="header-actions">
+                    <button id="btnAddCharacter" class="btn btn-success">
+                        <span class="icon">+</span> Add Character
+                    </button>
+                    <button id="btnValidate" class="btn btn-secondary">
+                        <span class="icon">✓</span> Validate
+                    </button>
+                    <button id="btnExport" class="btn btn-secondary">
+                        <span class="icon">⬇</span> Export JSON
+                    </button>
+                    <button id="btnSave" class="btn btn-primary">
+                        <span class="icon">💾</span> Save Changes
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="app-main">
+            <!-- Left Sidebar: Character Details -->
+            <aside class="sidebar sidebar-left collapsed">
+                <div class="sidebar-header">
+                    <h2>Character Details</h2>
+                    <button class="sidebar-toggle" id="toggleLeftSidebar" aria-label="Toggle Character Details" aria-expanded="false">
+                        <span class="toggle-icon">◀</span>
+                    </button>
+                </div>
+                <div class="sidebar-content" id="characterDetails">
+                    <div class="empty-state">
+                        <p>Select a character to view details</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center: Tier Grid -->
+            <section class="tier-grid-container">
+                <div class="tier-grid-header">
+                    <h2>Tier Grid</h2>
+                    <div class="view-controls">
+                        <label>
+                            <input type="checkbox" id="chkIncludeSynergy">
+                            Include Synergy
+                        </label>
+                        <label>
+                            <input type="checkbox" id="chkIncludeOmicron">
+                            Include Omicron
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="tier-grid" id="tierGrid">
+                    <!-- Tier columns will be generated dynamically -->
+                </div>
+
+                <div class="loading-overlay" id="loadingOverlay">
+                    <div class="spinner"></div>
+                    <p>Loading character data...</p>
+                </div>
+            </section>
+
+            <!-- Right Sidebar: Synergy Editor -->
+            <aside class="sidebar sidebar-right collapsed">
+                <div class="sidebar-header">
+                    <h2>Synergy Sets</h2>
+                    <button class="sidebar-toggle" id="toggleRightSidebar" aria-label="Toggle Synergy Sets" aria-expanded="false">
+                        <span class="toggle-icon">▶</span>
+                    </button>
+                </div>
+                <div class="sidebar-content" id="synergyEditor">
+                    <div class="empty-state">
+                        <p>Select a character to edit synergies</p>
+                    </div>
+                </div>
+            </aside>
+        </main>
+
+        <!-- Status Bar -->
+        <footer class="status-bar">
+            <div class="status-left">
+                <span id="statusMessage">Ready</span>
+            </div>
+            <div class="status-right">
+                <span id="characterCount">0 characters</span>
+                <span class="separator">|</span>
+                <span id="validationStatus">Not validated</span>
+            </div>
+        </footer>
+
+        <!-- Modal: Validation Results -->
+        <div id="validationModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Validation Results</h3>
+                    <button class="modal-close" onclick="closeValidationModal()">&times;</button>
+                </div>
+                <div class="modal-body" id="validationResults">
+                    <!-- Validation results will be inserted here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeValidationModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tooltip for tier calculations -->
+        <div id="tierTooltip" class="tier-tooltip" style="display: none;">
+            <div class="tooltip-content"></div>
+        </div>
+    </div>
+
+    <script src="editor.js"></script>
+</body>
+</html>

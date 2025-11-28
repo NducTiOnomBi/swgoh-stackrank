@@ -196,8 +196,8 @@ foreach ($character in $characterBaseDataItems) {
                     if ($synergySet.characters -isnot [System.Array]) {
                         $fieldErrors += "[$charId] Synergy set #$synergyIndex 'characters' must be an array"
                     }
-                    elseif ($synergySet.characters.Count -eq 0) {
-                        $validationWarnings += "[$charId] Synergy set #$synergyIndex 'characters' array is empty"
+                    elseif ($synergySet.characters.Count -lt 1 -or $synergySet.characters.Count -gt 4) {
+                        $fieldErrors += "[$charId] Synergy set #$synergyIndex 'characters' array must contain between 1 and 4 elements (found: $($synergySet.characters.Count))"
                     }
                 }
                 
@@ -229,6 +229,24 @@ foreach ($character in $characterBaseDataItems) {
                             }
                         }
                     }
+                }
+
+                # Validate total characters referenced in synergy set does not exceed 4
+                $totalCharactersInSet = 0
+                if ($synergySet.characters) {
+                    $totalCharactersInSet += $synergySet.characters.Count
+                }
+
+                if ($synergySet.categoryDefinitions) {
+                    foreach ($catDef in $synergySet.categoryDefinitions) {
+                        if ($catDef.include) {
+                            $totalCharactersInSet += $catDef.numberMatchesRequired
+                        }
+                    }
+                }
+
+                if ($totalCharactersInSet -lt 1 -or $totalCharactersInSet -gt 4) {
+                    $fieldErrors += "[$charId] Synergy set #$synergyIndex must reference between 1 and 4 total characters (found: $totalCharactersInSet)"
                 }
             }
         }

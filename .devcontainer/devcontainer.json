@@ -1,0 +1,38 @@
+{
+    "name": "SWGOH StackRank Development",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    
+    "features": {
+        "ghcr.io/devcontainers/features/powershell:1": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts"
+        }
+    },
+    
+    "forwardPorts": [8080],
+    
+    "portsAttributes": {
+        "8080": {
+            "label": "Visual Editor",
+            "onAutoForward": "openBrowser"
+        }
+    },
+    
+    "postCreateCommand": "npm install -g ajv-cli ajv-formats",
+    
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.powershell",
+                "ms-vscode.vscode-json-languageservice"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "pwsh"
+            }
+        }
+    },
+    
+    "remoteUser": "vscode"
+}
