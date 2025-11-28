@@ -165,6 +165,22 @@ jobs:
                   echo "✓ All character references are valid"
                   echo "::endgroup::"
 
+            - name: Run PowerShell validation script
+              shell: pwsh
+              run: |
+                  Write-Host "::group::Running comprehensive PowerShell validation"
+
+                  # Run the validation script
+                  ./Tools/ValidateCharacterData.ps1 -UseExternalValidator
+
+                  if ($LASTEXITCODE -ne 0) {
+                    Write-Host "::error::PowerShell validation failed"
+                    exit 1
+                  }
+
+                  Write-Host "✓ PowerShell validation passed"
+                  Write-Host "::endgroup::"
+
             - name: Check JSON formatting (2-space indentation)
               run: |
                   echo "::group::Checking JSON formatting"

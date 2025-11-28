@@ -74,12 +74,15 @@ Each synergy set reduces the effective tier when conditions are met:
 1. **Tier Range**: `baseTier` must be 1-19
 2. **Synergy Range**: `synergyEnhancement` and `synergyEnhancementOmicron` must be 0-10
 3. **Synergy Requirement**: Each synergy set MUST have at least one of `synergyEnhancement` or `synergyEnhancementOmicron`
-4. **Alphabetical Order**: All characters MUST be sorted by `id` (case-sensitive)
-5. **No Duplicates**: Each character `id` must be unique
-6. **Character References**: All character IDs in `synergySets[].characters` arrays MUST reference existing characters in the data file
-7. **Property Names**: Only known property names are allowed (enforced by schema `additionalProperties: false`)
-8. **Formatting**: Use 2-space indentation, UTF-8 encoding without BOM
-9. **JSON Validity**: Must parse as valid JSON
+4. **Synergy Slot Limit**: Each synergy set can reference a maximum of 4 total teammates: `characters.length + sum(categoryDefinitions[].numberMatchesRequired) ≤ 4` (enforced by PowerShell validation, not JSON schema)
+5. **Alphabetical Order**: All characters MUST be sorted by `id` (case-sensitive)
+6. **No Duplicates**: Each character `id` must be unique
+7. **Character References**: All character IDs in `synergySets[].characters` arrays MUST reference existing characters in the data file
+8. **Property Names**: Only known property names are allowed (enforced by schema `additionalProperties: false`)
+9. **Formatting**: Use 2-space indentation, UTF-8 encoding without BOM
+10. **JSON Validity**: Must parse as valid JSON
+
+> **Note**: The synergy slot limit (constraint #4) cannot be expressed in JSON Schema Draft 7, so it is enforced by the PowerShell validation script (`Tools/ValidateCharacterData.ps1`) which runs both locally and in CI/CD pipelines.
 
 ---
 
@@ -241,11 +244,14 @@ permissions:
 4. ✅ All tier values in range (1-19)
 5. ✅ All synergy enhancements in range (0-10)
 6. ✅ Each synergy set has at least one enhancement type
-7. ✅ All character cross-references are valid (no orphaned references)
-8. ✅ No unknown property names (schema enforces known properties only)
-9. ✅ Proper JSON formatting (2-space indent)
+7. ✅ **Synergy slot limit enforced** (characters + required matches ≤ 4 per set)
+8. ✅ All character cross-references are valid (no orphaned references)
+9. ✅ No unknown property names (schema enforces known properties only)
+10. ✅ Proper JSON formatting (2-space indent)
 
 **PR validation workflow automatically runs these checks** - see [`.github/workflows/validate-pr.yml`](.github/workflows/validate-pr.yml)
+
+> **Important**: The synergy slot limit (#7) is enforced by the PowerShell validation script, which now runs automatically in CI/CD pipelines. This ensures that no synergy set can reference more than 4 total teammates.
 
 ### Local Validation Required
 
@@ -299,24 +305,24 @@ npm install -g ajv-cli ajv-formats
 ```json
 // ❌ WRONG - VADAR doesn't exist
 {
-    "id": "PALPATINE",
-    "synergySets": [
-        {
-            "synergyEnhancement": 3,
-            "characters": ["VADAR", "THRAWN"]
-        }
-    ]
+  "id": "PALPATINE",
+  "synergySets": [
+    {
+      "synergyEnhancement": 3,
+      "characters": ["VADAR", "THRAWN"]
+    }
+  ]
 }
 
 // ✅ CORRECT - Fixed typo
 {
-    "id": "PALPATINE",
-    "synergySets": [
-        {
-            "synergyEnhancement": 3,
-            "characters": ["VADER", "THRAWN"]
-        }
-    ]
+  "id": "PALPATINE",
+  "synergySets": [
+    {
+      "synergyEnhancement": 3,
+      "characters": ["VADER", "THRAWN"]
+    }
+  ]
 }
 ```
 
@@ -340,24 +346,24 @@ npm install -g ajv-cli ajv-formats
 ```json
 // ❌ WRONG - Property name typo
 {
-    "id": "HERASYNDULLAS3",
-    "synergySets": [
-        {
-            "synergyEnhancement": 3,
-            "characetrs": ["EZRABRIDGERS3"]
-        }
-    ]
+  "id": "HERASYNDULLAS3",
+  "synergySets": [
+    {
+      "synergyEnhancement": 3,
+      "characetrs": ["EZRABRIDGERS3"]
+    }
+  ]
 }
 
 // ✅ CORRECT - Fixed property name
 {
-    "id": "HERASYNDULLAS3",
-    "synergySets": [
-        {
-            "synergyEnhancement": 3,
-            "characters": ["EZRABRIDGERS3"]
-        }
-    ]
+  "id": "HERASYNDULLAS3",
+  "synergySets": [
+    {
+      "synergyEnhancement": 3,
+      "characters": ["EZRABRIDGERS3"]
+    }
+  ]
 }
 ```
 

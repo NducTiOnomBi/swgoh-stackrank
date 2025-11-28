@@ -11,10 +11,82 @@ what you're doing and want to make it as good as possible - not that I'm trying 
 prevent you from contributing. 
 
 ## Getting started
-To get started contributing to the mods optimizer, first fork the repository. Once
-you have your own copy of the repository, start making changes and committing them to
-a new branch (or to your own `main` branch, if you wish). Once your changes are
-ready, open up a pull request back to the original repository.
+
+### Option 1: Web-Based Visual Editor (Recommended)
+
+The **Visual Editor** provides a modern, browser-based interface for managing character data without requiring Excel or Windows.
+
+#### Using GitHub Codespaces (Easiest)
+
+1. Fork this repository to your GitHub account
+2. Open your fork in GitHub Codespaces (click "Code" → "Codespaces" → "Create codespace on main")
+3. Wait for the devcontainer to initialize (automatically installs PowerShell Core and Node.js)
+4. Start the Visual Editor:
+   ```bash
+   cd Tools
+   pwsh StartVisualEditor.ps1
+   ```
+5. The editor opens automatically in your browser
+6. Make changes using the drag-and-drop interface:
+   - Drag characters between tier columns to change base tiers
+   - Select a character to edit omicron enhancements and synergy sets
+   - Use tooltips to understand synergy tier calculations
+7. Click "Validate" to check your changes (9 validation rules)
+8. Click "Save Changes" to persist changes to `Data/characterBaseData.json`
+9. Commit and push your changes to a new branch
+10. Open a pull request back to the original repository
+
+#### Using Local Development
+
+1. Fork and clone the repository
+2. Install PowerShell Core 7+ (https://github.com/PowerShell/PowerShell)
+3. Navigate to the Tools directory
+4. Start the Visual Editor:
+   ```powershell
+   .\StartVisualEditor.ps1
+   ```
+   
+   **Note:** On Windows, you may need to run PowerShell as Administrator the first time.
+5. Browser opens to `http://localhost:8080`
+6. Make changes, validate, and save
+7. Commit and push to a new branch
+8. Open a pull request
+
+**Visual Editor Features:**
+- 19-column tier grid with drag-and-drop
+- Multi-tier display (base, best standard, best omicron)
+- Interactive tooltips showing calculation breakdowns
+- Real-time validation with detailed error messages
+- No Excel required - works on Windows, macOS, Linux
+- Minimum viewport: 768px (desktop/laptop/tablet)
+
+### Option 2: Excel-Based Workflow (Legacy)
+
+The traditional Excel-based workflow is still supported for contributors who prefer it.
+
+1. Fork the repository
+2. Clone your fork to your local machine
+3. Export current data to Excel:
+   ```powershell
+   .\Tools\ReadBaseDataToXLS.ps1
+   ```
+4. Edit `c:\output\characterBaseData.xlsx` in Microsoft Excel
+5. Import changes back to JSON:
+   ```powershell
+   .\Tools\ReadXLStoBaseDataJson.ps1
+   ```
+6. Validate your changes:
+   ```powershell
+   .\Tools\ValidateCharacterData.ps1
+   ```
+7. Copy validated JSON to the Data folder:
+   ```powershell
+   Copy-Item c:\output\characterBaseData.json Data\characterBaseData.json
+   ```
+8. Commit and push to a new branch
+9. Open a pull request
+
+**Note:** The Excel workflow only supports base tier changes, not synergy editing. For synergy modifications, use the Visual Editor or edit JSON directly.
 
 ## Commit messages
 Commit messages should follow the format of:

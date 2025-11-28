@@ -196,8 +196,8 @@ foreach ($character in $characterBaseDataItems) {
                     if ($synergySet.characters -isnot [System.Array]) {
                         $fieldErrors += "[$charId] Synergy set #$synergyIndex 'characters' must be an array"
                     }
-                    elseif ($synergySet.characters.Count -eq 0) {
-                        $validationWarnings += "[$charId] Synergy set #$synergyIndex 'characters' array is empty"
+                    elseif ($synergySet.characters.Count -lt 1 -or $synergySet.characters.Count -gt 4) {
+                        $fieldErrors += "[$charId] Synergy set #$synergyIndex 'characters' array must contain between 1 and 4 elements (found: $($synergySet.characters.Count))"
                     }
                 }
                 
@@ -229,6 +229,24 @@ foreach ($character in $characterBaseDataItems) {
                             }
                         }
                     }
+                }
+
+                # Validate total characters referenced in synergy set does not exceed 4
+                $totalCharactersInSet = 0
+                if ($synergySet.characters) {
+                    $totalCharactersInSet += $synergySet.characters.Count
+                }
+
+                if ($synergySet.categoryDefinitions) {
+                    foreach ($catDef in $synergySet.categoryDefinitions) {
+                        if ($catDef.include) {
+                            $totalCharactersInSet += $catDef.numberMatchesRequired
+                        }
+                    }
+                }
+
+                if ($totalCharactersInSet -lt 1 -or $totalCharactersInSet -gt 4) {
+                    $fieldErrors += "[$charId] Synergy set #$synergyIndex must reference between 1 and 4 total characters (found: $totalCharactersInSet)"
                 }
             }
         }
@@ -404,8 +422,13 @@ if ($UseExternalValidator) {
     
     if ($ajvAvailable -and (Test-Path $SchemaPath)) {
         Write-Host "  ℹ Running ajv schema validator..." -ForegroundColor Cyan
+        
+        # Resolve to absolute paths for cross-platform compatibility
+        $absoluteSchemaPath = Resolve-Path $SchemaPath
+        $absoluteDataPath = Resolve-Path $CharacterBaseDataPath
+        
         try {
-            $ajvResult = & ajv validate -s $SchemaPath -d $CharacterBaseDataPath 2>&1
+            $ajvResult = & ajv validate -s $absoluteSchemaPath -d $absoluteDataPath 2>&1
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "  ✓ Schema validation passed (ajv)" -ForegroundColor Green
             }

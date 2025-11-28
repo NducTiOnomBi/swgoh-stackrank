@@ -12,11 +12,96 @@ Both of these outputs work together, specifcially when optimizing for a specific
 
 ## Requirements
 
+### For Visual Editor (Recommended)
+
+- PowerShell Core 7+ (cross-platform)
+- Modern web browser (Chrome, Edge, Firefox, Safari)
+- Minimum viewport: 768px (desktop/laptop/tablet)
+- GitHub Codespaces (optional, but recommended for cloud-based editing)
+
+### For Excel-Based Tools (Legacy)
+
 - PowerShell 5.1 or higher
 - Microsoft Excel (for data editing workflows)
+- Windows operating system
+
+### For Validation
+
 - Node.js and npm (optional, for external schema validation with ajv-cli)
 
 ## The Tools
+
+### StartVisualEditor.ps1 (NEW - Recommended)
+
+**Web-Based Visual Editor** - A browser-based editor that eliminates the need for Excel and provides a modern, cross-platform interface for managing character data.
+
+#### Key Features
+
+- **Visual Tier Grid**: Drag-and-drop interface with 19 tier columns
+- **Multi-Tier Display**: Shows base tier, best standard synergy tier, and best omicron synergy tier for each character
+- **Interactive Tooltips**: Hover over synergy tiers to see detailed calculation breakdowns
+- **Synergy Management**: Add, edit, and remove synergy sets directly in the browser
+- **Real-Time Validation**: Comprehensive validation with detailed error messages (9 validation rules)
+- **Cross-Platform**: Works on Windows, macOS, Linux (no Excel required)
+- **GitHub Codespaces Ready**: Optimized for cloud-based development
+
+#### Usage
+
+**Local Development:**
+
+```powershell
+cd Tools
+.\StartVisualEditor.ps1
+```
+
+**GitHub Codespaces:**
+
+```bash
+cd Tools
+pwsh StartVisualEditor.ps1
+```
+
+The browser will open automatically to `http://localhost:8080` (or Codespaces URL).
+
+**Note:** On Windows, you may need to run PowerShell as Administrator for the first time to allow HTTP listener binding.
+
+#### UI Overview
+
+- **Center Panel**: 19-column tier grid with drag-and-drop character cards
+- **Left Sidebar**: Character details (base tier, omicron enhancement, calculated tiers)
+- **Right Sidebar**: Synergy set editor (add/remove/view synergy configurations)
+- **Header Actions**: Validate, Export JSON, Save Changes
+- **Status Bar**: Operation status, character count, validation status
+
+#### Tier Calculation Display
+
+Each character card shows:
+
+- **Base**: Character's assigned base tier (1-19)
+- **Best Std**: Best standard synergy tier (Base - Omicron - Best Synergy Enhancement)
+- **Best Omi**: Best omicron synergy tier (Base - Omicron - Best Omicron Enhancement)
+
+**Example Tooltip (hover over synergy tier):**
+
+```text
+Base Tier (8)
+- Omicron Enhancement (1)
+- Best Synergy (4 from VADER, PALPATINE, 3× Empire)
+= Final Tier (3)
+```
+
+#### API Endpoints
+
+The PowerShell HTTP server provides these REST API endpoints:
+
+- `GET /api/data` - Load character data from characterBaseData.json
+- `POST /api/data` - Save character data (with validation)
+- `POST /api/validate` - Validate data without saving
+- `GET /*` - Serve static files (HTML, CSS, JavaScript)
+
+#### Documentation
+
+See [VisualEditor/README.md](VisualEditor/README.md) for complete documentation, troubleshooting, and architecture details.
 
 ### ValidateCharacterData.ps1
 
