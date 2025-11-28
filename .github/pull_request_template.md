@@ -52,9 +52,9 @@
 **Schema Compliance:**
 - [ ] All required fields (`id`, `baseTier`) are present
 - [ ] Character IDs follow format: uppercase letters/numbers/underscores only
-- [ ] Synergy sets include required `synergyEnhancement` field
+- [ ] Synergy sets include required `synergyEnhancement` or `synergyEnhancementOmicron` field
 - [ ] Category definitions include required `include` and `numberMatchesRequired` fields
-- [ ] `numberMatchesRequired` values are between 1-5
+- [ ] `numberMatchesRequired` values are between 1-4
 
 **Testing (if applicable):**
 - [ ] Exported data to Excel using `ReadBaseDataToXLS.ps1`
