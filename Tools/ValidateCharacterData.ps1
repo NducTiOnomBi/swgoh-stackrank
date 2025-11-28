@@ -422,8 +422,13 @@ if ($UseExternalValidator) {
     
     if ($ajvAvailable -and (Test-Path $SchemaPath)) {
         Write-Host "  ℹ Running ajv schema validator..." -ForegroundColor Cyan
+        
+        # Resolve to absolute paths for cross-platform compatibility
+        $absoluteSchemaPath = Resolve-Path $SchemaPath
+        $absoluteDataPath = Resolve-Path $CharacterBaseDataPath
+        
         try {
-            $ajvResult = & ajv validate -s $SchemaPath -d $CharacterBaseDataPath 2>&1
+            $ajvResult = & ajv validate -s $absoluteSchemaPath -d $absoluteDataPath 2>&1
             if ($LASTEXITCODE -eq 0) {
                 Write-Host "  ✓ Schema validation passed (ajv)" -ForegroundColor Green
             }
