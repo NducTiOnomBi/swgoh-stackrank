@@ -23,6 +23,9 @@ let isRightSidebarCollapsed = true; // Start collapsed
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme from localStorage
+    initializeTheme();
+
     // Initialize event listeners
     initializeEventListeners();
 
@@ -36,6 +39,9 @@ function initializeEventListeners() {
     document.getElementById('btnValidate').addEventListener('click', validateData);
     document.getElementById('btnExport').addEventListener('click', exportData);
     document.getElementById('btnSave').addEventListener('click', saveData);
+
+    // Theme selector
+    document.getElementById('themeSelect').addEventListener('change', changeTheme);
 
     // Sidebar toggle buttons
     document.getElementById('toggleLeftSidebar').addEventListener('click', toggleLeftSidebar);
@@ -3184,6 +3190,44 @@ function updateStatus(message, type = 'info') {
 function updateCharacterCount() {
     const countElement = document.getElementById('characterCount');
     countElement.textContent = `${characterData.length} characters`;
+}
+
+// ============================================
+// Theme Management
+// ============================================
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('swgoh-theme') || 'default';
+    const themeSelect = document.getElementById('themeSelect');
+    const app = document.getElementById('app');
+
+    // Set dropdown value
+    if (themeSelect) {
+        themeSelect.value = savedTheme;
+    }
+
+    // Apply theme class
+    applyTheme(savedTheme);
+}
+
+function changeTheme(event) {
+    const selectedTheme = event.target.value;
+    localStorage.setItem('swgoh-theme', selectedTheme);
+    applyTheme(selectedTheme);
+}
+
+function applyTheme(theme) {
+    const app = document.getElementById('app');
+
+    // Remove all theme classes
+    app.classList.remove('theme-swgoh', 'theme-dark');
+
+    // Apply selected theme class
+    if (theme === 'swgoh') {
+        app.classList.add('theme-swgoh');
+    } else if (theme === 'dark') {
+        app.classList.add('theme-dark');
+    }
+    // 'default' theme has no class (uses :root variables)
 }
 
 function updateValidationStatus(status) {
