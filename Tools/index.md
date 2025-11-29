@@ -70,7 +70,7 @@ The browser will open automatically to `http://localhost:8080` (or Codespaces UR
 - **Center Panel**: 19-column tier grid with drag-and-drop character cards
 - **Left Sidebar**: Character details (base tier, omicron enhancement, calculated tiers)
 - **Right Sidebar**: Synergy set editor (add/remove/view synergy configurations)
-- **Header Actions**: Validate, Export JSON, Save Changes
+- **Header Actions**: Add Character, Validate, Export JSON, Save Changes
 - **Status Bar**: Operation status, character count, validation status
 
 #### Tier Calculation Display
