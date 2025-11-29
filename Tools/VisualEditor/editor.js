@@ -1128,8 +1128,18 @@ function handlePointerDown(e) {
     // Capture pointer to receive events even when moving outside element
     card.setPointerCapture(e.pointerId);
 
-    // Add dragging state
-    card.classList.add('dragging');
+    // Create drag ghost element
+    const ghost = card.cloneNode(true);
+    ghost.classList.add('drag-ghost');
+    ghost.classList.remove('selected');
+    ghost.style.width = card.offsetWidth + 'px';
+    ghost.style.left = e.clientX - (card.offsetWidth / 2) + 'px';
+    ghost.style.top = e.clientY - 20 + 'px';
+    document.body.appendChild(ghost);
+    draggedElement.ghostElement = ghost;
+
+    // Add dragging state to original card (make it semi-transparent)
+    card.classList.add('dragging-touch');
 
     // Add pointer event listeners
     card.addEventListener('pointermove', handlePointerMove);
@@ -1143,10 +1153,22 @@ function handlePointerDown(e) {
 function handlePointerMove(e) {
     if (!isDraggingWithPointer) return;
 
-    // Get element at pointer position (excluding the dragged element)
+    // Update ghost position
+    if (draggedElement.ghostElement) {
+        draggedElement.ghostElement.style.left = e.clientX - (draggedElement.offsetWidth / 2) + 'px';
+        draggedElement.ghostElement.style.top = e.clientY - 20 + 'px';
+    }
+
+    // Get element at pointer position (excluding the dragged element and ghost)
     draggedElement.style.pointerEvents = 'none';
+    if (draggedElement.ghostElement) {
+        draggedElement.ghostElement.style.pointerEvents = 'none';
+    }
     const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
     draggedElement.style.pointerEvents = '';
+    if (draggedElement.ghostElement) {
+        draggedElement.ghostElement.style.pointerEvents = 'none'; // Keep ghost non-interactive
+    }
 
     // Find the tier column
     const tierColumn = elementBelow?.closest('.tier-column');
@@ -1220,7 +1242,13 @@ function handlePointerCancel(e) {
 
 function cleanupPointerDrag(card, pointerId) {
     // Remove dragging state
-    card.classList.remove('dragging');
+    card.classList.remove('dragging-touch');
+
+    // Remove ghost element
+    if (draggedElement && draggedElement.ghostElement) {
+        draggedElement.ghostElement.remove();
+        draggedElement.ghostElement = null;
+    }
 
     // Remove all column highlights
     document.querySelectorAll('.tier-column').forEach(col => {

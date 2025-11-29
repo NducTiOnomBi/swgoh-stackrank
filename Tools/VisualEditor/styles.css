@@ -337,6 +337,20 @@ body {
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
+.character-card.dragging-touch {
+    opacity: 0.3;
+}
+
+.drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    opacity: 0.9;
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: none;
+}
+
 .character-name {
     font-weight: 600;
     font-size: 0.875rem;
