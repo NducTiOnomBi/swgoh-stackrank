@@ -713,10 +713,14 @@ function createTierColumn(tier) {
     cardsContainer.className = 'tier-cards';
     column.appendChild(cardsContainer);
 
-    // Drag and drop event listeners
+    // Drag and drop event listeners - Mouse
     column.addEventListener('dragover', handleDragOver);
     column.addEventListener('drop', handleDrop);
     column.addEventListener('dragleave', handleDragLeave);
+    
+    // Touch/Pointer event listeners
+    column.addEventListener('pointerenter', handlePointerEnterColumn);
+    column.addEventListener('pointerleave', handlePointerLeaveColumn);
 
     return column;
 }
@@ -807,9 +811,13 @@ function createCharacterCard(character) {
 
     card.appendChild(tiers);
 
-    // Event listeners
+    // Event listeners - Mouse drag
     card.addEventListener('dragstart', handleDragStart);
     card.addEventListener('dragend', handleDragEnd);
+    
+    // Event listeners - Touch/Pointer drag
+    card.addEventListener('pointerdown', handlePointerDown);
+    
     card.addEventListener('click', () => selectCharacter(character));
 
     return card;
@@ -1021,9 +1029,12 @@ function hideTierTooltip() {
 }
 
 // ============================================
-// Drag and Drop
+// Drag and Drop (Mouse + Touch/Pointer Support)
 // ============================================
 let draggedCharacterId = null;
+let isDraggingWithPointer = false;
+let draggedElement = null;
+let currentDropTarget = null;
 
 function handleDragStart(e) {
     draggedCharacterId = e.target.dataset.characterId;
@@ -1096,6 +1107,171 @@ function handleDrop(e) {
     }
 
     return false;
+}
+
+// ============================================
+// Touch/Pointer Event Handlers for iPad Support
+// ============================================
+function handlePointerDown(e) {
+    // Only handle primary pointer (first finger/mouse)
+    if (!e.isPrimary) return;
+    
+    // Skip pointer events for mouse - let native drag/drop handle it
+    // Only use pointer events for touch input
+    if (e.pointerType === 'mouse') return;
+    
+    const card = e.currentTarget;
+    draggedCharacterId = card.dataset.characterId;
+    draggedElement = card;
+    isDraggingWithPointer = true;
+    
+    // Capture pointer to receive events even when moving outside element
+    card.setPointerCapture(e.pointerId);
+    
+    // Add dragging state
+    card.classList.add('dragging');
+    
+    // Add pointer event listeners
+    card.addEventListener('pointermove', handlePointerMove);
+    card.addEventListener('pointerup', handlePointerUp);
+    card.addEventListener('pointercancel', handlePointerCancel);
+    
+    // Prevent text selection and default touch behavior
+    e.preventDefault();
+}
+
+function handlePointerMove(e) {
+    if (!isDraggingWithPointer) return;
+    
+    // Get element at pointer position (excluding the dragged element)
+    draggedElement.style.pointerEvents = 'none';
+    const elementBelow = document.elementFromPoint(e.clientX, e.clientY);
+    draggedElement.style.pointerEvents = '';
+    
+    // Find the tier column
+    const tierColumn = elementBelow?.closest('.tier-column');
+    
+    // Update drop target highlighting
+    if (tierColumn !== currentDropTarget) {
+        // Remove highlight from previous target
+        if (currentDropTarget) {
+            currentDropTarget.classList.remove('drag-over');
+        }
+        
+        // Add highlight to new target
+        if (tierColumn) {
+            tierColumn.classList.add('drag-over');
+        }
+        
+        currentDropTarget = tierColumn;
+    }
+}
+
+function handlePointerUp(e) {
+    if (!isDraggingWithPointer) return;
+    
+    const card = e.currentTarget;
+    
+    // Get the drop target column
+    if (currentDropTarget) {
+        const newFinalTier = parseInt(currentDropTarget.dataset.tier);
+        
+        // Find and update the character
+        const character = characterData.find(c => c.id === draggedCharacterId);
+        if (character) {
+            const tierData = calculateFinalTier(character);
+            const currentFinalTier = tierData.finalTier;
+            
+            // Only update if tier actually changed
+            if (currentFinalTier !== newFinalTier) {
+                // Calculate tier difference
+                const tierOffset = newFinalTier - currentFinalTier;
+                
+                // Apply offset to baseTier
+                character.baseTier += tierOffset;
+                
+                // Clamp to valid range (1-19)
+                character.baseTier = Math.max(1, Math.min(19, character.baseTier));
+                
+                hasUnsavedChanges = true;
+                updateSaveButtonState();
+                updateStatus('Character moved - unsaved changes', 'warning');
+                renderTierGrid();
+                
+                // Keep character selected if it was selected
+                if (selectedCharacter && selectedCharacter.id === character.id) {
+                    selectCharacter(character);
+                }
+            }
+        }
+        
+        // Remove highlight
+        currentDropTarget.classList.remove('drag-over');
+    }
+    
+    // Cleanup
+    cleanupPointerDrag(card, e.pointerId);
+}
+
+function handlePointerCancel(e) {
+    if (!isDraggingWithPointer) return;
+    cleanupPointerDrag(e.currentTarget, e.pointerId);
+}
+
+function cleanupPointerDrag(card, pointerId) {
+    // Remove dragging state
+    card.classList.remove('dragging');
+    
+    // Remove all column highlights
+    document.querySelectorAll('.tier-column').forEach(col => {
+        col.classList.remove('drag-over');
+    });
+    
+    // Remove pointer event listeners
+    card.removeEventListener('pointermove', handlePointerMove);
+    card.removeEventListener('pointerup', handlePointerUp);
+    card.removeEventListener('pointercancel', handlePointerCancel);
+    
+    // Release pointer capture
+    if (card.hasPointerCapture(pointerId)) {
+        card.releasePointerCapture(pointerId);
+    }
+    
+    // Reset state
+    isDraggingWithPointer = false;
+    draggedElement = null;
+    currentDropTarget = null;
+    draggedCharacterId = null;
+}
+
+function handlePointerEnterColumn(e) {
+    // This is a backup for when pointermove doesn't catch the column
+    if (isDraggingWithPointer && e.currentTarget.classList.contains('tier-column')) {
+        if (currentDropTarget !== e.currentTarget) {
+            if (currentDropTarget) {
+                currentDropTarget.classList.remove('drag-over');
+            }
+            e.currentTarget.classList.add('drag-over');
+            currentDropTarget = e.currentTarget;
+        }
+    }
+}
+
+function handlePointerLeaveColumn(e) {
+    // Only remove highlight if we're actually leaving (not just moving to a child)
+    if (isDraggingWithPointer && e.currentTarget === currentDropTarget) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX;
+        const y = e.clientY;
+        
+        // Check if pointer is actually outside the column
+        if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+            e.currentTarget.classList.remove('drag-over');
+            if (currentDropTarget === e.currentTarget) {
+                currentDropTarget = null;
+            }
+        }
+    }
 }
 
 // ============================================

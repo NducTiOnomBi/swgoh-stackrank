@@ -318,6 +318,7 @@ body {
     margin-bottom: var(--spacing-sm);
     cursor: move;
     user-select: none;
+    touch-action: none;
     transition: all 0.2s ease;
 }
 
