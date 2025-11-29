@@ -65,7 +65,8 @@ body {
     color: var(--color-text-inverse);
     padding: var(--spacing-md) var(--spacing-lg);
     box-shadow: var(--box-shadow);
-    z-index: 100;
+    z-index: 10001;
+    position: relative;
 }
 
 .header-content {
@@ -223,6 +224,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 10001;
+    position: relative;
 }
 
 .tier-grid-header h2 {
