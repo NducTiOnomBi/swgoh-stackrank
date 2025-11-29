@@ -65,7 +65,8 @@ body {
     color: var(--color-text-inverse);
     padding: var(--spacing-md) var(--spacing-lg);
     box-shadow: var(--box-shadow);
-    z-index: 100;
+    z-index: 10001;
+    position: relative;
 }
 
 .header-content {
@@ -223,6 +224,8 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    z-index: 10001;
+    position: relative;
 }
 
 .tier-grid-header h2 {
@@ -318,6 +321,7 @@ body {
     margin-bottom: var(--spacing-sm);
     cursor: move;
     user-select: none;
+    touch-action: none;
     transition: all 0.2s ease;
 }
 
@@ -334,6 +338,20 @@ body {
 .character-card.selected {
     border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.character-card.dragging-touch {
+    opacity: 0.3;
+}
+
+.drag-ghost {
+    position: fixed;
+    pointer-events: none;
+    z-index: 10000;
+    opacity: 0.9;
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    transition: none;
 }
 
 .character-name {
