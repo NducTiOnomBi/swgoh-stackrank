@@ -1,6 +1,10 @@
 {
   "characterBaseData": [
     {
+      "id": "4LOM",
+      "baseTier": 17
+    },
+    {
       "id": "50RT",
       "baseTier": 11,
       "synergySets": [
@@ -116,7 +120,8 @@
           "synergyEnhancement": 3,
           "characters": [
             "JYNERSO",
-            "CASSIANANDOR"
+            "CASSIANANDOR",
+            "K2SO"
           ],
           "categoryDefinitions": [
             {
@@ -124,11 +129,13 @@
                 "Rogue One",
                 "Tank"
               ],
-              "numberMatchesRequired": 2
+              "numberMatchesRequired": 1
             }
-          ]
+          ],
+          "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "AHSOKATANO",
@@ -201,6 +208,44 @@
             {
               "include": [
                 "Galactic Republic"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "APPO",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GRANDMOFFTARKIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LORDVADER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
               ],
               "numberMatchesRequired": 3
             }
@@ -509,7 +554,7 @@
     },
     {
       "id": "BADBATCHWRECKER",
-      "baseTier": 11,
+      "baseTier": 12,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -550,9 +595,34 @@
       ]
     },
     {
+      "id": "BATCHERS3",
+      "baseTier": 13,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "OMEGAS3",
+            "HUNTERS3",
+            "WRECKERS3",
+            "CROSSHAIRS3"
+          ]
+        }
+      ]
+    },
+    {
       "id": "BAYLANSKOLL",
       "baseTier": 5,
-      "omicronEnhancement": 1
+      "omicronEnhancement": 1,
+      "synergySets": [
+        {
+          "synergyEnhancement": 0,
+          "characters": [
+            "SHINHATI",
+            "MARROK"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     },
     {
       "id": "BAZEMALBUS",
@@ -642,7 +712,8 @@
             "REYJEDITRAINING"
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "BIGGSDARKLIGHTER",
@@ -830,7 +901,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 4,
           "characters": [
             "MANDALORBOKATAN"
           ],
@@ -865,14 +936,6 @@
           "synergyEnhancement": 3,
           "characters": [
             "JARJARBINKS"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Gungan"
-              ],
-              "numberMatchesRequired": 3
-            }
           ]
         }
       ]
@@ -917,14 +980,6 @@
           "synergyEnhancement": 3,
           "characters": [
             "JARJARBINKS"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Gungan"
-              ],
-              "numberMatchesRequired": 3
-            }
           ]
         }
       ]
@@ -961,7 +1016,12 @@
             }
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 0
+    },
+    {
+      "id": "BRUTUS",
+      "baseTier": 17
     },
     {
       "id": "BT1",
@@ -1010,21 +1070,6 @@
         {
           "synergyEnhancement": 3,
           "characters": [
-            "JEDIMASTERKENOBI"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Galactic Republic",
-                "Jedi"
-              ],
-              "numberMatchesRequired": 3
-            }
-          ]
-        },
-        {
-          "synergyEnhancement": 3,
-          "characters": [
             "PADMEAMIDALA"
           ],
           "categoryDefinitions": [
@@ -1037,11 +1082,20 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "COMMANDERLUKESKYWALKER",
             "HANSOLO",
             "CHEWBACCALEGENDARY"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "COMMANDERLUKESKYWALKER",
+            "HANSOLO",
+            "CHEWBACCALEGENDARY",
+            "C3POCHEWBACCA"
           ]
         }
       ]
@@ -1266,6 +1320,10 @@
       ]
     },
     {
+      "id": "CAPTAINSILVO",
+      "baseTier": 17
+    },
+    {
       "id": "CAPTAINTARPALS",
       "baseTier": 14,
       "synergySets": [
@@ -1284,14 +1342,6 @@
           "synergyEnhancement": 3,
           "characters": [
             "JARJARBINKS"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Gungan"
-              ],
-              "numberMatchesRequired": 3
-            }
           ]
         }
       ]
@@ -1405,16 +1455,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
-          "characters": [
-            "SAWGERRERA",
-            "K2SO",
-            "CARADUNE",
-            "KYLEKATARN"
-          ]
-        },
-        {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "ADMIRALRADDUS",
             "JYNERSO"
@@ -1633,7 +1674,7 @@
       "baseTier": 17,
       "synergySets": [
         {
-          "synergyEnhancement": 6,
+          "synergyEnhancement": 4,
           "characters": [
             "SHAAKTI"
           ],
@@ -1761,6 +1802,21 @@
       ]
     },
     {
+      "id": "CROSSHAIRS3",
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "OMEGAS3",
+            "HUNTERS3",
+            "WRECKERS3",
+            "BATCHERS3"
+          ]
+        }
+      ]
+    },
+    {
       "id": "CT210408",
       "baseTier": 11,
       "synergySets": [
@@ -1786,7 +1842,8 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "501st"
               ],
               "numberMatchesRequired": 3
             }
@@ -1820,7 +1877,8 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "501st"
               ],
               "numberMatchesRequired": 3
             }
@@ -1840,7 +1898,8 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "Light Side"
               ],
               "numberMatchesRequired": 3
             }
@@ -1854,7 +1913,8 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "501st"
               ],
               "numberMatchesRequired": 3
             }
@@ -1902,7 +1962,16 @@
     },
     {
       "id": "DARKREY",
-      "baseTier": 7
+      "baseTier": 9,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "SUPREMELEADERKYLOREN"
+          ]
+        }
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "DARKTROOPER",
@@ -1958,8 +2027,9 @@
       ]
     },
     {
-      "baseTier": 5,
-      "id": "DARTHBANE"
+      "baseTier": 4,
+      "id": "DARTHBANE",
+      "omicronEnhancement": 1
     },
     {
       "id": "DARTHMALAK",
@@ -1977,7 +2047,7 @@
     },
     {
       "id": "DARTHMALGUS",
-      "baseTier": 5,
+      "baseTier": 6,
       "requiresAllOmicrons": false,
       "requiredOmicrons": [
         "leaderskill_DARTHMALGUS",
@@ -1999,7 +2069,8 @@
             "SITHASSASSIN"
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "DARTHNIHILUS",
@@ -2092,22 +2163,33 @@
           "characters": [
             "DARTHTRAYA",
             "DARTHNIHILUS",
-            "DARTHSION"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Sith"
-              ],
-              "numberMatchesRequired": 1
-            }
+            "DARTHSION",
+            "SAVAGEOPRESS"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "DARTHMALGUS",
+            "DARTHREVAN",
+            "DARTHMALAK",
+            "BASTILASHANDARK"
           ]
         }
       ]
     },
     {
       "id": "DARTHTRAYA",
-      "baseTier": 8
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "DARTHNIHILUS",
+            "DARTHSION"
+          ]
+        }
+      ]
     },
     {
       "id": "DASHRENDAR",
@@ -2316,12 +2398,54 @@
       ]
     },
     {
+      "id": "DEPABILLABA",
+      "baseTier": 17
+    },
+    {
       "id": "DIRECTORKRENNIC",
       "baseTier": 15
     },
     {
+      "id": "DISGUISEDCLONETROOPER",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GRANDMOFFTARKIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LORDVADER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "DOCTORAPHRA",
-      "baseTier": 11,
+      "baseTier": 9,
       "synergySets": [
         {
           "synergyEnhancement": 4,
@@ -2597,7 +2721,7 @@
     },
     {
       "id": "EWOKSCOUT",
-      "baseTier": 17,
+      "baseTier": 18,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -2664,7 +2788,22 @@
     },
     {
       "id": "EZRAEXILE",
-      "baseTier": 7
+      "baseTier": 9,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "REY"
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "GLAHSOKATANO"
+          ]
+        }
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "FENNECSHAND",
@@ -3074,7 +3213,53 @@
     },
     {
       "id": "GENERALSYNDULLA",
-      "baseTier": 7
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "PADAWANSABINE",
+            "HUYANG"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "PADAWANSABINE",
+            "HUYANG",
+            "EZRAEXILE"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "GLAHSOKATANO"
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "GLAHSOKATANO",
+            "EZRAEXILE"
+          ]
+        }
+      ]
     },
     {
       "id": "GEONOSIANBROODALPHA",
@@ -3129,7 +3314,27 @@
     },
     {
       "id": "GLAHSOKATANO",
-      "baseTier": 2
+      "baseTier": 2,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "EZRAEXILE"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "GLHONDO",
+      "baseTier": 2,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "SM33"
+          ]
+        }
+      ]
     },
     {
       "baseTier": 2,
@@ -3165,7 +3370,8 @@
             "THIRDSISTER"
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "GRANDMASTERLUKE",
@@ -3197,7 +3403,8 @@
             {
               "include": [
                 "Dark Side",
-                "Clone Trooper"
+                "Clone Trooper",
+                "Empire"
               ],
               "numberMatchesRequired": 2
             }
@@ -3207,27 +3414,52 @@
     },
     {
       "id": "GREATMOTHERS",
-      "baseTier": 10,
+      "baseTier": 9,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 1,
+          "characters": [],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Nightsister"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
           "characters": [
-            "MORGANELSBETH",
-            "MERRIN"
+            "MORGANELSBETH"
           ],
           "categoryDefinitions": [
             {
               "include": [
-                "Nightsister",
-                "Imperial Remnant"
+                "Nightsister"
               ],
-              "numberMatchesRequired": 1
-            },
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "MORGANELSBETH"
+          ],
+          "categoryDefinitions": [
             {
               "include": [
                 "Nightsister"
               ],
               "numberMatchesRequired": 1
+            },
+            {
+              "include": [
+                "Nightsister",
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 2
             }
           ]
         }
@@ -3305,7 +3537,7 @@
     },
     {
       "id": "GRIEVOUS",
-      "baseTier": 8,
+      "baseTier": 9,
       "synergySets": [
         {
           "synergyEnhancement": 2,
@@ -3355,14 +3587,6 @@
           "synergyEnhancement": 3,
           "characters": [
             "JARJARBINKS"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Gungan"
-              ],
-              "numberMatchesRequired": 3
-            }
           ]
         }
       ]
@@ -3689,8 +3913,69 @@
       ]
     },
     {
+      "id": "HUNTERS3",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "OMEGAS3",
+            "WRECKERS3",
+            "CROSSHAIRS3",
+            "BATCHERS3"
+          ]
+        }
+      ]
+    },
+    {
       "id": "HUYANG",
-      "baseTier": 12
+      "baseTier": 13,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "GENERALSYNDULLA",
+            "PADAWANSABINE"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GENERALSYNDULLA",
+            "PADAWANSABINE",
+            "EZRAEXILE"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "GLAHSOKATANO"
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "GLAHSOKATANO",
+            "EZRAEXILE"
+          ]
+        }
+      ]
     },
     {
       "id": "IDENVERSIOEMPIRE",
@@ -3752,7 +4037,7 @@
       ]
     },
     {
-      "baseTier": 11,
+      "baseTier": 10,
       "id": "IG12",
       "synergySets": [
         {
@@ -3841,11 +4126,15 @@
       ]
     },
     {
+      "id": "IG90",
+      "baseTier": 17
+    },
+    {
       "id": "IMAGUNDI",
       "baseTier": 18,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 3,
           "characters": [
             "JEDIMASTERKENOBI",
             "KIADIMUNDI"
@@ -3861,7 +4150,7 @@
           ]
         },
         {
-          "synergyEnhancement": 4,
+          "synergyEnhancement": 2,
           "characters": [
             "JEDIMASTERKENOBI"
           ],
@@ -3876,7 +4165,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 1,
           "characters": [
             "KIADIMUNDI"
           ],
@@ -3917,6 +4206,14 @@
           ]
         }
       ]
+    },
+    {
+      "id": "INQUISITORBARRISS",
+      "baseTier": 17
+    },
+    {
+      "id": "ITHANO",
+      "baseTier": 14
     },
     {
       "id": "JABBATHEHUTT",
@@ -4096,6 +4393,14 @@
       ]
     },
     {
+      "id": "JEDIMASTERMACEWINDU",
+      "baseTier": 10
+    },
+    {
+      "id": "JOCASTANU",
+      "baseTier": 10
+    },
+    {
       "id": "JOLEEBINDO",
       "baseTier": 11,
       "synergySets": [
@@ -4180,7 +4485,7 @@
       ],
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "ADMIRALRADDUS",
             "CASSIANANDOR"
@@ -4213,16 +4518,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
-          "characters": [
-            "SAWGERRERA",
-            "CARADUNE",
-            "KYLEKATARN",
-            "CASSIANANDOR"
-          ]
-        },
-        {
-          "synergyEnhancement": 6,
+          "synergyEnhancement": 5,
           "characters": [
             "ADMIRALRADDUS",
             "JYNERSO",
@@ -4293,10 +4589,25 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Jedi",
-                "Galactic Republic"
+                "Jedi Vanguard"
               ],
               "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "JOCASTANU",
+            "DEPABILLABA",
+            "VANGUARDTEMPLEGUARD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 1
             }
           ]
         }
@@ -4338,6 +4649,10 @@
     {
       "id": "KITFISTO",
       "baseTier": 18
+    },
+    {
+      "id": "KIX",
+      "baseTier": 17
     },
     {
       "id": "KRRSANTAN",
@@ -4539,7 +4854,7 @@
     },
     {
       "id": "LOGRAY",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -4583,6 +4898,20 @@
           "synergyEnhancement": 1,
           "characters": [
             "MAULS7"
+          ]
+        },
+        {
+          "synergyEnhancement": 1,
+          "characters": [],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Clone Trooper",
+                "Dark Side",
+                "Empire"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -4760,7 +5089,16 @@
     },
     {
       "baseTier": 5,
-      "id": "MANDALORBOKATAN"
+      "id": "MANDALORBOKATAN",
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "BOKATAN"
+          ]
+        }
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "MARAJADE",
@@ -4776,10 +5114,10 @@
     },
     {
       "id": "MARROK",
-      "baseTier": 9,
+      "baseTier": 10,
       "synergySets": [
         {
-          "synergyEnhancement": 2,
+          "synergyEnhancement": 3,
           "characters": [
             "BAYLANSKOLL"
           ]
@@ -4839,11 +5177,15 @@
       "baseTier": 5
     },
     {
+      "id": "MAZKANATA",
+      "baseTier": 17
+    },
+    {
       "id": "MERRIN",
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 4,
+          "synergyEnhancement": 3,
           "characters": [
             "DAKA",
             "MOTHERTALZIN",
@@ -4870,13 +5212,7 @@
                 "Nightsister",
                 "Imperial Remnant"
               ],
-              "numberMatchesRequired": 1
-            },
-            {
-              "include": [
-                "Nightsister"
-              ],
-              "numberMatchesRequired": 1
+              "numberMatchesRequired": 2
             }
           ]
         }
@@ -4984,27 +5320,26 @@
     },
     {
       "id": "MORGANELSBETH",
-      "baseTier": 8,
+      "baseTier": 9,
       "synergySets": [
         {
           "synergyEnhancement": 3,
           "characters": [
-            "GREATMOTHERS",
-            "MERRIN"
+            "GREATMOTHERS"
           ],
           "categoryDefinitions": [
-            {
-              "include": [
-                "Nightsister",
-                "Imperial Remnant"
-              ],
-              "numberMatchesRequired": 1
-            },
             {
               "include": [
                 "Nightsister"
               ],
               "numberMatchesRequired": 1
+            },
+            {
+              "include": [
+                "Nightsister",
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 2
             }
           ]
         }
@@ -5179,7 +5514,7 @@
     },
     {
       "id": "NINTHSISTER",
-      "baseTier": 11,
+      "baseTier": 12,
       "requiresAllZetas": false,
       "requiredZetas": [
         "specialskill_NINTHSISTER02"
@@ -5279,7 +5614,56 @@
     },
     {
       "id": "OMEGAS3",
-      "baseTier": 10
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "HUNTERS3",
+            "CROSSHAIRS3",
+            "WRECKERS3",
+            "BATCHERS3"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "OPERATIVE",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GRANDMOFFTARKIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LORDVADER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "PADAWANOBIWAN",
@@ -5311,7 +5695,53 @@
     },
     {
       "id": "PADAWANSABINE",
-      "baseTier": 8
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "GENERALSYNDULLA",
+            "HUYANG"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GENERALSYNDULLA",
+            "HUYANG",
+            "EZRAEXILE"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Spectre"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "GLAHSOKATANO"
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "GLAHSOKATANO",
+            "EZRAEXILE"
+          ]
+        }
+      ]
     },
     {
       "id": "PADMEAMIDALA",
@@ -5405,7 +5835,7 @@
     },
     {
       "id": "PAPLOO",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -5605,7 +6035,7 @@
     },
     {
       "id": "PRINCESSKNEESAA",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -5677,7 +6107,7 @@
     },
     {
       "id": "QUEENAMIDALA",
-      "baseTier": 9,
+      "baseTier": 8,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -5696,6 +6126,10 @@
           ]
         }
       ]
+    },
+    {
+      "id": "QUIGGOLD",
+      "baseTier": 17
     },
     {
       "id": "QUIGONJINN",
@@ -5899,7 +6333,7 @@
     },
     {
       "id": "REYJEDITRAINING",
-      "baseTier": 11,
+      "baseTier": 12,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -5940,7 +6374,7 @@
     },
     {
       "id": "ROSETICO",
-      "baseTier": 18,
+      "baseTier": 17,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -5984,7 +6418,7 @@
     },
     {
       "id": "SABINEWRENS3",
-      "baseTier": 16,
+      "baseTier": 17,
       "synergySets": [
         {
           "synergyEnhancement": 6,
@@ -6076,7 +6510,7 @@
     },
     {
       "id": "SAVAGEOPRESS",
-      "baseTier": 14,
+      "baseTier": 12,
       "omicronEnhancement": 3,
       "synergySets": [
         {
@@ -6086,7 +6520,8 @@
             "DARTHSION",
             "DARTHNIHILUS",
             "DARTHTALON"
-          ]
+          ],
+          "synergyEnhancementOmicron": 1
         }
       ]
     },
@@ -6191,6 +6626,44 @@
       ]
     },
     {
+      "id": "SCORCH",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "GRANDMOFFTARKIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LORDVADER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire",
+                "Clone Trooper",
+                "Dark Side"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "SCOUTTROOPER_V3",
       "baseTier": 10,
       "ignoreSynergyRequirements": {
@@ -6203,9 +6676,23 @@
       },
       "synergySets": [
         {
-          "synergyEnhancement": 4,
+          "synergyEnhancement": 3,
           "characters": [
             "MOFFGIDEONS1"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MOFFGIDEONS3"
           ],
           "categoryDefinitions": [
             {
@@ -6315,10 +6802,10 @@
     },
     {
       "id": "SHINHATI",
-      "baseTier": 9,
+      "baseTier": 10,
       "synergySets": [
         {
-          "synergyEnhancement": 2,
+          "synergyEnhancement": 3,
           "characters": [
             "BAYLANSKOLL"
           ]
@@ -6418,6 +6905,12 @@
           "characters": [
             "WATTAMBOR"
           ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "DARTHBANE"
+          ]
         }
       ]
     },
@@ -6447,6 +6940,10 @@
           ]
         }
       ]
+    },
+    {
+      "id": "SM33",
+      "baseTier": 17
     },
     {
       "id": "SMUGGLERCHEWBACCA",
@@ -6560,7 +7057,7 @@
       ]
     },
     {
-      "baseTier": 12,
+      "baseTier": 14,
       "id": "STAP",
       "synergySets": [
         {
@@ -6614,7 +7111,8 @@
     },
     {
       "id": "STARKILLER",
-      "baseTier": 5
+      "baseTier": 5,
+      "omicronEnhancement": 1
     },
     {
       "id": "STORMTROOPER",
@@ -6690,6 +7188,10 @@
       "baseTier": 14
     },
     {
+      "id": "STRANGER",
+      "baseTier": 5
+    },
+    {
       "id": "SUNFAC",
       "baseTier": 11,
       "synergySets": [
@@ -6708,7 +7210,15 @@
     },
     {
       "id": "SUPREMELEADERKYLOREN",
-      "baseTier": 2
+      "baseTier": 2,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "DARKREY"
+          ]
+        }
+      ]
     },
     {
       "id": "T3_M4",
@@ -6784,7 +7294,8 @@
     },
     {
       "baseTier": 5,
-      "id": "TARONMALICOS"
+      "id": "TARONMALICOS",
+      "omicronEnhancement": 1
     },
     {
       "id": "TEEBO",
@@ -6961,7 +7472,8 @@
             "SEVENTHSISTER"
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "TIEFIGHTERPILOT",
@@ -7152,7 +7664,7 @@
     },
     {
       "id": "VADER",
-      "baseTier": 8,
+      "baseTier": 9,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -7165,6 +7677,14 @@
     {
       "id": "VADERDUELSEND",
       "baseTier": 14
+    },
+    {
+      "id": "VANE",
+      "baseTier": 17
+    },
+    {
+      "id": "VANGUARDTEMPLEGUARD",
+      "baseTier": 17
     },
     {
       "id": "VEERS",
@@ -7309,6 +7829,21 @@
             "CHIEFCHIRPA",
             "LOGRAY",
             "PAPLOO"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "WRECKERS3",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "OMEGAS3",
+            "HUNTERS3",
+            "CROSSHAIRS3",
+            "BATCHERS3"
           ]
         }
       ]
@@ -7483,7 +8018,7 @@
     },
     {
       "id": "ZORIIBLISS_V2",
-      "baseTier": 13,
+      "baseTier": 12,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -7495,6 +8030,10 @@
           ]
         }
       ]
+    },
+    {
+      "id": "ZUCKUSS",
+      "baseTier": 17
     }
   ]
 }
