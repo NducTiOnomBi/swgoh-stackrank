@@ -5560,7 +5560,7 @@
     },
     {
       "id": "NINTHSISTER",
-      "baseTier": 12,
+      "baseTier": 11,
       "requiresAllZetas": false,
       "requiredZetas": [
         "specialskill_NINTHSISTER02"
