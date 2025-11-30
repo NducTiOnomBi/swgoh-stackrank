@@ -2081,7 +2081,7 @@
       ],
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "DARTHTRAYA",
             "DARTHSION",
@@ -2093,6 +2093,21 @@
                 "Sith"
               ],
               "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "DARTHTRAYA",
+            "DARTHSION"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
             }
           ]
         }
@@ -2137,7 +2152,7 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "DARTHTRAYA",
             "DARTHNIHILUS",
@@ -2149,6 +2164,21 @@
                 "Sith"
               ],
               "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "DARTHTRAYA",
+            "DARTHNIHILUS"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
             }
           ]
         }
@@ -2183,10 +2213,34 @@
       "baseTier": 10,
       "synergySets": [
         {
-          "synergyEnhancement": 2,
+          "synergyEnhancement": 1,
           "characters": [
             "DARTHNIHILUS",
             "DARTHSION"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "DARTHSION",
+            "DARTHNIHILUS",
+            "DARTHTALON"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
