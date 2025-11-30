@@ -153,6 +153,15 @@
           },
           "minItems": 0
         },
+        "excludeIfPresentCharacters": {
+          "type": "array",
+          "description": "Optional list of character IDs that prevent this synergy from activating if present on the team",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]+$"
+          },
+          "minItems": 1
+        },
         "categoryDefinitions": {
           "type": "array",
           "description": "Optional array of category-based synergy requirements",

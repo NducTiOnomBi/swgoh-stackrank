@@ -303,6 +303,14 @@ foreach ($character in $characterBaseDataItems) {
                     }
                 }
             }
+            
+            if ($synergySet.excludeIfPresentCharacters) {
+                foreach ($excludedCharId in $synergySet.excludeIfPresentCharacters) {
+                    if (-not $validCharacterIds.ContainsKey($excludedCharId)) {
+                        $crossRefErrors += "[$charId] Synergy set #$synergyIndex excludeIfPresentCharacters references non-existent character: '$excludedCharId'"
+                    }
+                }
+            }
         }
     }
 }
