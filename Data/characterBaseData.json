@@ -5144,14 +5144,6 @@
     {
       "baseTier": 5,
       "id": "MANDALORBOKATAN",
-      "synergySets": [
-        {
-          "synergyEnhancement": 1,
-          "characters": [
-            "BOKATAN"
-          ]
-        }
-      ],
       "omicronEnhancement": 1
     },
     {
@@ -6179,7 +6171,8 @@
             }
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "QUIGGOLD",
