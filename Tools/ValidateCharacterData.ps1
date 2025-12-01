@@ -306,7 +306,7 @@ foreach ($character in $characterBaseDataItems) {
             
             if ($synergySet.skipIfPresentCharacters) {
                 foreach ($excludedCharId in $synergySet.skipIfPresentCharacters) {
-                    if (-not $allCharacterIds.Contains($excludedCharId)) {
+                    if (-not $validCharacterIds.ContainsKey($excludedCharId)) {
                         $crossRefErrors += "[$charId] Synergy set #$synergyIndex skipIfPresentCharacters references non-existent character: '$excludedCharId'"
                     }
                 }
