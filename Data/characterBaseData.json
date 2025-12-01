@@ -3456,15 +3456,9 @@
       "synergySets": [
         {
           "synergyEnhancement": 3,
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Dark Side",
-                "Clone Trooper",
-                "Empire"
-              ],
-              "numberMatchesRequired": 2
-            }
+          "characters": [
+            "SCORCH",
+            "OPERATIVE"
           ]
         }
       ]
