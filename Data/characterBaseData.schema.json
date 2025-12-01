@@ -1,213 +1,222 @@
 {
-    "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://github.com/NducTiOnomBi/swgoh-stackrank/blob/main/Data/characterBaseData.schema.json",
-    "title": "SWGOH StackRank Character Base Data Schema",
-    "description": "Schema validation for Star Wars: Galaxy of Heroes character tier ranking data",
-    "type": "object",
-    "required": [
-        "characterBaseData"
-    ],
-    "additionalProperties": false,
-    "properties": {
-        "characterBaseData": {
-            "type": "array",
-            "description": "Array of character tier ranking configurations",
-            "items": {
-                "$ref": "#/definitions/character"
-            },
-            "minItems": 1
-        }
-    },
-    "definitions": {
-        "character": {
-            "type": "object",
-            "description": "Individual character tier and synergy configuration",
-            "required": [
-                "id",
-                "baseTier"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "id": {
-                    "type": "string",
-                    "description": "Unique character identifier (uppercase, may contain underscores and numbers)",
-                    "pattern": "^[A-Z0-9_]+$",
-                    "minLength": 1,
-                    "maxLength": 100
-                },
-                "baseTier": {
-                    "type": "integer",
-                    "description": "Base tier ranking (1-19, where 1 is highest/best)",
-                    "minimum": 1,
-                    "maximum": 19
-                },
-                "synergySets": {
-                    "type": "array",
-                    "description": "Optional array of synergy configurations that can improve tier placement",
-                    "items": {
-                        "$ref": "#/definitions/synergySet"
-                    },
-                    "minItems": 1
-                },
-                "requiresAllZetas": {
-                    "type": "boolean",
-                    "description": "Optional flag indicating if all zeta abilities must be unlocked"
-                },
-                "requiredZetas": {
-                    "type": "array",
-                    "description": "Optional array of required zeta ability identifiers (only used when requiresAllZetas is false, can be empty)",
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[A-Za-z0-9_]+$"
-                    }
-                },
-                "requiresAllOmicrons": {
-                    "type": "boolean",
-                    "description": "Optional flag indicating if all omicron abilities must be unlocked"
-                },
-                "requiredOmicrons": {
-                    "type": "array",
-                    "description": "Optional array of required omicron ability identifiers (only used when requiresAllOmicrons is false, can be empty)",
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[A-Za-z0-9_]+$"
-                    }
-                },
-                "omicronEnhancement": {
-                    "type": "integer",
-                    "description": "Optional omicron tier enhancement value (0-10)",
-                    "minimum": 0,
-                    "maximum": 10
-                },
-                "categories": {
-                    "type": "array",
-                    "description": "Optional array of category tags",
-                    "items": {
-                        "type": "string",
-                        "minLength": 1
-                    }
-                },
-                "ignoreSynergyRequirements": {
-                    "type": "object",
-                    "description": "Optional flags to ignore specific synergy requirements",
-                    "properties": {
-                        "gear": {
-                            "type": "boolean"
-                        },
-                        "rarity": {
-                            "type": "boolean"
-                        }
-                    },
-                    "additionalProperties": false
-                },
-                "ignoreRequirements": {
-                    "type": "object",
-                    "description": "Optional flags to ignore specific requirements",
-                    "properties": {
-                        "gear": {
-                            "type": "boolean"
-                        },
-                        "rarity": {
-                            "type": "boolean"
-                        }
-                    },
-                    "additionalProperties": false
-                }
-            }
-        },
-        "synergySet": {
-            "type": "object",
-            "description": "Synergy configuration that reduces effective tier when conditions are met",
-            "anyOf": [
-                {
-                    "required": [
-                        "synergyEnhancement"
-                    ]
-                },
-                {
-                    "required": [
-                        "synergyEnhancementOmicron"
-                    ]
-                }
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "synergyEnhancement": {
-                    "type": "integer",
-                    "description": "Tier improvement value when synergy conditions are met (0-10)",
-                    "minimum": 0,
-                    "maximum": 10
-                },
-                "synergyEnhancementOmicron": {
-                    "type": "integer",
-                    "description": "Additional tier improvement when omicron is applied (0-10)",
-                    "minimum": 0,
-                    "maximum": 10
-                },
-                "characters": {
-                    "type": "array",
-                    "description": "Optional list of specific character IDs that trigger this synergy",
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[A-Z0-9_]+$"
-                    },
-                    "minItems": 1
-                },
-                "categoryDefinitions": {
-                    "type": "array",
-                    "description": "Optional array of category-based synergy requirements",
-                    "items": {
-                        "$ref": "#/definitions/categoryDefinition"
-                    },
-                    "minItems": 1
-                },
-                "requiresAllZetas": {
-                    "type": "boolean",
-                    "description": "Optional flag indicating if all zeta abilities must be unlocked for this synergy"
-                },
-                "requiredZetas": {
-                    "type": "array",
-                    "description": "Optional array of required zeta ability identifiers for this synergy (only used when requiresAllZetas is false, can be empty)",
-                    "items": {
-                        "type": "string",
-                        "pattern": "^[A-Za-z0-9_]+$"
-                    }
-                }
-            }
-        },
-        "categoryDefinition": {
-            "type": "object",
-            "description": "Category-based matching criteria for synergy activation",
-            "required": [
-                "include",
-                "numberMatchesRequired"
-            ],
-            "additionalProperties": false,
-            "properties": {
-                "include": {
-                    "type": "array",
-                    "description": "Array of category tags that must be matched (e.g., 'Jedi', 'Galactic Republic')",
-                    "items": {
-                        "type": "string",
-                        "minLength": 1
-                    },
-                    "minItems": 1
-                },
-                "exclude": {
-                    "type": "array",
-                    "description": "Optional array of category tags to exclude from matching",
-                    "items": {
-                        "type": "string",
-                        "minLength": 1
-                    }
-                },
-                "numberMatchesRequired": {
-                    "type": "integer",
-                    "description": "Number of team members that must match the include criteria",
-                    "minimum": 1,
-                    "maximum": 4
-                }
-            }
-        }
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/NducTiOnomBi/swgoh-stackrank/blob/main/Data/characterBaseData.schema.json",
+  "title": "SWGOH StackRank Character Base Data Schema",
+  "description": "Schema validation for Star Wars: Galaxy of Heroes character tier ranking data",
+  "type": "object",
+  "required": [
+    "characterBaseData"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "characterBaseData": {
+      "type": "array",
+      "description": "Array of character tier ranking configurations",
+      "items": {
+        "$ref": "#/definitions/character"
+      },
+      "minItems": 1
     }
+  },
+  "definitions": {
+    "character": {
+      "type": "object",
+      "description": "Individual character tier and synergy configuration",
+      "required": [
+        "id",
+        "baseTier"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique character identifier (uppercase, may contain underscores and numbers)",
+          "pattern": "^[A-Z0-9_]+$",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "baseTier": {
+          "type": "integer",
+          "description": "Base tier ranking (1-19, where 1 is highest/best)",
+          "minimum": 1,
+          "maximum": 19
+        },
+        "synergySets": {
+          "type": "array",
+          "description": "Optional array of synergy configurations that can improve tier placement",
+          "items": {
+            "$ref": "#/definitions/synergySet"
+          },
+          "minItems": 1
+        },
+        "requiresAllZetas": {
+          "type": "boolean",
+          "description": "Optional flag indicating if all zeta abilities must be unlocked"
+        },
+        "requiredZetas": {
+          "type": "array",
+          "description": "Optional array of required zeta ability identifiers (only used when requiresAllZetas is false, can be empty)",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+$"
+          }
+        },
+        "requiresAllOmicrons": {
+          "type": "boolean",
+          "description": "Optional flag indicating if all omicron abilities must be unlocked"
+        },
+        "requiredOmicrons": {
+          "type": "array",
+          "description": "Optional array of required omicron ability identifiers (only used when requiresAllOmicrons is false, can be empty)",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+$"
+          }
+        },
+        "omicronEnhancement": {
+          "type": "integer",
+          "description": "Optional omicron tier enhancement value (0-10)",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "categories": {
+          "type": "array",
+          "description": "Optional array of category tags",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "ignoreSynergyRequirements": {
+          "type": "object",
+          "description": "Optional flags to ignore specific synergy requirements",
+          "properties": {
+            "gear": {
+              "type": "boolean"
+            },
+            "rarity": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        },
+        "ignoreRequirements": {
+          "type": "object",
+          "description": "Optional flags to ignore specific requirements",
+          "properties": {
+            "gear": {
+              "type": "boolean"
+            },
+            "rarity": {
+              "type": "boolean"
+            }
+          },
+          "additionalProperties": false
+        }
+      }
+    },
+    "synergySet": {
+      "type": "object",
+      "description": "Synergy configuration that reduces effective tier when conditions are met",
+      "anyOf": [
+        {
+          "required": [
+            "synergyEnhancement"
+          ]
+        },
+        {
+          "required": [
+            "synergyEnhancementOmicron"
+          ]
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "synergyEnhancement": {
+          "type": "integer",
+          "description": "Tier improvement value when synergy conditions are met (0-10)",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "synergyEnhancementOmicron": {
+          "type": "integer",
+          "description": "Additional tier improvement when omicron is applied (0-10)",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "characters": {
+          "type": "array",
+          "description": "Optional list of specific character IDs that trigger this synergy",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]+$"
+          },
+          "minItems": 0
+        },
+        "skipIfPresentCharacters": {
+          "type": "array",
+          "description": "Optional list of character IDs that prevent this synergy from activating if present on the team",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]+$"
+          },
+          "minItems": 1
+        },
+        "categoryDefinitions": {
+          "type": "array",
+          "description": "Optional array of category-based synergy requirements",
+          "items": {
+            "$ref": "#/definitions/categoryDefinition"
+          },
+          "minItems": 1
+        },
+        "requiresAllZetas": {
+          "type": "boolean",
+          "description": "Optional flag indicating if all zeta abilities must be unlocked for this synergy"
+        },
+        "requiredZetas": {
+          "type": "array",
+          "description": "Optional array of required zeta ability identifiers for this synergy (only used when requiresAllZetas is false, can be empty)",
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_]+$"
+          }
+        }
+      }
+    },
+    "categoryDefinition": {
+      "type": "object",
+      "description": "Category-based matching criteria for synergy activation",
+      "required": [
+        "include",
+        "numberMatchesRequired"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "include": {
+          "type": "array",
+          "description": "Array of category tags that must be matched (e.g., 'Jedi', 'Galactic Republic')",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "minItems": 1
+        },
+        "exclude": {
+          "type": "array",
+          "description": "Optional array of category tags to exclude from matching",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "numberMatchesRequired": {
+          "type": "integer",
+          "description": "Number of team members that must match the include criteria",
+          "minimum": 1,
+          "maximum": 4
+        }
+      }
+    }
+  }
 }

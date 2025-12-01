@@ -56,6 +56,7 @@ Each synergy set reduces the effective tier when conditions are met:
     "synergyEnhancement": 3, // 0-10 (tier improvement) - at least one of synergyEnhancement or synergyEnhancementOmicron required
     "synergyEnhancementOmicron": 2, // Optional: 0-10 (additional omicron enhancement)
     "characters": ["VADER", "EMPEROR"], // Optional: specific character IDs
+    "skipIfPresentCharacters": ["BADBATCHOMEGA"], // Optional: character IDs that prevent synergy activation if present
     "categoryDefinitions": [
         // Optional: category matching
         {
@@ -77,7 +78,7 @@ Each synergy set reduces the effective tier when conditions are met:
 4. **Synergy Slot Limit**: Each synergy set can reference a maximum of 4 total teammates: `characters.length + sum(categoryDefinitions[].numberMatchesRequired) ≤ 4` (enforced by PowerShell validation, not JSON schema)
 5. **Alphabetical Order**: All characters MUST be sorted by `id` (case-sensitive)
 6. **No Duplicates**: Each character `id` must be unique
-7. **Character References**: All character IDs in `synergySets[].characters` arrays MUST reference existing characters in the data file
+7. **Character References**: All character IDs in `synergySets[].characters` and `synergySets[].skipIfPresentCharacters` arrays MUST reference existing characters in the data file
 8. **Property Names**: Only known property names are allowed (enforced by schema `additionalProperties: false`)
 9. **Formatting**: Use 2-space indentation, UTF-8 encoding without BOM
 10. **JSON Validity**: Must parse as valid JSON
