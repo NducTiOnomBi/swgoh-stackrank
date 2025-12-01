@@ -1486,7 +1486,7 @@
             "BADBATCHTECH",
             "BADBATCHWRECKER"
           ],
-          "excludeIfPresentCharacters": [
+          "skipIfPresentCharacters": [
             "BADBATCHOMEGA"
           ]
         },

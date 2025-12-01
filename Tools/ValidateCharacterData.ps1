@@ -304,10 +304,10 @@ foreach ($character in $characterBaseDataItems) {
                 }
             }
             
-            if ($synergySet.excludeIfPresentCharacters) {
-                foreach ($excludedCharId in $synergySet.excludeIfPresentCharacters) {
-                    if (-not $validCharacterIds.ContainsKey($excludedCharId)) {
-                        $crossRefErrors += "[$charId] Synergy set #$synergyIndex excludeIfPresentCharacters references non-existent character: '$excludedCharId'"
+            if ($synergySet.skipIfPresentCharacters) {
+                foreach ($excludedCharId in $synergySet.skipIfPresentCharacters) {
+                    if (-not $allCharacterIds.Contains($excludedCharId)) {
+                        $crossRefErrors += "[$charId] Synergy set #$synergyIndex skipIfPresentCharacters references non-existent character: '$excludedCharId'"
                     }
                 }
             }

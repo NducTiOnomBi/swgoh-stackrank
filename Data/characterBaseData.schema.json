@@ -153,7 +153,7 @@
           },
           "minItems": 0
         },
-        "excludeIfPresentCharacters": {
+        "skipIfPresentCharacters": {
           "type": "array",
           "description": "Optional list of character IDs that prevent this synergy from activating if present on the team",
           "items": {

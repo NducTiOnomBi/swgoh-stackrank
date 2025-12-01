@@ -60,14 +60,16 @@ function initializeEventListeners() {
         }
     });
 
-    // Click outside to close all dropdowns (character and tag)
+    // Click outside to close all dropdowns (character, exclusion, and tag)
     document.addEventListener('click', (e) => {
         const isCharacterInput = e.target.closest('.character-input');
         const isCharacterDropdown = e.target.closest('.character-dropdown');
+        const isExclusionInput = e.target.closest('.exclusion-input');
+        const isExclusionDropdown = e.target.closest('[id^="exclDropdown_"]');
         const isTagInput = e.target.closest('.tag-input');
         const isTagDropdown = e.target.closest('[id^="tag-dropdown_"]');
 
-        if (!isCharacterInput && !isCharacterDropdown && !isTagInput && !isTagDropdown) {
+        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown) {
             hideAllDropdowns();
         }
     });
@@ -80,6 +82,15 @@ function initializeEventListeners() {
                 const synergyIndex = parseInt(match[1]);
                 const charIndex = parseInt(match[2]);
                 showCharacterDropdown(e.target, synergyIndex, charIndex);
+            }
+        }
+        // Exclusion input events
+        if (e.target.classList.contains('exclusion-input')) {
+            const match = e.target.id.match(/exclInput_(\d+)_(\d+)/);
+            if (match) {
+                const synergyIndex = parseInt(match[1]);
+                const exclIndex = parseInt(match[2]);
+                showExclusionDropdown(e.target, synergyIndex, exclIndex);
             }
         }
         // Tag input events
@@ -103,6 +114,15 @@ function initializeEventListeners() {
                 handleCharacterInputKeydown(e, e.target, synergyIndex, charIndex);
             }
         }
+        // Exclusion input keydown
+        if (e.target.classList.contains('exclusion-input')) {
+            const match = e.target.id.match(/exclInput_(\d+)_(\d+)/);
+            if (match) {
+                const synergyIndex = parseInt(match[1]);
+                const exclIndex = parseInt(match[2]);
+                handleExclusionInputKeydown(e, e.target, synergyIndex, exclIndex);
+            }
+        }
         // Tag input keydown
         if (e.target.classList.contains('tag-input')) {
             const synergyIndex = parseInt(e.target.dataset.synergyIndex);
@@ -122,6 +142,15 @@ function initializeEventListeners() {
                 const synergyIndex = parseInt(match[1]);
                 const charIndex = parseInt(match[2]);
                 showCharacterDropdown(e.target, synergyIndex, charIndex);
+            }
+        }
+        // Exclusion input focus
+        if (e.target.classList.contains('exclusion-input')) {
+            const match = e.target.id.match(/exclInput_(\d+)_(\d+)/);
+            if (match) {
+                const synergyIndex = parseInt(match[1]);
+                const exclIndex = parseInt(match[2]);
+                showExclusionDropdown(e.target, synergyIndex, exclIndex);
             }
         }
         // Tag input focus
@@ -433,6 +462,17 @@ function deepEqualDrafts(draft1, draft2) {
                     }
                 }
             }
+
+            // Compare skipIfPresentCharacters arrays
+            const excChar1 = set1.skipIfPresentCharacters;
+            const excChar2 = set2.skipIfPresentCharacters;
+            if ((excChar1 === undefined) !== (excChar2 === undefined)) return false;
+            if (excChar1 && excChar2) {
+                if (excChar1.length !== excChar2.length) return false;
+                for (let j = 0; j < excChar1.length; j++) {
+                    if (excChar1[j] !== excChar2[j]) return false;
+                }
+            }
         }
     }
 
@@ -474,6 +514,7 @@ function initializeDraft(character) {
         return sets.map(set => ({
             ...set,
             characters: set.characters ? [...set.characters] : undefined,
+            skipIfPresentCharacters: set.skipIfPresentCharacters ? [...set.skipIfPresentCharacters] : undefined,
             categoryDefinitions: set.categoryDefinitions ? set.categoryDefinitions.map(catDef => ({
                 ...catDef,
                 include: catDef.include ? [...catDef.include] : undefined,
@@ -2148,6 +2189,46 @@ function renderSynergyCharactersEditor(synergyIndex, synergySet) {
     return html;
 }
 
+function renderSynergyExclusionsEditor(synergyIndex, synergySet) {
+    const exclusions = synergySet.skipIfPresentCharacters || [];
+
+    let html = `
+        <div class="form-group">
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <label class="info-label">Skip If Present:</label>
+                <div style="display: flex; flex-direction: column; gap: 8px;">`;
+
+    exclusions.forEach((charId, exclIndex) => {
+        html += `
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <input type="text" 
+                               id="exclInput_${synergyIndex}_${exclIndex}"
+                               value="${charId}"
+                               class="exclusion-input"
+                               style="flex: 1; font-family: monospace;"
+                               placeholder="Type to filter...">
+                        <button class="btn btn-danger btn-small" 
+                                onclick="removeExclusionCharacter(${synergyIndex}, ${exclIndex})"
+                                style="padding: 4px 8px;">
+                            <span class="icon">×</span>
+                        </button>
+                    </div>`;
+    });
+
+    html += `
+                </div>
+            </div>
+            <div class="form-help">This synergy set  will be skipped if the specified characters meet the synergy requirements.</div>
+            <button class="btn btn-primary btn-small" 
+                    onclick="addExclusionCharacter(${synergyIndex})"
+                    style="margin-top: 8px; align-self: flex-end;">
+                <span class="icon">+</span> Add Skip
+            </button>
+        </div>`;
+
+    return html;
+}
+
 function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
     const categoryDefs = synergySet.categoryDefinitions || [];
 
@@ -2156,7 +2237,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
     const canAddCategoryDef = currentTotal < 4;
 
     let html = `
-        <div style="display: flex; flex-direction: column; gap: 8px;">
+        <div class="form-group">
             <label class="info-label">Category Definitions:</label>
             <div style="display: flex; flex-direction: column; gap: 12px;">`;
 
@@ -2210,23 +2291,25 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
     });
 
     html += `
-            </div>
-        </div>`;
+            </div>`;
 
     // Only show Add Category Definition button if limit not reached
     if (canAddCategoryDef) {
         html += `
-        <button class="btn btn-primary btn-small" 
-                onclick="addCategoryDefinition(${synergyIndex})"
-                style="margin-top: 8px; align-self: flex-end;">
-            <span class="icon">+</span> Add Category Definition
-        </button>`;
+            <button class="btn btn-primary btn-small" 
+                    onclick="addCategoryDefinition(${synergyIndex})"
+                    style="margin-top: 8px; align-self: flex-end;">
+                <span class="icon">+</span> Add Category Definition
+            </button>`;
     } else {
         html += `
-        <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
-            Cannot add more category definitions (limit: characters + required matches = 4)
-        </div>`;
+            <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
+                Cannot add more category definitions (limit: characters + required matches = 4)
+            </div>`;
     }
+
+    html += `
+        </div>`;
 
     return html;
 }
@@ -2309,6 +2392,7 @@ function renderSynergyEditor(character) {
                 </div>
                 ${renderSynergyCharactersEditor(index, synergySet)}
                 ${renderSynergyCategoryDefinitionsEditor(index, synergySet)}
+                ${renderSynergyExclusionsEditor(index, synergySet)}
             </div>
         `;
     });
@@ -2621,6 +2705,226 @@ function removeSynergyCharacter(synergyIndex, charIndex) {
     refreshDraftDirtyState();
     updateStatus('Character removed - staged in draft', 'warning');
     renderSynergyEditor(selectedCharacter);
+}
+
+// ============================================
+// Exclusion Character Handlers
+// ============================================
+function addExclusionCharacter(synergyIndex) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
+
+    const synergySet = currentDraft.synergySets[synergyIndex];
+
+    if (!synergySet.skipIfPresentCharacters) {
+        synergySet.skipIfPresentCharacters = [];
+    }
+
+    synergySet.skipIfPresentCharacters.push('');
+
+    refreshDraftDirtyState();
+    updateStatus('Exclusion field added - click Update Character to apply', 'warning');
+    renderSynergyEditor(selectedCharacter);
+}
+
+function removeExclusionCharacter(synergyIndex, exclIndex) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
+
+    const synergySet = currentDraft.synergySets[synergyIndex];
+    if (!synergySet.skipIfPresentCharacters || exclIndex >= synergySet.skipIfPresentCharacters.length) return;
+
+    // Check for unsaved draft changes (gate before destructive action)
+    if (!confirmDiscardDrafts()) {
+        return;
+    }
+
+    synergySet.skipIfPresentCharacters.splice(exclIndex, 1);
+
+    // Remove array if empty
+    if (synergySet.skipIfPresentCharacters.length === 0) {
+        delete synergySet.skipIfPresentCharacters;
+    }
+
+    refreshDraftDirtyState();
+    updateStatus('Exclusion removed - staged in draft', 'warning');
+    renderSynergyEditor(selectedCharacter);
+}
+
+function updateExclusionCharacter(synergyIndex, exclIndex, value) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
+
+    const synergySet = currentDraft.synergySets[synergyIndex];
+    if (!synergySet.skipIfPresentCharacters || exclIndex >= synergySet.skipIfPresentCharacters.length) return;
+
+    // Auto-uppercase and trim
+    value = value.trim().toUpperCase();
+
+    // Auto-remove if empty
+    if (value === '') {
+        removeExclusionCharacter(synergyIndex, exclIndex);
+        return;
+    }
+
+    // Validate format: uppercase letters, numbers, and underscores only
+    const validPattern = /^[A-Z0-9_]+$/;
+    if (!validPattern.test(value)) {
+        alert('Invalid character ID format. Only uppercase letters, numbers, and underscores are allowed.');
+        // Re-render to restore previous value
+        renderSynergyEditor(selectedCharacter);
+        return;
+    }
+
+    // Check for duplicates within the same exclusion list
+    const isDuplicate = synergySet.skipIfPresentCharacters.some((excl, i) =>
+        i !== exclIndex && excl === value
+    );
+
+    if (isDuplicate) {
+        alert('This character is already in the exclusion list. Duplicates are not allowed.');
+        // Re-render to restore previous value
+        renderSynergyEditor(selectedCharacter);
+        return;
+    }
+
+    // Update the value
+    synergySet.skipIfPresentCharacters[exclIndex] = value;
+
+    refreshDraftDirtyState();
+    updateStatus('Exclusion character updated - staged in draft', 'warning');
+    renderSynergyEditor(selectedCharacter);
+}
+
+function getAvailableExclusionIds(synergyIndex, exclIndex) {
+    if (!selectedCharacter || !currentDraft) return [];
+
+    const currentCharId = selectedCharacter.id;
+    const synergySet = currentDraft.synergySets?.[synergyIndex];
+    const existingExclIds = synergySet?.skipIfPresentCharacters || [];
+
+    // Get the ID being edited (if any)
+    const editingExclId = existingExclIds[exclIndex] || '';
+
+    return characterData
+        .map(char => char.id)
+        .filter(id => {
+            // Exclude the current character being edited
+            if (id === currentCharId) return false;
+            // Include the exclusion being edited or characters not in the list
+            return id === editingExclId || !existingExclIds.includes(id);
+        })
+        .sort();
+}
+
+function showExclusionDropdown(inputElement, synergyIndex, exclIndex) {
+    hideAllDropdowns();
+
+    const availableIds = getAvailableExclusionIds(synergyIndex, exclIndex);
+    const inputValue = inputElement.value.trim().toUpperCase();
+
+    const filteredIds = inputValue
+        ? availableIds.filter(id => id.startsWith(inputValue))
+        : availableIds;
+
+    if (filteredIds.length === 0) return;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `exclDropdown_${synergyIndex}_${exclIndex}`;
+
+    filteredIds.forEach((id, index) => {
+        const option = document.createElement('div');
+        option.className = 'dropdown-option';
+        option.textContent = id;
+        option.dataset.index = index;
+
+        option.addEventListener('click', (e) => {
+            e.stopPropagation();
+            selectExclusionFromDropdown(synergyIndex, exclIndex, id);
+        });
+
+        option.addEventListener('mouseenter', () => {
+            dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+        });
+
+        dropdown.appendChild(option);
+    });
+
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+
+    document.body.appendChild(dropdown);
+
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+function selectExclusionFromDropdown(synergyIndex, exclIndex, characterId) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
+
+    const synergySet = currentDraft.synergySets[synergyIndex];
+    if (!synergySet.skipIfPresentCharacters || exclIndex >= synergySet.skipIfPresentCharacters.length) return;
+
+    synergySet.skipIfPresentCharacters[exclIndex] = characterId;
+
+    refreshDraftDirtyState();
+    updateStatus('Exclusion character selected - staged in draft', 'warning');
+
+    hideAllDropdowns();
+    renderSynergyEditor(selectedCharacter);
+}
+
+function handleExclusionInputKeydown(event, inputElement, synergyIndex, exclIndex) {
+    const dropdown = document.getElementById(`exclDropdown_${synergyIndex}_${exclIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showExclusionDropdown(inputElement, synergyIndex, exclIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option');
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption) {
+                selectExclusionFromDropdown(synergyIndex, exclIndex, selectedOption.textContent);
+            } else if (options.length === 1) {
+                selectExclusionFromDropdown(synergyIndex, exclIndex, options[0].textContent);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
 }
 
 // Tag dropdown helper functions for category definitions
