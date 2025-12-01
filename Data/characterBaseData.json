@@ -378,9 +378,11 @@
     },
     {
       "id": "AURRA_SING",
-      "baseTier": 15,
+      "baseTier": 14,
       "requiresAllZetas": false,
-      "requiredZetas": [],
+      "requiredZetas": [
+        "specialskill_AURRA_SING02"
+      ],
       "synergySets": [
         {
           "synergyEnhancement": 2,
@@ -5114,7 +5116,37 @@
     },
     {
       "id": "LUTHENRAEL",
-      "baseTier": 11
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MONMOTHMA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Rebel Fighter"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "SAWGERRERA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Rebel Fighter"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "MACEWINDU",
@@ -6656,14 +6688,28 @@
     },
     {
       "id": "SANASTARROS",
-      "baseTier": 11,
+      "baseTier": 12,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 1,
           "characters": [
             "HOTHHAN",
             "HOTHLEIA",
             "STORMTROOPERHAN"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
         }
       ]
@@ -6690,13 +6736,27 @@
       "baseTier": 12,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "categoryDefinitions": [
             {
               "include": [
                 "Rebel Fighter"
               ],
               "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LUTHENRAEL"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Rebel Fighter"
+              ],
+              "numberMatchesRequired": 3
             }
           ]
         }
