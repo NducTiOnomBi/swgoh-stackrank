@@ -1572,7 +1572,8 @@
               ],
               "numberMatchesRequired": 1
             }
-          ]
+          ],
+          "synergyEnhancementOmicron": 1
         },
         {
           "synergyEnhancement": 3,
@@ -2456,7 +2457,46 @@
     },
     {
       "id": "DEPABILLABA",
-      "baseTier": 17
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "JEDIMASTERMACEWINDU"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "KELLERANBEQ",
+            "JOCASTANU",
+            "VANGUARDTEMPLEGUARD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 0,
+          "characters": [
+            "KELLERANBEQ",
+            "VANGUARDTEMPLEGUARD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "DIRECTORKRENNIC",
@@ -4317,7 +4357,8 @@
     },
     {
       "id": "JARJARBINKS",
-      "baseTier": 7
+      "baseTier": 8,
+      "omicronEnhancement": 1
     },
     {
       "id": "JAWA",
@@ -4445,11 +4486,86 @@
     },
     {
       "id": "JEDIMASTERMACEWINDU",
-      "baseTier": 10
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "JOCASTANU"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ],
+      "omicronEnhancement": 1
     },
     {
       "id": "JOCASTANU",
-      "baseTier": 10
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "JEDIMASTERMACEWINDU"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "KELLERANBEQ",
+            "DEPABILLABA",
+            "VANGUARDTEMPLEGUARD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "KELLERANBEQ"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "JOLEEBINDO",
@@ -6841,6 +6957,15 @@
               "numberMatchesRequired": 4
             }
           ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "KELLERANBEQ",
+            "VANGUARDTEMPLEGUARD",
+            "DEPABILLABA",
+            "JOCASTANU"
+          ]
         }
       ]
     },
@@ -7728,7 +7853,39 @@
     },
     {
       "id": "VANGUARDTEMPLEGUARD",
-      "baseTier": 17
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "KELLERANBEQ"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "KELLERANBEQ",
+            "JOCASTANU",
+            "DEPABILLABA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi Vanguard"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "VEERS",
@@ -8005,7 +8162,7 @@
     },
     {
       "id": "ZAMWESELL",
-      "baseTier": 14,
+      "baseTier": 16,
       "synergySets": [
         {
           "synergyEnhancement": 4,
@@ -8023,7 +8180,8 @@
             }
           ]
         }
-      ]
+      ],
+      "omicronEnhancement": 2
     },
     {
       "id": "ZEBS3",
