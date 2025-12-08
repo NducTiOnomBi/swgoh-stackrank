@@ -76,8 +76,13 @@ function initializeEventListeners() {
 
     // Click on empty area in tier grid to deselect current character
     document.getElementById('tierGrid').addEventListener('click', (e) => {
-        // Only deselect if clicking empty space (not a character card)
-        if (!e.target.closest('.character-card') && selectedCharacter) {
+        // Only deselect if clicking on the tier grid itself or tier containers (not a character card)
+        const clickedElement = e.target;
+        const isCharacterCard = clickedElement.classList.contains('character-card') || clickedElement.closest('.character-card');
+        const isTierGrid = clickedElement.id === 'tierGrid';
+        const isTierContainer = clickedElement.classList.contains('tier-container');
+
+        if (!isCharacterCard && (isTierGrid || isTierContainer) && selectedCharacter) {
             clearCharacterSelection();
         }
     });
@@ -1445,6 +1450,7 @@ function renderEmptyCharacterDetails() {
             <p>Select a character to view details</p>
         </div>
     `;
+    updateCharacterIdDisplay(null);
 }
 
 function renderEmptySynergyEditor() {
@@ -1454,6 +1460,19 @@ function renderEmptySynergyEditor() {
             <p>Select a character to view synergy sets</p>
         </div>
     `;
+}
+
+/**
+ * Updates the character ID display in both sidebar subheaders
+ * @param {string|null} characterId - The character ID to display, or null to show default message
+ */
+function updateCharacterIdDisplay(characterId) {
+    const leftDisplay = document.querySelector('#characterIdLeft .character-id-display');
+    const rightDisplay = document.querySelector('#characterIdRight .character-id-display');
+    const displayText = characterId || 'No character selected';
+
+    if (leftDisplay) leftDisplay.textContent = displayText;
+    if (rightDisplay) rightDisplay.textContent = displayText;
 }
 
 function clearCharacterSelection() {
@@ -1513,6 +1532,9 @@ function selectCharacter(character) {
 function renderCharacterDetails(character) {
     const container = document.getElementById('characterDetails');
 
+    // Update character ID display in both sidebars
+    updateCharacterIdDisplay(character.id);
+
     // Use draft values if available, otherwise use character values
     const draftValues = currentDraft || character;
 
@@ -1529,7 +1551,6 @@ function renderCharacterDetails(character) {
 
     const html = `
         <div class="character-info">
-            <div class="character-info-header">${character.id}</div>
             <div class="info-row">
                 <span class="info-label">Base Tier</span>
                 <span class="info-value">${character.baseTier}</span>
