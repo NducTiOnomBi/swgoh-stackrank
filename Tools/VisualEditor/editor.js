@@ -2193,7 +2193,7 @@ function renderSynergyCharactersEditor(synergyIndex, synergySet) {
     // Only show Add Character button if limit not reached
     if (canAddCharacter) {
         html += `
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addSynergyCharacter(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Character
@@ -2241,7 +2241,7 @@ function renderSynergyExclusionsEditor(synergyIndex, synergySet) {
                 </div>
             </div>
             <div class="form-help">This synergy set  will be skipped if the specified characters meet the synergy requirements.</div>
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addExclusionCharacter(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Skip
@@ -2318,7 +2318,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
     // Only show Add Category Definition button if limit not reached
     if (canAddCategoryDef) {
         html += `
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addCategoryDefinition(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Category Definition
@@ -2348,7 +2348,7 @@ function renderSynergyEditor(character) {
             <div class="empty-state">
                 <p>No synergy sets defined</p>
             </div>
-            <button class="btn btn-primary add-synergy-btn" onclick="addSynergySet()">
+            <button class="btn btn-secondary add-synergy-btn" onclick="addSynergySet()">
                 <span class="icon">+</span> Add Synergy Set
             </button>
         `;
@@ -2421,7 +2421,7 @@ function renderSynergyEditor(character) {
 
     html += '</div>';
     html += `
-        <button class="btn btn-primary add-synergy-btn" onclick="addSynergySet()">
+        <button class="btn btn-secondary add-synergy-btn" onclick="addSynergySet()">
             <span class="icon">+</span> Add Synergy Set
         </button>
     `;
