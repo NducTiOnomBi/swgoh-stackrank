@@ -74,6 +74,14 @@ function initializeEventListeners() {
         }
     });
 
+    // Click on empty area in tier grid to deselect current character
+    document.getElementById('tierGrid').addEventListener('click', (e) => {
+        // Only deselect if clicking empty space (not a character card)
+        if (!e.target.closest('.character-card') && selectedCharacter) {
+            clearCharacterSelection();
+        }
+    });
+
     // Delegate input events for character dropdowns
     document.addEventListener('input', (e) => {
         if (e.target.classList.contains('character-input')) {

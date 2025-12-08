@@ -280,7 +280,6 @@ body {
 }
 
 .tier-column {
-    min-height: 200px;
     background-color: var(--color-bg-card);
     border: 2px solid var(--color-border);
     border-radius: var(--border-radius);
