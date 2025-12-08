@@ -15,6 +15,13 @@ let draftIsDirty = false; // Cached dirty state
 // Category tag autocomplete cache
 let categoryTags = []; // All unique tags from character.categories and categoryDefinitions
 
+// Reference data from authoritative API
+let referenceCharacters = []; // All characters from swgoh.spineless.net
+let referenceAbilities = [];  // All abilities (zetas, omicrons, etc.)
+let referenceCategories = []; // All possible categories/tags
+let referenceRoles = [];      // All possible roles
+let referenceAlignments = []; // All possible alignments
+
 // Sidebar collapse state
 let isLeftSidebarCollapsed = true;  // Start collapsed
 let isRightSidebarCollapsed = true; // Start collapsed
@@ -26,8 +33,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize event listeners
     initializeEventListeners();
 
-    // Load character data from server
-    await loadCharacterData();
+    // Load reference data and character data in parallel
+    await Promise.all([
+        loadReferenceData(),
+        loadCharacterData()
+    ]);
 });
 
 function initializeEventListeners() {
@@ -181,6 +191,75 @@ function initializeEventListeners() {
 // ============================================
 // Data Loading and Saving
 // ============================================
+
+/**
+ * Loads reference data from the authoritative SWGOH API.
+ * This includes characters, abilities, categories, roles, and alignments.
+ * These are used for validation and autocomplete features.
+ */
+async function loadReferenceData() {
+    const baseUrl = 'https://swgoh.spineless.net/api';
+
+    try {
+        updateStatus('Loading reference data...');
+
+        // Fetch all reference data in parallel
+        const [charactersRes, abilitiesRes, categoriesRes, rolesRes, alignmentsRes] = await Promise.all([
+            fetch(`${baseUrl}/characters`),
+            fetch(`${baseUrl}/abilities`),
+            fetch(`${baseUrl}/categories`),
+            fetch(`${baseUrl}/roles`),
+            fetch(`${baseUrl}/alignments`)
+        ]);
+
+        // Check for failures
+        const responses = [
+            { name: 'characters', res: charactersRes },
+            { name: 'abilities', res: abilitiesRes },
+            { name: 'categories', res: categoriesRes },
+            { name: 'roles', res: rolesRes },
+            { name: 'alignments', res: alignmentsRes }
+        ];
+
+        const failures = responses.filter(r => !r.res.ok);
+        if (failures.length > 0) {
+            console.warn('Some reference data failed to load:', failures.map(f => f.name).join(', '));
+        }
+
+        // Parse successful responses
+        if (charactersRes.ok) {
+            referenceCharacters = await charactersRes.json();
+            console.log(`Loaded ${referenceCharacters.length} reference characters`);
+        }
+
+        if (abilitiesRes.ok) {
+            referenceAbilities = await abilitiesRes.json();
+            console.log(`Loaded ${referenceAbilities.length} reference abilities`);
+        }
+
+        if (categoriesRes.ok) {
+            referenceCategories = await categoriesRes.json();
+            console.log(`Loaded ${referenceCategories.length} reference categories`);
+        }
+
+        if (rolesRes.ok) {
+            referenceRoles = await rolesRes.json();
+            console.log(`Loaded ${referenceRoles.length} reference roles`);
+        }
+
+        if (alignmentsRes.ok) {
+            referenceAlignments = await alignmentsRes.json();
+            console.log(`Loaded ${referenceAlignments.length} reference alignments`);
+        }
+
+        updateStatus('Reference data loaded');
+    } catch (error) {
+        console.error('Error loading reference data:', error);
+        updateStatus('Warning: Reference data unavailable', 'warning');
+        // Don't block the app - reference data is supplementary
+    }
+}
+
 async function loadCharacterData() {
     try {
         showLoading(true);
