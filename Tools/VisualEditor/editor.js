@@ -1618,13 +1618,6 @@ function renderCharacterDetails(character) {
     // Render the omicron requirements editor
     renderOmicronEditor(character);
 
-    // Add the Update Character button after all fields
-    container.innerHTML += `
-        <button class="btn btn-primary" id="btnUpdateCharacter" onclick="updateCharacter()" style="margin-top: 20px;" disabled>
-            Update Character
-        </button>
-    `;
-
     // Add event listeners to capture form changes into draft
     setTimeout(() => {
         ['inputBaseTier', 'chkHasOmicronEnhancement', 'inputOmicronEnhancement', 'ignoreReqGear', 'ignoreReqRarity', 'ignoreSynergyReqGear', 'ignoreSynergyReqRarity'].forEach(id => {
@@ -3476,9 +3469,16 @@ function updateSaveButtonState() {
         saveButton.disabled = !hasUnsavedChanges;
     }
 
-    const updateButton = document.getElementById('btnUpdateCharacter');
-    if (updateButton) {
-        updateButton.disabled = !hasDraftChanges();
+    // Update both sidebar Update Character buttons
+    const isDraftDirty = hasDraftChanges();
+    const updateButtonLeft = document.getElementById('btnUpdateCharacterLeft');
+    const updateButtonRight = document.getElementById('btnUpdateCharacterRight');
+
+    if (updateButtonLeft) {
+        updateButtonLeft.disabled = !isDraftDirty;
+    }
+    if (updateButtonRight) {
+        updateButtonRight.disabled = !isDraftDirty;
     }
 }
 
