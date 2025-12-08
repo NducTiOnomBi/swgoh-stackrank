@@ -4,11 +4,7 @@
 
 The purpose of these tools are to manage the [characterBaseData.json](../Data/characterBaseData.json) file values.
 
-When the characterBaseData is converted into an Excel file, the data will be formatted to validate character tiering. specifically how the characters will be sorted into tiers. This sorting does not take into account any player specifics, so all sorting is done based on best case scenario.
-
-There are two types of tiered Excel output, the default which ignores all synergy bonuses, and the synergy based output. The synergy based will sort all characters like the defalt, but will take into account the best synergy optimizations for every character. The synergy based output is intended to validate synergy optimization balance.
-
-Both of these outputs work together, specifcially when optimizing for a specific ranking position.
+The Web-Based Visual Editor is the easiest method to edit the characterBaseData.json.
 
 ## Requirements
 
@@ -19,7 +15,7 @@ Both of these outputs work together, specifcially when optimizing for a specific
 - Minimum viewport: 768px (desktop/laptop/tablet)
 - GitHub Codespaces (optional, but recommended for cloud-based editing)
 
-### For Excel-Based Tools (Legacy)
+### For Excel-Based Tools (Deprecated)
 
 - PowerShell 5.1 or higher
 - Microsoft Excel (for data editing workflows)
@@ -68,7 +64,7 @@ The browser will open automatically to `http://localhost:8080` (or Codespaces UR
 #### UI Overview
 
 - **Center Panel**: 19-column tier grid with drag-and-drop character cards
-- **Left Sidebar**: Character details (base tier, omicron enhancement, calculated tiers)
+- **Left Sidebar**: Character details (base tier, omicron boosts, calculated tiers)
 - **Right Sidebar**: Synergy set editor (add/remove/view synergy configurations)
 - **Header Actions**: Add Character, Validate, Export JSON, Save Changes
 - **Status Bar**: Operation status, character count, validation status
@@ -79,13 +75,13 @@ Each character card shows:
 
 - **Base**: Character's assigned base tier (1-19)
 - **Best Std**: Best standard synergy tier (Base - Omicron - Best Synergy Enhancement)
-- **Best Omi**: Best omicron synergy tier (Base - Omicron - Best Omicron Enhancement)
+- **Best Omi**: Best omicron synergy tier (Base - Omicron - Best Omicron Boosts)
 
 **Example Tooltip (hover over synergy tier):**
 
 ```text
 Base Tier (8)
-- Omicron Enhancement (1)
+- Omicron Boost (1)
 - Best Synergy (4 from VADER, PALPATINE, 3× Empire)
 = Final Tier (3)
 ```

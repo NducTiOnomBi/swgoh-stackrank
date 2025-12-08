@@ -670,7 +670,7 @@ function calculateFinalTier(character) {
     let appliedOmicronBonus = 0;
     let omicronSource = null; // null, 'character', or character ID that provides synergy omicron
 
-    // Determine the best omicron enhancement to apply (max of personal vs synergy)
+    // Determine the best omicron boost to apply (max of personal vs synergy)
     if (includeOmicron) {
         const personalOmicron = character.omicronEnhancement ?? 0;
         let bestSynergyOmicronBonus = 0;
@@ -1043,9 +1043,9 @@ function showTierTooltip(event, character, calculation) {
     // Show the single applied omicron bonus (max of character or synergy)
     if (calculation.appliedOmicronBonus > 0) {
         if (calculation.omicronSource === 'character') {
-            text += `\n- Omicron Enhancement (${calculation.appliedOmicronBonus} from character)`;
+            text += `\n- Omicron Boost (${calculation.appliedOmicronBonus} from character)`;
         } else if (calculation.omicronSource) {
-            text += `\n- Omicron Enhancement (${calculation.appliedOmicronBonus} from ${calculation.omicronSource})`;
+            text += `\n- Omicron Boost (${calculation.appliedOmicronBonus} from ${calculation.omicronSource})`;
         }
     }
 
@@ -1527,7 +1527,7 @@ function renderCharacterDetails(character) {
                 <span class="info-value">${character.baseTier}</span>
             </div>
             <div class="info-row">
-                <span class="info-label">Omicron Enhancement</span>
+                <span class="info-label">Omicron Boost</span>
                 <span class="info-value">${character.omicronEnhancement ?? 1}${character.omicronEnhancement === undefined ? ' (default)' : ''}</span>
             </div>
             <div class="info-row">
@@ -1555,7 +1555,7 @@ function renderCharacterDetails(character) {
                 <input type="checkbox" id="chkHasOmicronEnhancement" 
                        ${draftValues.omicronEnhancement !== undefined ? 'checked' : ''}
                        onchange="toggleOmicronEnhancement()" style="margin-right: 8px;">
-                Omicron Enhancement (0-10)
+                Omicron Boost (0-10)
             </label>
             <input type="number" class="form-input" id="inputOmicronEnhancement" 
                    value="${draftValues.omicronEnhancement ?? 1}" min="0" max="10"
@@ -1655,7 +1655,7 @@ function updateCharacter() {
     }
 
     if (currentDraft.omicronEnhancement !== undefined && (currentDraft.omicronEnhancement < 0 || currentDraft.omicronEnhancement > 10)) {
-        alert('Omicron enhancement must be between 0 and 10');
+        alert('Omicron boost must be between 0 and 10');
         return;
     }
 
@@ -1668,7 +1668,7 @@ function updateCharacter() {
                 return;
             }
             if (set.synergyEnhancementOmicron !== undefined && (set.synergyEnhancementOmicron < 0 || set.synergyEnhancementOmicron > 10)) {
-                alert(`Synergy Set #${i + 1}: Omicron enhancement must be between 0 and 10`);
+                alert(`Synergy Set #${i + 1}: Omicron boost must be between 0 and 10`);
                 return;
             }
 
@@ -2378,7 +2378,7 @@ function renderSynergyEditor(character) {
                         <input type="checkbox" id="chkSynergyOmicron_${index}" 
                                ${synergySet.synergyEnhancementOmicron !== undefined ? 'checked' : ''}
                                onchange="toggleSynergyOmicronEnhancement(${index})" style="margin-right: 8px;">
-                        Omicron Enhancement (0-10)
+                        Omicron Boost (0-10)
                     </label>
                     <input type="number" 
                            class="form-input"
@@ -2388,7 +2388,7 @@ function renderSynergyEditor(character) {
                            value="${synergySet.synergyEnhancementOmicron ?? 0}"
                            ${synergySet.synergyEnhancementOmicron === undefined ? 'readonly' : ''}
                            onchange="updateSynergyOmicronEnhancement(${index}, this.value)">
-                    <div class="form-help">When checked, the specified Omicron enhancement will be applied to the synergy characters specified below. NOTE: This will only apply if ${character.id} has an Omicron ability.</div>
+                    <div class="form-help">When checked, the specified Omicron boost will be applied to the synergy characters specified below. NOTE: This will only apply if ${character.id} has an Omicron ability.</div>
                 </div>
                 ${renderSynergyCharactersEditor(index, synergySet)}
                 ${renderSynergyCategoryDefinitionsEditor(index, synergySet)}
@@ -2503,7 +2503,7 @@ function updateSynergyOmicronEnhancement(index, value) {
     const numValue = parseInt(value, 10);
 
     if (hasOmicronEnhancement && (isNaN(numValue) || numValue < 0 || numValue > 10)) {
-        alert('Omicron Enhancement must be between 0 and 10');
+        alert('Omicron boost must be between 0 and 10');
         renderSynergyEditor(selectedCharacter);
         return;
     }
@@ -2516,7 +2516,7 @@ function updateSynergyOmicronEnhancement(index, value) {
     }
 
     refreshDraftDirtyState();
-    updateStatus('Omicron enhancement updated - click Update Character to apply', 'warning');
+    updateStatus('Omicron boost updated - click Update Character to apply', 'warning');
 }
 
 function addSynergyCharacter(synergyIndex) {

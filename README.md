@@ -26,6 +26,7 @@ cd Tools
 Browser opens to `http://localhost:8080` with a visual tier grid.
 
 **Features:**
+
 - 19-column drag-and-drop tier grid
 - Multi-tier display with synergy calculations
 - Real-time validation (9 validation rules)
@@ -34,9 +35,9 @@ Browser opens to `http://localhost:8080` with a visual tier grid.
 
 See [Visual Editor README](./Tools/VisualEditor/README.md) for complete documentation.
 
-### Excel-Based Workflow (Legacy)
+### Excel-Based Workflow (Deprecated)
 
-The traditional Excel workflow is still supported. See [Tools documentation](./Tools/index.md) for details.
+The previous Excel workflow is no longer supported. See [Tools documentation](./Tools/index.md) for details.
 
 ## Documentation
 
@@ -59,7 +60,7 @@ The main data file is [`Data/characterBaseData.json`](./Data/characterBaseData.j
 
 - **200+ SWGOH characters** with tier rankings (1-19, where 1 = best)
 - **Synergy configurations** for team-based tier improvements
-- **Omicron enhancements** for characters with omicron abilities
+- **Omicron boosts** for characters with omicron abilities
 - **Zeta requirements** for unlocking certain synergies
 
 ## Deployment Pipeline
