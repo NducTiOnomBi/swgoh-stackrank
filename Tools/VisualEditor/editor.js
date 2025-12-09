@@ -2576,7 +2576,7 @@ function renderSynergyEditor(character) {
                            max="10" 
                            value="${synergySet.synergyEnhancement ?? 0}"
                            ${synergySet.synergyEnhancement === undefined ? 'readonly' : ''}
-                           onchange="updateSynergyEnhancement(${index}, this.value)">
+                           oninput="updateSynergyEnhancement(${index}, this.value)">
                     <div class="form-help">When checked, the specified synergy enhancement will be applied if the synergy set criteria are met.</div>
                 </div>
                 <div class="form-group">
@@ -2593,7 +2593,7 @@ function renderSynergyEditor(character) {
                            max="10" 
                            value="${synergySet.synergyEnhancementOmicron ?? 0}"
                            ${synergySet.synergyEnhancementOmicron === undefined ? 'readonly' : ''}
-                           onchange="updateSynergyOmicronEnhancement(${index}, this.value)">
+                           oninput="updateSynergyOmicronEnhancement(${index}, this.value)">
                     <div class="form-help">When checked, the specified Omicron enhancement will be applied to the synergy characters specified below. NOTE: This will only apply if ${character.id} has an Omicron ability.</div>
                 </div>
                 ${renderSynergyCharactersEditor(index, synergySet)}
@@ -2652,17 +2652,27 @@ function removeSynergySet(index) {
 }
 
 function toggleSynergyEnhancement(index) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
+
     const checkbox = document.getElementById(`chkSynergyEnhancement_${index}`);
     const input = document.getElementById(`inputSynergyEnhancement_${index}`);
 
     if (checkbox.checked) {
         // Enable input - user wants to set a specific value
         input.removeAttribute('readonly');
+        // Set initial value in draft (use current input value or default to 0)
+        const currentValue = parseInt(input.value, 10);
+        currentDraft.synergySets[index].synergyEnhancement = isNaN(currentValue) ? 0 : currentValue;
     } else {
         // Disable input and show default value
         input.setAttribute('readonly', 'readonly');
         input.value = 0;
+        // Remove from draft
+        delete currentDraft.synergySets[index].synergyEnhancement;
     }
+
+    refreshDraftDirtyState();
+    updateStatus('Synergy enhancement toggled - click Update Character to apply', 'warning');
 }
 
 function updateSynergyEnhancement(index, value) {
@@ -2689,17 +2699,27 @@ function updateSynergyEnhancement(index, value) {
 }
 
 function toggleSynergyOmicronEnhancement(index) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
+
     const checkbox = document.getElementById(`chkSynergyOmicron_${index}`);
     const input = document.getElementById(`inputSynergyOmicron_${index}`);
 
     if (checkbox.checked) {
         // Enable input - user wants to set a specific value
         input.removeAttribute('readonly');
+        // Set initial value in draft (use current input value or default to 0)
+        const currentValue = parseInt(input.value, 10);
+        currentDraft.synergySets[index].synergyEnhancementOmicron = isNaN(currentValue) ? 0 : currentValue;
     } else {
         // Disable input and show default value
         input.setAttribute('readonly', 'readonly');
         input.value = 0;
+        // Remove from draft
+        delete currentDraft.synergySets[index].synergyEnhancementOmicron;
     }
+
+    refreshDraftDirtyState();
+    updateStatus('Omicron boost toggled - click Update Character to apply', 'warning');
 }
 
 function updateSynergyOmicronEnhancement(index, value) {
@@ -2895,11 +2915,6 @@ function removeSynergyCharacter(synergyIndex, charIndex) {
 
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.characters || charIndex >= synergySet.characters.length) return;
-
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
 
     synergySet.characters.splice(charIndex, 1);
 
