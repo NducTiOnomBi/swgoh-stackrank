@@ -26,6 +26,11 @@ let referenceAlignments = []; // All possible alignments
 let isLeftSidebarCollapsed = true;  // Start collapsed
 let isRightSidebarCollapsed = true; // Start collapsed
 
+// Filter state
+let activeFilterCategories = [];
+let activeFilterRoles = [];
+let activeFilterAlignments = [];
+
 // ============================================
 // Initialization
 // ============================================
@@ -64,6 +69,8 @@ function initializeEventListeners() {
         includeOmicron = e.target.checked;
         renderTierGrid();
     });
+
+    document.getElementById('btnFilter').addEventListener('click', showFilterModal);
 
     // Warn before leaving with unsaved changes
     window.addEventListener('beforeunload', (e) => {
@@ -838,11 +845,277 @@ function submitNewCharacter() {
 }
 
 // ============================================
+// Filter Modal
+// ============================================
+function showFilterModal() {
+    const modal = document.getElementById('filterModal');
+
+    // Sort reference arrays alphabetically
+    const sortedCategories = [...referenceCategories].sort();
+    const sortedRoles = [...referenceRoles].sort();
+    const sortedAlignments = [...referenceAlignments].sort();
+
+    // Populate Categories
+    const categoriesContainer = document.getElementById('filterCategories');
+    categoriesContainer.innerHTML = '';
+    sortedCategories.forEach(category => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = category;
+        checkbox.checked = activeFilterCategories.includes(category);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(category));
+        categoriesContainer.appendChild(label);
+    });
+
+    // Populate Roles
+    const rolesContainer = document.getElementById('filterRoles');
+    rolesContainer.innerHTML = '';
+    sortedRoles.forEach(role => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = role;
+        checkbox.checked = activeFilterRoles.includes(role);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(role));
+        rolesContainer.appendChild(label);
+    });
+
+    // Populate Alignments
+    const alignmentsContainer = document.getElementById('filterAlignments');
+    alignmentsContainer.innerHTML = '';
+    sortedAlignments.forEach(alignment => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = alignment;
+        checkbox.checked = activeFilterAlignments.includes(alignment);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(alignment));
+        alignmentsContainer.appendChild(label);
+    });
+
+    // Update Clear button state
+    updateFilterClearButton();
+
+    // Show modal
+    modal.style.display = 'flex';
+}
+
+function closeFilterModal() {
+    const modal = document.getElementById('filterModal');
+    modal.style.display = 'none';
+}
+
+function applyFilter() {
+    // Read checked values from checkboxes (these are the pending filter values)
+    const categoryCheckboxes = document.querySelectorAll('#filterCategories input[type="checkbox"]:checked');
+    const pendingCategories = Array.from(categoryCheckboxes).map(cb => cb.value);
+
+    const roleCheckboxes = document.querySelectorAll('#filterRoles input[type="checkbox"]:checked');
+    const pendingRoles = Array.from(roleCheckboxes).map(cb => cb.value);
+
+    const alignmentCheckboxes = document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked');
+    const pendingAlignments = Array.from(alignmentCheckboxes).map(cb => cb.value);
+
+    // Check if selected character would be filtered out
+    if (selectedCharacter) {
+        const wouldBeFiltered = willCharacterBeFilteredOut(
+            selectedCharacter.id,
+            pendingCategories,
+            pendingRoles,
+            pendingAlignments
+        );
+
+        if (wouldBeFiltered) {
+            // Check for unsaved draft changes before deselecting
+            if (!confirmDiscardDrafts()) {
+                // User chose to keep editing - don't apply filter, close modal
+                closeFilterModal();
+                return;
+            }
+
+            // User confirmed discard or no changes - clear the character selection
+            // This will reset draft, clear selectedCharacter, restore empty states, and collapse sidebars
+            resetDraft();
+            selectedCharacter = null;
+            document.querySelectorAll('.character-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            renderEmptyCharacterDetails();
+            renderEmptySynergyEditor();
+            collapseBothSidebars();
+        }
+    }
+
+    // Apply the filter
+    activeFilterCategories = pendingCategories;
+    activeFilterRoles = pendingRoles;
+    activeFilterAlignments = pendingAlignments;
+
+    // Update indicator
+    updateFilterIndicator();
+
+    // Close modal
+    closeFilterModal();
+
+    // Re-render grid with filter
+    renderTierGrid();
+}
+
+// Check if a character would be filtered out by the given filter criteria
+function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments) {
+    // If no filters are active, character won't be filtered out
+    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0) {
+        return false;
+    }
+
+    // Find reference character
+    const refChar = referenceCharacters.find(rc => rc.baseId === characterId);
+    if (!refChar) {
+        // No reference data - character will be hidden by the filter
+        return true;
+    }
+
+    // Check Categories (must have ALL selected categories)
+    if (filterCategories.length > 0) {
+        const hasAllCategories = filterCategories.every(filterCat =>
+            refChar.categories && refChar.categories.includes(filterCat)
+        );
+        if (!hasAllCategories) return true;
+    }
+
+    // Check Roles (must match one of the selected roles)
+    if (filterRoles.length > 0) {
+        if (!refChar.role || !filterRoles.includes(refChar.role)) {
+            return true;
+        }
+    }
+
+    // Check Alignments (must match one of the selected alignments)
+    if (filterAlignments.length > 0) {
+        if (!refChar.alignment || !filterAlignments.includes(refChar.alignment)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function clearFilterSelections() {
+    // Uncheck all checkboxes
+    document.querySelectorAll('#filterCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterRoles input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterAlignments input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    // Update Clear button state
+    updateFilterClearButton();
+}
+
+function updateFilterClearButton() {
+    const anyChecked =
+        document.querySelectorAll('#filterCategories input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterRoles input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0;
+
+    const clearButton = document.getElementById('btnFilterClear');
+    clearButton.disabled = !anyChecked;
+}
+
+function updateFilterIndicator() {
+    const indicator = document.getElementById('filterIndicator');
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+
+    if (isFilterActive) {
+        indicator.classList.add('active');
+    } else {
+        indicator.classList.remove('active');
+    }
+}
+
+function getFilteredCharacterIds() {
+    // Returns a Set of character IDs (from characterData) that match ALL active filter criteria
+    const matchingIds = new Set();
+
+    // If no reference data is loaded, we can't filter
+    if (referenceCharacters.length === 0) {
+        console.warn('No reference character data available for filtering');
+        return matchingIds;
+    }
+
+    // Build a map of baseId to reference character for quick lookup
+    const refCharMap = new Map();
+    referenceCharacters.forEach(refChar => {
+        // API returns baseId (camelCase)
+        const key = refChar.baseId;
+        if (key) {
+            refCharMap.set(key, refChar);
+        }
+    });
+
+    // Check each character in characterData
+    characterData.forEach(character => {
+        const refChar = refCharMap.get(character.id);
+
+        // If no reference character found, skip (can't match)
+        if (!refChar) return;
+
+        // Check Categories (AND within group - must have ALL selected categories)
+        if (activeFilterCategories.length > 0) {
+            const hasAllCategories = activeFilterCategories.every(filterCat =>
+                refChar.categories && refChar.categories.includes(filterCat)
+            );
+            if (!hasAllCategories) return;
+        }
+
+        // Check Roles (AND within group - must match ALL selected roles)
+        // Since role is a single string, this means if any role is selected, character must match one of them
+        if (activeFilterRoles.length > 0) {
+            if (!refChar.role || !activeFilterRoles.includes(refChar.role)) {
+                return;
+            }
+        }
+
+        // Check Alignments (AND within group - must match ALL selected alignments)
+        // Since alignment is a single string, this means if any alignment is selected, character must match one of them
+        if (activeFilterAlignments.length > 0) {
+            if (!refChar.alignment || !activeFilterAlignments.includes(refChar.alignment)) {
+                return;
+            }
+        }
+
+        // If we made it here, character matches all criteria
+        matchingIds.add(character.id);
+    });
+
+    return matchingIds;
+}
+
+// ============================================
 // Tier Grid Rendering
 // ============================================
 function renderTierGrid() {
     const grid = document.getElementById('tierGrid');
     grid.innerHTML = '';
+
+    // Update header text to show filter status
+    const gridHeader = document.querySelector('.tier-grid-header h2');
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    gridHeader.textContent = isFilterActive ? 'Tier Grid (Filtered)' : 'Tier Grid';
+
+    // Get filtered character IDs if filter is active
+    let filteredIds = null;
+    if (isFilterActive) {
+        filteredIds = getFilteredCharacterIds();
+    }
 
     // Create 19 tier columns
     for (let tier = 1; tier <= 19; tier++) {
@@ -852,6 +1125,11 @@ function renderTierGrid() {
 
     // Add characters to their respective tiers based on Final tier
     characterData.forEach(character => {
+        // Skip character if filter is active and character doesn't match
+        if (filteredIds !== null && !filteredIds.has(character.id)) {
+            return;
+        }
+
         const card = createCharacterCard(character);
         const tierData = calculateFinalTier(character);
         const columnId = `tier-${tierData.finalTier}`;

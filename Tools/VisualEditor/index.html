@@ -67,6 +67,10 @@
                             <input type="checkbox" id="chkIncludeOmicron">
                             Include Omicron
                         </label>
+                        <button class="btn btn-secondary btn-small" id="btnFilter">
+                            Filter Characters
+                            <span class="filter-indicator" id="filterIndicator"></span>
+                        </button>
                     </div>
                 </div>
                 
@@ -157,6 +161,41 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeAddCharacterModal()">Cancel</button>
                     <button class="btn btn-primary" onclick="submitNewCharacter()" id="btnSubmitCharacter">Add Character</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Filter Characters -->
+        <div id="filterModal" class="modal" style="display: none;">
+            <div class="modal-content modal-content-wide">
+                <div class="modal-header">
+                    <h3>Filter Characters</h3>
+                    <button class="modal-close" onclick="closeFilterModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-group">
+                        <h4>Categories</h4>
+                        <div class="filter-checkboxes" id="filterCategories">
+                            <!-- Category checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h4>Roles</h4>
+                        <div class="filter-checkboxes" id="filterRoles">
+                            <!-- Role checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h4>Alignments</h4>
+                        <div class="filter-checkboxes" id="filterAlignments">
+                            <!-- Alignment checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnFilterClear" onclick="clearFilterSelections()" disabled>Clear</button>
+                    <button class="btn btn-secondary" onclick="closeFilterModal()">Close</button>
+                    <button class="btn btn-primary" onclick="applyFilter()">Apply</button>
                 </div>
             </div>
         </div>
