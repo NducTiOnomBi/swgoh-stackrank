@@ -2004,12 +2004,42 @@ function renderCharacterDetails(character) {
     // Use draft values if available, otherwise use character values
     const draftValues = currentDraft || character;
 
-    // Format required zetas from draft
+    // Count total zeta and omicron abilities for this character
+    const totalZetaCount = referenceAbilities.filter(ability =>
+        ability.character_base_id === character.id && ability.is_zeta === true
+    ).length;
+    const totalOmicronCount = referenceAbilities.filter(ability =>
+        ability.character_base_id === character.id && ability.is_omicron === true
+    ).length;
+
+    // Format required zetas display
     let requiredZetasDisplay = 'All (if any)';
-    if (draftValues.requiredZetas !== undefined) {
-        requiredZetasDisplay = (draftValues.requiredZetas.length > 0)
-            ? draftValues.requiredZetas.join(', ')
-            : 'None';
+    if (totalZetaCount === 0) {
+        requiredZetasDisplay = 'None';
+    } else if (draftValues.requiredZetas !== undefined) {
+        const requiredCount = draftValues.requiredZetas.length;
+        if (requiredCount === 0) {
+            requiredZetasDisplay = 'None';
+        } else {
+            requiredZetasDisplay = `${requiredCount} of ${totalZetaCount}`;
+        }
+    } else {
+        requiredZetasDisplay = `All (${totalZetaCount})`;
+    }
+
+    // Format required omicrons display
+    let requiredOmicronsDisplay = 'All (if any)';
+    if (totalOmicronCount === 0) {
+        requiredOmicronsDisplay = 'None';
+    } else if (draftValues.requiredOmicrons !== undefined) {
+        const requiredCount = draftValues.requiredOmicrons.length;
+        if (requiredCount === 0) {
+            requiredOmicronsDisplay = 'None';
+        } else {
+            requiredOmicronsDisplay = `${requiredCount} of ${totalOmicronCount}`;
+        }
+    } else {
+        requiredOmicronsDisplay = `All (${totalOmicronCount})`;
     }
 
     // Check requiresAllZetas (default is true if not explicitly set to false)
@@ -2031,11 +2061,11 @@ function renderCharacterDetails(character) {
             </div>
             <div class="info-row">
                 <span class="info-label">Required Zetas</span>
-                <span class="info-value" style="font-size: 0.85em; word-break: break-all;">${requiredZetasDisplay}</span>
+                <span class="info-value">${requiredZetasDisplay}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Required Omicrons</span>
-                <span class="info-value" style="font-size: 0.85em; word-break: break-all;">${draftValues.requiredOmicrons !== undefined ? (draftValues.requiredOmicrons.length > 0 ? draftValues.requiredOmicrons.join(', ') : 'None') : 'All (if any)'}</span>
+                <span class="info-value">${requiredOmicronsDisplay}</span>
             </div>
         </div>
         
