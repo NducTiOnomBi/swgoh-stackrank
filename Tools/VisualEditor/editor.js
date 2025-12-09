@@ -1151,7 +1151,20 @@ function calculateFinalTier(character) {
 
     // Determine the best omicron enhancement to apply (max of personal vs synergy)
     if (includeOmicron) {
-        const personalOmicron = character.omicronEnhancement ?? 0;
+        // Check if character has omicron abilities (for default omicron boost calculation)
+        const hasOmicronAbilities = referenceAbilities.some(ability =>
+            ability.character_base_id === character.id && ability.is_omicron === true
+        );
+
+        // Personal omicron: use defined value, or default to 1 if character has omicron abilities, otherwise 0
+        let personalOmicron = 0;
+        if (character.omicronEnhancement !== undefined) {
+            personalOmicron = character.omicronEnhancement;
+        } else if (hasOmicronAbilities) {
+            // StackRank service auto-applies 1 tier boost for characters with omicron abilities
+            personalOmicron = 1;
+        }
+
         let bestSynergyOmicronBonus = 0;
         let bestSynergyOmicronSource = null;
 
