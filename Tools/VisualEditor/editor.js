@@ -3343,11 +3343,6 @@ function updateSynergyCharacter(synergyIndex, charIndex, value) {
 function addCategoryDefinition(synergyIndex) {
     if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
 
-    // Check for unsaved draft changes
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
-
     const synergySet = currentDraft.synergySets[synergyIndex];
 
     // Check if adding a new definition (with default of 1 match) would exceed the limit
@@ -3376,11 +3371,6 @@ function removeCategoryDefinition(synergyIndex, catIndex) {
 
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.categoryDefinitions || catIndex >= synergySet.categoryDefinitions.length) return;
-
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
 
     synergySet.categoryDefinitions.splice(catIndex, 1);
 
