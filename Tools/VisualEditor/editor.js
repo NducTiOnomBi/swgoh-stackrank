@@ -73,7 +73,7 @@ function initializeEventListeners() {
         }
     });
 
-    // Click outside to close all dropdowns (character, exclusion, tag, and zeta)
+    // Click outside to close all dropdowns (character, exclusion, tag, zeta, and omicron)
     document.addEventListener('click', (e) => {
         const isCharacterInput = e.target.closest('.character-input');
         const isCharacterDropdown = e.target.closest('.character-dropdown');
@@ -83,8 +83,10 @@ function initializeEventListeners() {
         const isTagDropdown = e.target.closest('[id^="tag-dropdown_"]');
         const isZetaInput = e.target.closest('.zeta-input');
         const isZetaDropdown = e.target.closest('[id^="zeta-dropdown_"]');
+        const isOmicronInput = e.target.closest('.omicron-input');
+        const isOmicronDropdown = e.target.closest('[id^="omicron-dropdown_"]');
 
-        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown) {
+        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown && !isOmicronInput && !isOmicronDropdown) {
             hideAllDropdowns();
         }
     });
@@ -2393,11 +2395,16 @@ function renderOmicronEditor(character) {
             requiredOmicrons.forEach((omicron, index) => {
                 omicronEditorHtml += `
                     <div class="info-row" style="margin-bottom: 8px; align-items: center;">
-                        <input type="text" class="form-input" 
+                        <input type="text" class="omicron-input" 
+                               data-omicron-index="${index}"
+                               data-omicron-value="${omicron}"
                                value="${omicron}" 
-                               onblur="updateRequiredOmicron(${index}, this.value)" 
-                               placeholder="e.g., specialskill_DARTHMALAK01"
-                               style="flex: 1; margin-right: 8px; font-size: 0.85em;">
+                               oninput="showOmicronDropdown(this, ${index})"
+                               onfocus="showOmicronDropdown(this, ${index})"
+                               onkeydown="handleOmicronInputKeydown(event, this, ${index})"
+                               onblur="updateRequiredOmicronFromInput(${index}, this)"
+                               placeholder="Type to search omicron abilities..."
+                               style="flex: 1; margin-right: 8px; font-family: monospace;">
                         <button class="btn btn-danger btn-small" onclick="removeRequiredOmicron(${index})">
                             <span class="icon">×</span>
                         </button>
@@ -2408,11 +2415,23 @@ function renderOmicronEditor(character) {
             omicronEditorHtml += '</div>';
         }
 
+        // Check if there are any available omicron abilities left
+        const characterId = character.id;
+        const existingOmicrons = (requiredOmicrons || []).filter(o => o.trim() !== '');
+        const availableOmicrons = getAvailableOmicronAbilities(characterId, existingOmicrons);
+        const hasAvailableOmicrons = availableOmicrons.length > 0;
+
         omicronEditorHtml += `
-            <button class="btn btn-secondary" onclick="addRequiredOmicron()" style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="addRequiredOmicron()" style="margin-top: 10px;" ${!hasAvailableOmicrons ? 'disabled' : ''}>
                 <span class="icon">+</span> Add Required Omicron
             </button>
         `;
+
+        if (!hasAvailableOmicrons && requiredOmicrons.length === 0) {
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No omicron abilities available for this character</div>';
+        } else if (!hasAvailableOmicrons && requiredOmicrons.length > 0) {
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available omicrons have been added</div>';
+        }
 
         omicronEditorHtml += '</div>';
     }
@@ -2522,6 +2541,202 @@ function updateRequiredOmicron(index, value) {
 
     refreshDraftDirtyState();
     updateStatus('Required Omicron updated - click Update Character to apply', 'warning');
+}
+
+function updateRequiredOmicronFromInput(index, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredOmicrons) return;
+
+    const storedValue = inputElement.dataset.omicronValue;
+    const inputValue = inputElement.value.trim();
+
+    // If no change from stored value, skip
+    if (storedValue === inputValue) {
+        return;
+    }
+
+    updateRequiredOmicron(index, inputValue);
+}
+
+// Get available omicron abilities for the selected character
+function getAvailableOmicronAbilities(characterId, existingOmicrons = []) {
+    if (!characterId || referenceAbilities.length === 0) return [];
+
+    return referenceAbilities
+        .filter(ability =>
+            ability.character_base_id === characterId &&
+            ability.is_omicron === true &&
+            !existingOmicrons.includes(ability.base_id)
+        )
+        .map(ability => ({
+            base_id: ability.base_id,
+            name: ability.name,
+            displayText: `${ability.name} (${ability.base_id})`
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Show omicron dropdown with filtered abilities
+function showOmicronDropdown(inputElement, omicronIndex) {
+    hideAllDropdowns();
+
+    if (!selectedCharacter || !currentDraft) return;
+
+    const characterId = selectedCharacter.id;
+    const existingOmicrons = (currentDraft.requiredOmicrons || []).filter((o, i) => i !== omicronIndex);
+    const allAbilities = getAvailableOmicronAbilities(characterId, existingOmicrons);
+
+    // Filter based on input text
+    const inputValue = inputElement.value.trim().toLowerCase();
+    const filteredAbilities = inputValue
+        ? allAbilities.filter(a =>
+            a.name.toLowerCase().includes(inputValue) ||
+            a.base_id.toLowerCase().includes(inputValue))
+        : allAbilities;
+
+    // Create dropdown
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `omicron-dropdown_${omicronIndex}`;
+
+    if (allAbilities.length === 0) {
+        // No omicron abilities for this character
+        const emptyOption = document.createElement('div');
+        emptyOption.className = 'dropdown-option';
+        emptyOption.style.fontStyle = 'italic';
+        emptyOption.style.color = '#888';
+        emptyOption.textContent = 'No omicron abilities available for this character';
+        dropdown.appendChild(emptyOption);
+    } else if (filteredAbilities.length === 0) {
+        // No matches for filter
+        const noMatch = document.createElement('div');
+        noMatch.className = 'dropdown-option';
+        noMatch.style.fontStyle = 'italic';
+        noMatch.style.color = '#888';
+        noMatch.textContent = 'No matching abilities found';
+        dropdown.appendChild(noMatch);
+    } else {
+        filteredAbilities.forEach((ability, index) => {
+            const option = document.createElement('div');
+            option.className = 'dropdown-option';
+            option.dataset.index = index;
+            option.dataset.baseId = ability.base_id;
+            option.textContent = ability.displayText;
+
+            option.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent blur
+                e.stopPropagation();
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            });
+
+            option.addEventListener('mouseenter', () => {
+                dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Position dropdown below input
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+
+    document.body.appendChild(dropdown);
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+// Handle omicron selection from dropdown
+function selectOmicronFromDropdown(omicronIndex, ability, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredOmicrons) return;
+
+    // Update the draft
+    currentDraft.requiredOmicrons[omicronIndex] = ability.base_id;
+
+    // Update the input display (just the base_id)
+    inputElement.value = ability.base_id;
+    inputElement.dataset.omicronValue = ability.base_id;
+
+    refreshDraftDirtyState();
+    updateStatus('Omicron ability selected - click Update Character to apply', 'warning');
+
+    // Re-render to update button state based on remaining available omicrons
+    renderCharacterDetails(selectedCharacter);
+
+    hideAllDropdowns();
+}
+
+// Keyboard navigation for omicron dropdown
+function handleOmicronInputKeydown(event, inputElement, omicronIndex) {
+    const dropdown = document.getElementById(`omicron-dropdown_${omicronIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showOmicronDropdown(inputElement, omicronIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option:not([style*="italic"])');
+    if (options.length === 0) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            hideAllDropdowns();
+        }
+        return;
+    }
+
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption && selectedOption.dataset.baseId) {
+                const ability = {
+                    base_id: selectedOption.dataset.baseId,
+                    displayText: selectedOption.textContent
+                };
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            } else if (options.length === 1 && options[0].dataset.baseId) {
+                const ability = {
+                    base_id: options[0].dataset.baseId,
+                    displayText: options[0].textContent
+                };
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
 }
 
 // ============================================
@@ -3055,6 +3270,7 @@ function hideAllDropdowns() {
     document.querySelectorAll('.character-dropdown').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="tag-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="zeta-dropdown_"]').forEach(dropdown => dropdown.remove());
+    document.querySelectorAll('[id^="omicron-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('input[data-dropdown-open]').forEach(input => {
         delete input.dataset.dropdownOpen;
     });
