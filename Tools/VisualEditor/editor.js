@@ -38,6 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadReferenceData(),
         loadCharacterData()
     ]);
+
+    // Build category tag index after both data sources are loaded
+    buildCategoryTagIndex();
 });
 
 function initializeEventListeners() {
@@ -287,7 +290,6 @@ async function loadCharacterData() {
 
         hasUnsavedChanges = false;
         updateSaveButtonState();
-        buildCategoryTagIndex();
     } catch (error) {
         console.error('Error loading data:', error);
         updateStatus(`Error: ${error.message}`, 'error');
@@ -312,42 +314,37 @@ function buildCategoryTagIndex() {
                 }
             });
         }
-
-        // Collect from synergySets categoryDefinitions
-        if (char.synergySets && Array.isArray(char.synergySets)) {
-            char.synergySets.forEach(synergySet => {
-                if (synergySet.categoryDefinitions && Array.isArray(synergySet.categoryDefinitions)) {
-                    synergySet.categoryDefinitions.forEach(catDef => {
-                        // Include tags
-                        if (catDef.include && Array.isArray(catDef.include)) {
-                            catDef.include.forEach(tag => {
-                                if (tag && typeof tag === 'string') {
-                                    const lowerTag = tag.toLowerCase();
-                                    if (!tagMap.has(lowerTag)) {
-                                        tagMap.set(lowerTag, tag);
-                                    }
-                                }
-                            });
-                        }
-                        // Exclude tags
-                        if (catDef.exclude && Array.isArray(catDef.exclude)) {
-                            catDef.exclude.forEach(tag => {
-                                if (tag && typeof tag === 'string') {
-                                    const lowerTag = tag.toLowerCase();
-                                    if (!tagMap.has(lowerTag)) {
-                                        tagMap.set(lowerTag, tag);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
     });
+
+    // Helper function to add tags from reference data arrays
+    // Reference data may be strings OR objects with a name field
+    const addReferenceData = (refArray, nameField = 'name') => {
+        if (!refArray || !Array.isArray(refArray)) return;
+        refArray.forEach(item => {
+            const tag = typeof item === 'string' ? item : item[nameField];
+            if (tag && typeof tag === 'string') {
+                const lowerTag = tag.toLowerCase();
+                if (!tagMap.has(lowerTag)) {
+                    tagMap.set(lowerTag, tag);
+                }
+            }
+        });
+    };
+
+    // Collect from reference data
+    addReferenceData(referenceCategories);
+    addReferenceData(referenceRoles);
+    addReferenceData(referenceAlignments);
 
     // Convert to sorted array for display
     categoryTags = Array.from(tagMap.values()).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+    console.log(`Built category tag index with ${categoryTags.length} tags from:`, {
+        characterCategories: tagMap.size - referenceCategories.length - referenceRoles.length - referenceAlignments.length,
+        referenceCategories: referenceCategories.length,
+        referenceRoles: referenceRoles.length,
+        referenceAlignments: referenceAlignments.length
+    });
 }
 
 async function saveData() {
@@ -3183,7 +3180,8 @@ function showTagDropdown(inputElement, synergyIndex, catIndex, field) {
         option.textContent = tag;
         option.dataset.index = index;
 
-        option.addEventListener('click', (e) => {
+        option.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent blur event from firing
             e.stopPropagation();
             insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field);
         });
@@ -3235,6 +3233,8 @@ function insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field) {
     } else {
         newValue = tag;
     }
+
+    console.log('insertTagAtCursor:', { tag, before, after, newValue, field });
 
     inputElement.value = newValue;
 
@@ -3402,6 +3402,8 @@ function updateCategoryDefInclude(synergyIndex, catIndex, value) {
     const tags = value.split(',')
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
+
+    console.log('updateCategoryDefInclude:', { value, tags });
 
     if (tags.length === 0) {
         alert('Include tags cannot be empty. At least one tag is required.');
