@@ -73,7 +73,7 @@ function initializeEventListeners() {
         }
     });
 
-    // Click outside to close all dropdowns (character, exclusion, and tag)
+    // Click outside to close all dropdowns (character, exclusion, tag, and zeta)
     document.addEventListener('click', (e) => {
         const isCharacterInput = e.target.closest('.character-input');
         const isCharacterDropdown = e.target.closest('.character-dropdown');
@@ -81,8 +81,10 @@ function initializeEventListeners() {
         const isExclusionDropdown = e.target.closest('[id^="exclDropdown_"]');
         const isTagInput = e.target.closest('.tag-input');
         const isTagDropdown = e.target.closest('[id^="tag-dropdown_"]');
+        const isZetaInput = e.target.closest('.zeta-input');
+        const isZetaDropdown = e.target.closest('[id^="zeta-dropdown_"]');
 
-        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown) {
+        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown) {
             hideAllDropdowns();
         }
     });
@@ -2005,11 +2007,16 @@ function renderZetaEditor(character) {
             requiredZetas.forEach((zeta, index) => {
                 zetaEditorHtml += `
                     <div class="info-row" style="margin-bottom: 8px; align-items: center;">
-                        <input type="text" class="form-input" 
+                        <input type="text" class="zeta-input" 
+                               data-zeta-index="${index}"
+                               data-zeta-value="${zeta}"
                                value="${zeta}" 
-                               onblur="updateRequiredZeta(${index}, this.value)" 
-                               placeholder="e.g., uniqueskill_VADER01"
-                               style="flex: 1; margin-right: 8px; font-size: 0.85em;">
+                               oninput="showZetaDropdown(this, ${index})"
+                               onfocus="showZetaDropdown(this, ${index})"
+                               onkeydown="handleZetaInputKeydown(event, this, ${index})"
+                               onblur="updateRequiredZetaFromInput(${index}, this)" 
+                               placeholder="Type to search zeta abilities..."
+                               style="flex: 1; font-family: monospace;">
                         <button class="btn btn-danger btn-small" onclick="removeRequiredZeta(${index})">
                             <span class="icon">×</span>
                         </button>
@@ -2020,11 +2027,23 @@ function renderZetaEditor(character) {
             zetaEditorHtml += '</div>';
         }
 
+        // Check if there are any available zeta abilities left
+        const characterId = character.id;
+        const existingZetas = (requiredZetas || []).filter(z => z.trim() !== '');
+        const availableZetas = getAvailableZetaAbilities(characterId, existingZetas);
+        const hasAvailableZetas = availableZetas.length > 0;
+
         zetaEditorHtml += `
-            <button class="btn btn-secondary" onclick="addRequiredZeta()" style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="addRequiredZeta()" style="margin-top: 10px;" ${!hasAvailableZetas ? 'disabled' : ''}>
                 <span class="icon">+</span> Add Required Zeta
             </button>
         `;
+
+        if (!hasAvailableZetas && requiredZetas.length === 0) {
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No zeta abilities available for this character</div>';
+        } else if (!hasAvailableZetas && requiredZetas.length > 0) {
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available zetas have been added</div>';
+        }
 
         zetaEditorHtml += '</div>';
     }
@@ -2134,6 +2153,203 @@ function updateRequiredZeta(index, value) {
 
     refreshDraftDirtyState();
     updateStatus('Required Zeta updated - click Update Character to apply', 'warning');
+}
+
+// Update zeta from input blur
+function updateRequiredZetaFromInput(index, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredZetas) return;
+
+    const storedValue = inputElement.dataset.zetaValue;
+    const inputValue = inputElement.value.trim();
+
+    // If no change from stored value, skip
+    if (storedValue === inputValue) {
+        return;
+    }
+
+    updateRequiredZeta(index, inputValue);
+}
+
+// Get available zeta abilities for the selected character
+function getAvailableZetaAbilities(characterId, existingZetas = []) {
+    if (!characterId || referenceAbilities.length === 0) return [];
+
+    return referenceAbilities
+        .filter(ability =>
+            ability.character_base_id === characterId &&
+            ability.is_zeta === true &&
+            !existingZetas.includes(ability.base_id)
+        )
+        .map(ability => ({
+            base_id: ability.base_id,
+            name: ability.name,
+            displayText: `${ability.name} (${ability.base_id})`
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Show zeta dropdown with filtered abilities
+function showZetaDropdown(inputElement, zetaIndex) {
+    hideAllDropdowns();
+
+    if (!selectedCharacter || !currentDraft) return;
+
+    const characterId = selectedCharacter.id;
+    const existingZetas = (currentDraft.requiredZetas || []).filter((z, i) => i !== zetaIndex);
+    const allAbilities = getAvailableZetaAbilities(characterId, existingZetas);
+
+    // Filter based on input text
+    const inputValue = inputElement.value.trim().toLowerCase();
+    const filteredAbilities = inputValue
+        ? allAbilities.filter(a =>
+            a.name.toLowerCase().includes(inputValue) ||
+            a.base_id.toLowerCase().includes(inputValue))
+        : allAbilities;
+
+    // Create dropdown
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `zeta-dropdown_${zetaIndex}`;
+
+    if (allAbilities.length === 0) {
+        // No zeta abilities for this character
+        const emptyOption = document.createElement('div');
+        emptyOption.className = 'dropdown-option';
+        emptyOption.style.fontStyle = 'italic';
+        emptyOption.style.color = '#888';
+        emptyOption.textContent = 'No zeta abilities available for this character';
+        dropdown.appendChild(emptyOption);
+    } else if (filteredAbilities.length === 0) {
+        // No matches for filter
+        const noMatch = document.createElement('div');
+        noMatch.className = 'dropdown-option';
+        noMatch.style.fontStyle = 'italic';
+        noMatch.style.color = '#888';
+        noMatch.textContent = 'No matching abilities found';
+        dropdown.appendChild(noMatch);
+    } else {
+        filteredAbilities.forEach((ability, index) => {
+            const option = document.createElement('div');
+            option.className = 'dropdown-option';
+            option.dataset.index = index;
+            option.dataset.baseId = ability.base_id;
+            option.textContent = ability.displayText;
+
+            option.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent blur
+                e.stopPropagation();
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            });
+
+            option.addEventListener('mouseenter', () => {
+                dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Position dropdown below input
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+
+    document.body.appendChild(dropdown);
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+// Handle zeta selection from dropdown
+function selectZetaFromDropdown(zetaIndex, ability, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredZetas) return;
+
+    // Update the draft
+    currentDraft.requiredZetas[zetaIndex] = ability.base_id;
+
+    // Update the input display (just the base_id)
+    inputElement.value = ability.base_id;
+    inputElement.dataset.zetaValue = ability.base_id;
+
+    refreshDraftDirtyState();
+    updateStatus('Zeta ability selected - click Update Character to apply', 'warning');
+
+    // Re-render to update button state based on remaining available zetas
+    renderCharacterDetails(selectedCharacter);
+
+    hideAllDropdowns();
+}
+
+// Keyboard navigation for zeta dropdown
+function handleZetaInputKeydown(event, inputElement, zetaIndex) {
+    const dropdown = document.getElementById(`zeta-dropdown_${zetaIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showZetaDropdown(inputElement, zetaIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option:not([style*="italic"])');
+    if (options.length === 0) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            hideAllDropdowns();
+        }
+        return;
+    }
+
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption && selectedOption.dataset.baseId) {
+                const ability = {
+                    base_id: selectedOption.dataset.baseId,
+                    displayText: selectedOption.textContent
+                };
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            } else if (options.length === 1 && options[0].dataset.baseId) {
+                const ability = {
+                    base_id: options[0].dataset.baseId,
+                    displayText: options[0].textContent
+                };
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
 }
 
 // ============================================
@@ -2838,6 +3054,7 @@ function showCharacterDropdown(inputElement, synergyIndex, charIndex) {
 function hideAllDropdowns() {
     document.querySelectorAll('.character-dropdown').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="tag-dropdown_"]').forEach(dropdown => dropdown.remove());
+    document.querySelectorAll('[id^="zeta-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('input[data-dropdown-open]').forEach(input => {
         delete input.dataset.dropdownOpen;
     });
