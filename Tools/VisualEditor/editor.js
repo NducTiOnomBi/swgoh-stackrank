@@ -3220,8 +3220,9 @@ function insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field) {
     const tagEndIndex = nextCommaIndex === -1 ? inputValue.length : cursorPosition + nextCommaIndex;
 
     // Build new value: before + tag + after
-    const before = inputValue.substring(0, tagStartIndex).trim();
-    const after = inputValue.substring(tagEndIndex).trim();
+    // Trim whitespace AND trailing/leading commas to avoid double commas
+    const before = inputValue.substring(0, tagStartIndex).trim().replace(/,+$/, '').trim();
+    const after = inputValue.substring(tagEndIndex).trim().replace(/^,+/, '').trim();
 
     let newValue;
     if (before && after) {
