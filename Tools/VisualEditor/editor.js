@@ -253,10 +253,16 @@ async function loadReferenceData() {
         }
 
         updateStatus('Reference data loaded');
+
+        // Update missing characters display now that reference data is available
+        updateMissingCharacters();
     } catch (error) {
         console.error('Error loading reference data:', error);
         updateStatus('Warning: Reference data unavailable', 'warning');
         // Don't block the app - reference data is supplementary
+
+        // Still update the display even if reference data failed
+        updateMissingCharacters();
     }
 }
 
@@ -677,37 +683,136 @@ function updateDraftFromForm() {
 // ============================================
 // Add New Character
 // ============================================
+let selectedMissingCharacterId = null;
+
 function addNewCharacter() {
     // Check for unsaved draft changes
     if (!confirmDiscardDrafts()) {
         return;
     }
 
-    const characterId = prompt('Enter the new character ID (uppercase letters, numbers, and underscores only):');
+    showAddCharacterModal();
+}
 
-    if (!characterId) {
-        return; // User cancelled
+function showAddCharacterModal() {
+    const modal = document.getElementById('addCharacterModal');
+    const missingSection = document.getElementById('missingCharactersSection');
+    const missingList = document.getElementById('missingCharactersList');
+    const searchInput = document.getElementById('missingCharacterSearch');
+    const customInput = document.getElementById('customCharacterId');
+
+    // Reset state
+    selectedMissingCharacterId = null;
+    customInput.value = '';
+    searchInput.value = '';
+
+    // Get missing characters
+    const missingIds = getMissingCharacterIds();
+
+    if (missingIds.length > 0) {
+        // Show missing characters section
+        missingSection.style.display = 'block';
+
+        // Populate missing characters list
+        missingList.innerHTML = '';
+        missingIds.forEach(id => {
+            const item = document.createElement('div');
+            item.className = 'missing-character-item';
+            item.textContent = id;
+            item.dataset.characterId = id;
+            item.addEventListener('click', () => selectMissingCharacter(id));
+            missingList.appendChild(item);
+        });
+
+        // Setup search filter
+        searchInput.addEventListener('input', filterMissingCharacters);
+    } else {
+        // Hide missing characters section if none exist
+        missingSection.style.display = 'none';
     }
 
-    const trimmedId = characterId.trim();
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Focus appropriate input
+    if (missingIds.length > 0) {
+        searchInput.focus();
+    } else {
+        customInput.focus();
+    }
+}
+
+function closeAddCharacterModal() {
+    const modal = document.getElementById('addCharacterModal');
+    modal.style.display = 'none';
+    selectedMissingCharacterId = null;
+}
+
+function filterMissingCharacters() {
+    const searchInput = document.getElementById('missingCharacterSearch');
+    const searchTerm = searchInput.value.trim().toUpperCase();
+    const items = document.querySelectorAll('.missing-character-item');
+
+    items.forEach(item => {
+        const characterId = item.dataset.characterId;
+        if (characterId.includes(searchTerm)) {
+            item.classList.remove('hidden');
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+}
+
+function selectMissingCharacter(characterId) {
+    // Update selection state
+    selectedMissingCharacterId = characterId;
+
+    // Update visual selection
+    document.querySelectorAll('.missing-character-item').forEach(item => {
+        if (item.dataset.characterId === characterId) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+
+    // Clear custom input when selecting from list
+    document.getElementById('customCharacterId').value = '';
+}
+
+function submitNewCharacter() {
+    const customInput = document.getElementById('customCharacterId');
+    let characterId = null;
+
+    // Determine which ID to use: selected missing character or custom input
+    if (selectedMissingCharacterId) {
+        characterId = selectedMissingCharacterId;
+    } else {
+        characterId = customInput.value.trim();
+    }
+
+    if (!characterId) {
+        alert('Please select a character from the list or enter a custom character ID.');
+        return;
+    }
 
     // Validate format
     const validPattern = /^[A-Z0-9_]+$/;
-    if (!validPattern.test(trimmedId)) {
+    if (!validPattern.test(characterId)) {
         alert('Invalid character ID format. Must contain only uppercase letters, numbers, and underscores.');
         return;
     }
 
     // Check for duplicates
-    const exists = characterData.some(char => char.id === trimmedId);
+    const exists = characterData.some(char => char.id === characterId);
     if (exists) {
-        alert(`Character "${trimmedId}" already exists.`);
+        alert(`Character "${characterId}" already exists.`);
         return;
     }
 
     // Create new character with default values
     const newCharacter = {
-        id: trimmedId,
+        id: characterId,
         baseTier: 17  // Default tier for new characters
     };
 
@@ -717,11 +822,14 @@ function addNewCharacter() {
     // Mark as unsaved
     hasUnsavedChanges = true;
     updateSaveButtonState();
-    updateStatus(`Character "${trimmedId}" added - unsaved changes`, 'warning');
+    updateStatus(`Character "${characterId}" added - unsaved changes`, 'warning');
     updateCharacterCount();
 
     // Re-render grid
     renderTierGrid();
+
+    // Close modal
+    closeAddCharacterModal();
 
     // Reset draft and auto-select the new character
     resetDraft();
@@ -3596,6 +3704,49 @@ function updateStatus(message, type = 'info') {
 function updateCharacterCount() {
     const countElement = document.getElementById('characterCount');
     countElement.textContent = `${characterData.length} characters`;
+    updateMissingCharacters();
+}
+
+/**
+ * Gets the list of missing character IDs by comparing reference data with existing characters.
+ * @returns {string[]} Array of missing character IDs, sorted alphabetically
+ */
+function getMissingCharacterIds() {
+    if (!referenceCharacters || referenceCharacters.length === 0) {
+        return [];
+    }
+
+    const existingIds = new Set(characterData.map(c => c.id));
+    const missingCharacters = referenceCharacters.filter(refChar => {
+        const refId = refChar.id || refChar.baseId;
+        return refId && !existingIds.has(refId);
+    });
+
+    return missingCharacters
+        .map(refChar => refChar.id || refChar.baseId)
+        .filter(id => id)
+        .sort();
+}
+
+function updateMissingCharacters() {
+    const missingElement = document.getElementById('missingCharacters');
+
+    if (!referenceCharacters || referenceCharacters.length === 0) {
+        missingElement.textContent = 'Reference data loading...';
+        missingElement.style.color = '';
+        return;
+    }
+
+    const missingIds = getMissingCharacterIds();
+    const missingCount = missingIds.length;
+
+    if (missingCount === 0) {
+        missingElement.textContent = 'No missing characters';
+        missingElement.style.color = '';
+    } else {
+        missingElement.textContent = `${missingCount} missing character${missingCount === 1 ? '' : 's'}`;
+        missingElement.style.color = '#f0ad4e';
+    }
 }
 
 function updateValidationStatus(status) {

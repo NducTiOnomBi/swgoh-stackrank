@@ -110,9 +110,11 @@
                 <span id="statusMessage">Ready</span>
             </div>
             <div class="status-right">
+                <span id="missingCharacters">No missing characters</span>
+                <span class="separator">|</span>
                 <span id="characterCount">0 characters</span>
                 <span class="separator">|</span>
-                <span id="validationStatus">Not validated</span>
+                <span id="validationStatus"></span>
             </div>
         </footer>
 
@@ -128,6 +130,33 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeValidationModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add Character -->
+        <div id="addCharacterModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add Character</h3>
+                    <button class="modal-close" onclick="closeAddCharacterModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="missingCharactersSection" style="display: none;">
+                        <label class="form-label">Select from missing characters:</label>
+                        <input type="text" id="missingCharacterSearch" class="form-input" placeholder="Search missing characters..." style="margin-bottom: 12px;">
+                        <div id="missingCharactersList" class="missing-characters-list">
+                            <!-- Missing characters will be inserted here -->
+                        </div>
+                        <div style="text-align: center; margin: 16px 0; color: var(--color-text-secondary);">— OR —</div>
+                    </div>
+                    <label class="form-label">Enter custom character ID:</label>
+                    <input type="text" id="customCharacterId" class="form-input" placeholder="Uppercase letters, numbers, and underscores only">
+                    <div class="form-help">Character ID must contain only uppercase letters, numbers, and underscores.</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAddCharacterModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitNewCharacter()" id="btnSubmitCharacter">Add Character</button>
                 </div>
             </div>
         </div>
