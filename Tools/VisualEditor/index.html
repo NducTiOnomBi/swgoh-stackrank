@@ -39,10 +39,18 @@
                         <span class="toggle-icon">◀</span>
                     </button>
                 </div>
+                <div class="sidebar-subheader" id="characterIdLeft">
+                    <span class="character-id-display">No character selected</span>
+                </div>
                 <div class="sidebar-content" id="characterDetails">
                     <div class="empty-state">
                         <p>Select a character to view details</p>
                     </div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="btn btn-primary btn-update-character" id="btnUpdateCharacterLeft" onclick="updateCharacter()" disabled>
+                        Update Character
+                    </button>
                 </div>
             </aside>
 
@@ -59,6 +67,10 @@
                             <input type="checkbox" id="chkIncludeOmicron">
                             Include Omicron
                         </label>
+                        <button class="btn btn-secondary btn-small" id="btnFilter">
+                            Filter Characters
+                            <span class="filter-indicator" id="filterIndicator"></span>
+                        </button>
                     </div>
                 </div>
                 
@@ -80,10 +92,18 @@
                         <span class="toggle-icon">▶</span>
                     </button>
                 </div>
+                <div class="sidebar-subheader" id="characterIdRight">
+                    <span class="character-id-display">No character selected</span>
+                </div>
                 <div class="sidebar-content" id="synergyEditor">
                     <div class="empty-state">
                         <p>Select a character to edit synergies</p>
                     </div>
+                </div>
+                <div class="sidebar-footer">
+                    <button class="btn btn-primary btn-update-character" id="btnUpdateCharacterRight" onclick="updateCharacter()" disabled>
+                        Update Character
+                    </button>
                 </div>
             </aside>
         </main>
@@ -94,9 +114,11 @@
                 <span id="statusMessage">Ready</span>
             </div>
             <div class="status-right">
+                <span id="missingCharacters">No missing characters</span>
+                <span class="separator">|</span>
                 <span id="characterCount">0 characters</span>
                 <span class="separator">|</span>
-                <span id="validationStatus">Not validated</span>
+                <span id="validationStatus"></span>
             </div>
         </footer>
 
@@ -112,6 +134,68 @@
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" onclick="closeValidationModal()">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add Character -->
+        <div id="addCharacterModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Add Character</h3>
+                    <button class="modal-close" onclick="closeAddCharacterModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="missingCharactersSection" style="display: none;">
+                        <label class="form-label">Select from missing characters:</label>
+                        <input type="text" id="missingCharacterSearch" class="form-input" placeholder="Search missing characters..." style="margin-bottom: 12px;">
+                        <div id="missingCharactersList" class="missing-characters-list">
+                            <!-- Missing characters will be inserted here -->
+                        </div>
+                        <div style="text-align: center; margin: 16px 0; color: var(--color-text-secondary);">— OR —</div>
+                    </div>
+                    <label class="form-label">Enter custom character ID:</label>
+                    <input type="text" id="customCharacterId" class="form-input" placeholder="Uppercase letters, numbers, and underscores only">
+                    <div class="form-help">Character ID must contain only uppercase letters, numbers, and underscores.</div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAddCharacterModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitNewCharacter()" id="btnSubmitCharacter">Add Character</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Filter Characters -->
+        <div id="filterModal" class="modal" style="display: none;">
+            <div class="modal-content modal-content-wide">
+                <div class="modal-header">
+                    <h3>Filter Characters</h3>
+                    <button class="modal-close" onclick="closeFilterModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="filter-group">
+                        <h4>Categories</h4>
+                        <div class="filter-checkboxes" id="filterCategories">
+                            <!-- Category checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h4>Roles</h4>
+                        <div class="filter-checkboxes" id="filterRoles">
+                            <!-- Role checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="filter-group">
+                        <h4>Alignments</h4>
+                        <div class="filter-checkboxes" id="filterAlignments">
+                            <!-- Alignment checkboxes will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnFilterClear" onclick="clearFilterSelections()" disabled>Clear</button>
+                    <button class="btn btn-secondary" onclick="closeFilterModal()">Close</button>
+                    <button class="btn btn-primary" onclick="applyFilter()">Apply</button>
                 </div>
             </div>
         </div>

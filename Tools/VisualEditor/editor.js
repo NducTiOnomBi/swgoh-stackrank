@@ -15,9 +15,21 @@ let draftIsDirty = false; // Cached dirty state
 // Category tag autocomplete cache
 let categoryTags = []; // All unique tags from character.categories and categoryDefinitions
 
+// Reference data from authoritative API
+let referenceCharacters = []; // All characters from swgoh.spineless.net
+let referenceAbilities = [];  // All abilities (zetas, omicrons, etc.)
+let referenceCategories = []; // All possible categories/tags
+let referenceRoles = [];      // All possible roles
+let referenceAlignments = []; // All possible alignments
+
 // Sidebar collapse state
 let isLeftSidebarCollapsed = true;  // Start collapsed
 let isRightSidebarCollapsed = true; // Start collapsed
+
+// Filter state
+let activeFilterCategories = [];
+let activeFilterRoles = [];
+let activeFilterAlignments = [];
 
 // ============================================
 // Initialization
@@ -26,8 +38,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize event listeners
     initializeEventListeners();
 
-    // Load character data from server
-    await loadCharacterData();
+    // Load reference data and character data in parallel
+    await Promise.all([
+        loadReferenceData(),
+        loadCharacterData()
+    ]);
+
+    // Build category tag index after both data sources are loaded
+    buildCategoryTagIndex();
 });
 
 function initializeEventListeners() {
@@ -52,6 +70,8 @@ function initializeEventListeners() {
         renderTierGrid();
     });
 
+    document.getElementById('btnFilter').addEventListener('click', showFilterModal);
+
     // Warn before leaving with unsaved changes
     window.addEventListener('beforeunload', (e) => {
         if (hasUnsavedChanges) {
@@ -60,7 +80,7 @@ function initializeEventListeners() {
         }
     });
 
-    // Click outside to close all dropdowns (character, exclusion, and tag)
+    // Click outside to close all dropdowns (character, exclusion, tag, zeta, and omicron)
     document.addEventListener('click', (e) => {
         const isCharacterInput = e.target.closest('.character-input');
         const isCharacterDropdown = e.target.closest('.character-dropdown');
@@ -68,9 +88,26 @@ function initializeEventListeners() {
         const isExclusionDropdown = e.target.closest('[id^="exclDropdown_"]');
         const isTagInput = e.target.closest('.tag-input');
         const isTagDropdown = e.target.closest('[id^="tag-dropdown_"]');
+        const isZetaInput = e.target.closest('.zeta-input');
+        const isZetaDropdown = e.target.closest('[id^="zeta-dropdown_"]');
+        const isOmicronInput = e.target.closest('.omicron-input');
+        const isOmicronDropdown = e.target.closest('[id^="omicron-dropdown_"]');
 
-        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown) {
+        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown && !isOmicronInput && !isOmicronDropdown) {
             hideAllDropdowns();
+        }
+    });
+
+    // Click on empty area in tier grid to deselect current character
+    document.getElementById('tierGrid').addEventListener('click', (e) => {
+        // Only deselect if clicking on the tier grid itself or tier containers (not a character card)
+        const clickedElement = e.target;
+        const isCharacterCard = clickedElement.classList.contains('character-card') || clickedElement.closest('.character-card');
+        const isTierGrid = clickedElement.id === 'tierGrid';
+        const isTierContainer = clickedElement.classList.contains('tier-container');
+
+        if (!isCharacterCard && (isTierGrid || isTierContainer) && selectedCharacter) {
+            clearCharacterSelection();
         }
     });
 
@@ -168,6 +205,81 @@ function initializeEventListeners() {
 // ============================================
 // Data Loading and Saving
 // ============================================
+
+/**
+ * Loads reference data from the authoritative SWGOH API.
+ * This includes characters, abilities, categories, roles, and alignments.
+ * These are used for validation and autocomplete features.
+ */
+async function loadReferenceData() {
+    const baseUrl = 'https://swgoh.spineless.net/api';
+
+    try {
+        updateStatus('Loading reference data...');
+
+        // Fetch all reference data in parallel
+        const [charactersRes, abilitiesRes, categoriesRes, rolesRes, alignmentsRes] = await Promise.all([
+            fetch(`${baseUrl}/characters`),
+            fetch(`${baseUrl}/abilities`),
+            fetch(`${baseUrl}/categories`),
+            fetch(`${baseUrl}/roles`),
+            fetch(`${baseUrl}/alignments`)
+        ]);
+
+        // Check for failures
+        const responses = [
+            { name: 'characters', res: charactersRes },
+            { name: 'abilities', res: abilitiesRes },
+            { name: 'categories', res: categoriesRes },
+            { name: 'roles', res: rolesRes },
+            { name: 'alignments', res: alignmentsRes }
+        ];
+
+        const failures = responses.filter(r => !r.res.ok);
+        if (failures.length > 0) {
+            console.warn('Some reference data failed to load:', failures.map(f => f.name).join(', '));
+        }
+
+        // Parse successful responses
+        if (charactersRes.ok) {
+            referenceCharacters = await charactersRes.json();
+            console.log(`Loaded ${referenceCharacters.length} reference characters`);
+        }
+
+        if (abilitiesRes.ok) {
+            referenceAbilities = await abilitiesRes.json();
+            console.log(`Loaded ${referenceAbilities.length} reference abilities`);
+        }
+
+        if (categoriesRes.ok) {
+            referenceCategories = await categoriesRes.json();
+            console.log(`Loaded ${referenceCategories.length} reference categories`);
+        }
+
+        if (rolesRes.ok) {
+            referenceRoles = await rolesRes.json();
+            console.log(`Loaded ${referenceRoles.length} reference roles`);
+        }
+
+        if (alignmentsRes.ok) {
+            referenceAlignments = await alignmentsRes.json();
+            console.log(`Loaded ${referenceAlignments.length} reference alignments`);
+        }
+
+        updateStatus('Reference data loaded');
+
+        // Update missing characters display now that reference data is available
+        updateMissingCharacters();
+    } catch (error) {
+        console.error('Error loading reference data:', error);
+        updateStatus('Warning: Reference data unavailable', 'warning');
+        // Don't block the app - reference data is supplementary
+
+        // Still update the display even if reference data failed
+        updateMissingCharacters();
+    }
+}
+
 async function loadCharacterData() {
     try {
         showLoading(true);
@@ -189,7 +301,6 @@ async function loadCharacterData() {
 
         hasUnsavedChanges = false;
         updateSaveButtonState();
-        buildCategoryTagIndex();
     } catch (error) {
         console.error('Error loading data:', error);
         updateStatus(`Error: ${error.message}`, 'error');
@@ -214,42 +325,37 @@ function buildCategoryTagIndex() {
                 }
             });
         }
-
-        // Collect from synergySets categoryDefinitions
-        if (char.synergySets && Array.isArray(char.synergySets)) {
-            char.synergySets.forEach(synergySet => {
-                if (synergySet.categoryDefinitions && Array.isArray(synergySet.categoryDefinitions)) {
-                    synergySet.categoryDefinitions.forEach(catDef => {
-                        // Include tags
-                        if (catDef.include && Array.isArray(catDef.include)) {
-                            catDef.include.forEach(tag => {
-                                if (tag && typeof tag === 'string') {
-                                    const lowerTag = tag.toLowerCase();
-                                    if (!tagMap.has(lowerTag)) {
-                                        tagMap.set(lowerTag, tag);
-                                    }
-                                }
-                            });
-                        }
-                        // Exclude tags
-                        if (catDef.exclude && Array.isArray(catDef.exclude)) {
-                            catDef.exclude.forEach(tag => {
-                                if (tag && typeof tag === 'string') {
-                                    const lowerTag = tag.toLowerCase();
-                                    if (!tagMap.has(lowerTag)) {
-                                        tagMap.set(lowerTag, tag);
-                                    }
-                                }
-                            });
-                        }
-                    });
-                }
-            });
-        }
     });
+
+    // Helper function to add tags from reference data arrays
+    // Reference data may be strings OR objects with a name field
+    const addReferenceData = (refArray, nameField = 'name') => {
+        if (!refArray || !Array.isArray(refArray)) return;
+        refArray.forEach(item => {
+            const tag = typeof item === 'string' ? item : item[nameField];
+            if (tag && typeof tag === 'string') {
+                const lowerTag = tag.toLowerCase();
+                if (!tagMap.has(lowerTag)) {
+                    tagMap.set(lowerTag, tag);
+                }
+            }
+        });
+    };
+
+    // Collect from reference data
+    addReferenceData(referenceCategories);
+    addReferenceData(referenceRoles);
+    addReferenceData(referenceAlignments);
 
     // Convert to sorted array for display
     categoryTags = Array.from(tagMap.values()).sort((a, b) => a.localeCompare(b, undefined, { sensitivity: 'base' }));
+
+    console.log(`Built category tag index with ${categoryTags.length} tags from:`, {
+        characterCategories: tagMap.size - referenceCategories.length - referenceRoles.length - referenceAlignments.length,
+        referenceCategories: referenceCategories.length,
+        referenceRoles: referenceRoles.length,
+        referenceAlignments: referenceAlignments.length
+    });
 }
 
 async function saveData() {
@@ -585,37 +691,136 @@ function updateDraftFromForm() {
 // ============================================
 // Add New Character
 // ============================================
+let selectedMissingCharacterId = null;
+
 function addNewCharacter() {
     // Check for unsaved draft changes
     if (!confirmDiscardDrafts()) {
         return;
     }
 
-    const characterId = prompt('Enter the new character ID (uppercase letters, numbers, and underscores only):');
+    showAddCharacterModal();
+}
 
-    if (!characterId) {
-        return; // User cancelled
+function showAddCharacterModal() {
+    const modal = document.getElementById('addCharacterModal');
+    const missingSection = document.getElementById('missingCharactersSection');
+    const missingList = document.getElementById('missingCharactersList');
+    const searchInput = document.getElementById('missingCharacterSearch');
+    const customInput = document.getElementById('customCharacterId');
+
+    // Reset state
+    selectedMissingCharacterId = null;
+    customInput.value = '';
+    searchInput.value = '';
+
+    // Get missing characters
+    const missingIds = getMissingCharacterIds();
+
+    if (missingIds.length > 0) {
+        // Show missing characters section
+        missingSection.style.display = 'block';
+
+        // Populate missing characters list
+        missingList.innerHTML = '';
+        missingIds.forEach(id => {
+            const item = document.createElement('div');
+            item.className = 'missing-character-item';
+            item.textContent = id;
+            item.dataset.characterId = id;
+            item.addEventListener('click', () => selectMissingCharacter(id));
+            missingList.appendChild(item);
+        });
+
+        // Setup search filter
+        searchInput.addEventListener('input', filterMissingCharacters);
+    } else {
+        // Hide missing characters section if none exist
+        missingSection.style.display = 'none';
     }
 
-    const trimmedId = characterId.trim();
+    // Show modal
+    modal.style.display = 'flex';
+
+    // Focus appropriate input
+    if (missingIds.length > 0) {
+        searchInput.focus();
+    } else {
+        customInput.focus();
+    }
+}
+
+function closeAddCharacterModal() {
+    const modal = document.getElementById('addCharacterModal');
+    modal.style.display = 'none';
+    selectedMissingCharacterId = null;
+}
+
+function filterMissingCharacters() {
+    const searchInput = document.getElementById('missingCharacterSearch');
+    const searchTerm = searchInput.value.trim().toUpperCase();
+    const items = document.querySelectorAll('.missing-character-item');
+
+    items.forEach(item => {
+        const characterId = item.dataset.characterId;
+        if (characterId.includes(searchTerm)) {
+            item.classList.remove('hidden');
+        } else {
+            item.classList.add('hidden');
+        }
+    });
+}
+
+function selectMissingCharacter(characterId) {
+    // Update selection state
+    selectedMissingCharacterId = characterId;
+
+    // Update visual selection
+    document.querySelectorAll('.missing-character-item').forEach(item => {
+        if (item.dataset.characterId === characterId) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+
+    // Clear custom input when selecting from list
+    document.getElementById('customCharacterId').value = '';
+}
+
+function submitNewCharacter() {
+    const customInput = document.getElementById('customCharacterId');
+    let characterId = null;
+
+    // Determine which ID to use: selected missing character or custom input
+    if (selectedMissingCharacterId) {
+        characterId = selectedMissingCharacterId;
+    } else {
+        characterId = customInput.value.trim();
+    }
+
+    if (!characterId) {
+        alert('Please select a character from the list or enter a custom character ID.');
+        return;
+    }
 
     // Validate format
     const validPattern = /^[A-Z0-9_]+$/;
-    if (!validPattern.test(trimmedId)) {
+    if (!validPattern.test(characterId)) {
         alert('Invalid character ID format. Must contain only uppercase letters, numbers, and underscores.');
         return;
     }
 
     // Check for duplicates
-    const exists = characterData.some(char => char.id === trimmedId);
+    const exists = characterData.some(char => char.id === characterId);
     if (exists) {
-        alert(`Character "${trimmedId}" already exists.`);
+        alert(`Character "${characterId}" already exists.`);
         return;
     }
 
     // Create new character with default values
     const newCharacter = {
-        id: trimmedId,
+        id: characterId,
         baseTier: 17  // Default tier for new characters
     };
 
@@ -625,15 +830,273 @@ function addNewCharacter() {
     // Mark as unsaved
     hasUnsavedChanges = true;
     updateSaveButtonState();
-    updateStatus(`Character "${trimmedId}" added - unsaved changes`, 'warning');
+    updateStatus(`Character "${characterId}" added - unsaved changes`, 'warning');
     updateCharacterCount();
 
     // Re-render grid
     renderTierGrid();
 
+    // Close modal
+    closeAddCharacterModal();
+
     // Reset draft and auto-select the new character
     resetDraft();
     selectCharacter(newCharacter);
+}
+
+// ============================================
+// Filter Modal
+// ============================================
+function showFilterModal() {
+    const modal = document.getElementById('filterModal');
+
+    // Sort reference arrays alphabetically
+    const sortedCategories = [...referenceCategories].sort();
+    const sortedRoles = [...referenceRoles].sort();
+    const sortedAlignments = [...referenceAlignments].sort();
+
+    // Populate Categories
+    const categoriesContainer = document.getElementById('filterCategories');
+    categoriesContainer.innerHTML = '';
+    sortedCategories.forEach(category => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = category;
+        checkbox.checked = activeFilterCategories.includes(category);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(category));
+        categoriesContainer.appendChild(label);
+    });
+
+    // Populate Roles
+    const rolesContainer = document.getElementById('filterRoles');
+    rolesContainer.innerHTML = '';
+    sortedRoles.forEach(role => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = role;
+        checkbox.checked = activeFilterRoles.includes(role);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(role));
+        rolesContainer.appendChild(label);
+    });
+
+    // Populate Alignments
+    const alignmentsContainer = document.getElementById('filterAlignments');
+    alignmentsContainer.innerHTML = '';
+    sortedAlignments.forEach(alignment => {
+        const label = document.createElement('label');
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = alignment;
+        checkbox.checked = activeFilterAlignments.includes(alignment);
+        checkbox.addEventListener('change', updateFilterClearButton);
+
+        label.appendChild(checkbox);
+        label.appendChild(document.createTextNode(alignment));
+        alignmentsContainer.appendChild(label);
+    });
+
+    // Update Clear button state
+    updateFilterClearButton();
+
+    // Show modal
+    modal.style.display = 'flex';
+}
+
+function closeFilterModal() {
+    const modal = document.getElementById('filterModal');
+    modal.style.display = 'none';
+}
+
+function applyFilter() {
+    // Read checked values from checkboxes (these are the pending filter values)
+    const categoryCheckboxes = document.querySelectorAll('#filterCategories input[type="checkbox"]:checked');
+    const pendingCategories = Array.from(categoryCheckboxes).map(cb => cb.value);
+
+    const roleCheckboxes = document.querySelectorAll('#filterRoles input[type="checkbox"]:checked');
+    const pendingRoles = Array.from(roleCheckboxes).map(cb => cb.value);
+
+    const alignmentCheckboxes = document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked');
+    const pendingAlignments = Array.from(alignmentCheckboxes).map(cb => cb.value);
+
+    // Check if selected character would be filtered out
+    if (selectedCharacter) {
+        const wouldBeFiltered = willCharacterBeFilteredOut(
+            selectedCharacter.id,
+            pendingCategories,
+            pendingRoles,
+            pendingAlignments
+        );
+
+        if (wouldBeFiltered) {
+            // Check for unsaved draft changes before deselecting
+            if (!confirmDiscardDrafts()) {
+                // User chose to keep editing - don't apply filter, close modal
+                closeFilterModal();
+                return;
+            }
+
+            // User confirmed discard or no changes - clear the character selection
+            // This will reset draft, clear selectedCharacter, restore empty states, and collapse sidebars
+            resetDraft();
+            selectedCharacter = null;
+            document.querySelectorAll('.character-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            renderEmptyCharacterDetails();
+            renderEmptySynergyEditor();
+            collapseBothSidebars();
+        }
+    }
+
+    // Apply the filter
+    activeFilterCategories = pendingCategories;
+    activeFilterRoles = pendingRoles;
+    activeFilterAlignments = pendingAlignments;
+
+    // Update indicator
+    updateFilterIndicator();
+
+    // Close modal
+    closeFilterModal();
+
+    // Re-render grid with filter
+    renderTierGrid();
+}
+
+// Check if a character would be filtered out by the given filter criteria
+function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments) {
+    // If no filters are active, character won't be filtered out
+    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0) {
+        return false;
+    }
+
+    // Find reference character
+    const refChar = referenceCharacters.find(rc => rc.baseId === characterId);
+    if (!refChar) {
+        // No reference data - character will be hidden by the filter
+        return true;
+    }
+
+    // Check Categories (must have ALL selected categories)
+    if (filterCategories.length > 0) {
+        const hasAllCategories = filterCategories.every(filterCat =>
+            refChar.categories && refChar.categories.includes(filterCat)
+        );
+        if (!hasAllCategories) return true;
+    }
+
+    // Check Roles (must match one of the selected roles)
+    if (filterRoles.length > 0) {
+        if (!refChar.role || !filterRoles.includes(refChar.role)) {
+            return true;
+        }
+    }
+
+    // Check Alignments (must match one of the selected alignments)
+    if (filterAlignments.length > 0) {
+        if (!refChar.alignment || !filterAlignments.includes(refChar.alignment)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function clearFilterSelections() {
+    // Uncheck all checkboxes
+    document.querySelectorAll('#filterCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterRoles input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterAlignments input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    // Update Clear button state
+    updateFilterClearButton();
+}
+
+function updateFilterClearButton() {
+    const anyChecked =
+        document.querySelectorAll('#filterCategories input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterRoles input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0;
+
+    const clearButton = document.getElementById('btnFilterClear');
+    clearButton.disabled = !anyChecked;
+}
+
+function updateFilterIndicator() {
+    const indicator = document.getElementById('filterIndicator');
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+
+    if (isFilterActive) {
+        indicator.classList.add('active');
+    } else {
+        indicator.classList.remove('active');
+    }
+}
+
+function getFilteredCharacterIds() {
+    // Returns a Set of character IDs (from characterData) that match ALL active filter criteria
+    const matchingIds = new Set();
+
+    // If no reference data is loaded, we can't filter
+    if (referenceCharacters.length === 0) {
+        console.warn('No reference character data available for filtering');
+        return matchingIds;
+    }
+
+    // Build a map of baseId to reference character for quick lookup
+    const refCharMap = new Map();
+    referenceCharacters.forEach(refChar => {
+        // API returns baseId (camelCase)
+        const key = refChar.baseId;
+        if (key) {
+            refCharMap.set(key, refChar);
+        }
+    });
+
+    // Check each character in characterData
+    characterData.forEach(character => {
+        const refChar = refCharMap.get(character.id);
+
+        // If no reference character found, skip (can't match)
+        if (!refChar) return;
+
+        // Check Categories (AND within group - must have ALL selected categories)
+        if (activeFilterCategories.length > 0) {
+            const hasAllCategories = activeFilterCategories.every(filterCat =>
+                refChar.categories && refChar.categories.includes(filterCat)
+            );
+            if (!hasAllCategories) return;
+        }
+
+        // Check Roles (AND within group - must match ALL selected roles)
+        // Since role is a single string, this means if any role is selected, character must match one of them
+        if (activeFilterRoles.length > 0) {
+            if (!refChar.role || !activeFilterRoles.includes(refChar.role)) {
+                return;
+            }
+        }
+
+        // Check Alignments (AND within group - must match ALL selected alignments)
+        // Since alignment is a single string, this means if any alignment is selected, character must match one of them
+        if (activeFilterAlignments.length > 0) {
+            if (!refChar.alignment || !activeFilterAlignments.includes(refChar.alignment)) {
+                return;
+            }
+        }
+
+        // If we made it here, character matches all criteria
+        matchingIds.add(character.id);
+    });
+
+    return matchingIds;
 }
 
 // ============================================
@@ -643,6 +1106,17 @@ function renderTierGrid() {
     const grid = document.getElementById('tierGrid');
     grid.innerHTML = '';
 
+    // Update header text to show filter status
+    const gridHeader = document.querySelector('.tier-grid-header h2');
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    gridHeader.textContent = isFilterActive ? 'Tier Grid (Filtered)' : 'Tier Grid';
+
+    // Get filtered character IDs if filter is active
+    let filteredIds = null;
+    if (isFilterActive) {
+        filteredIds = getFilteredCharacterIds();
+    }
+
     // Create 19 tier columns
     for (let tier = 1; tier <= 19; tier++) {
         const column = createTierColumn(tier);
@@ -651,6 +1125,11 @@ function renderTierGrid() {
 
     // Add characters to their respective tiers based on Final tier
     characterData.forEach(character => {
+        // Skip character if filter is active and character doesn't match
+        if (filteredIds !== null && !filteredIds.has(character.id)) {
+            return;
+        }
+
         const card = createCharacterCard(character);
         const tierData = calculateFinalTier(character);
         const columnId = `tier-${tierData.finalTier}`;
@@ -672,7 +1151,20 @@ function calculateFinalTier(character) {
 
     // Determine the best omicron enhancement to apply (max of personal vs synergy)
     if (includeOmicron) {
-        const personalOmicron = character.omicronEnhancement ?? 0;
+        // Check if character has omicron abilities (for default omicron boost calculation)
+        const hasOmicronAbilities = referenceAbilities.some(ability =>
+            ability.character_base_id === character.id && ability.is_omicron === true
+        );
+
+        // Personal omicron: use defined value, or default to 1 if character has omicron abilities, otherwise 0
+        let personalOmicron = 0;
+        if (character.omicronEnhancement !== undefined) {
+            personalOmicron = character.omicronEnhancement;
+        } else if (hasOmicronAbilities) {
+            // StackRank service auto-applies 1 tier boost for characters with omicron abilities
+            personalOmicron = 1;
+        }
+
         let bestSynergyOmicronBonus = 0;
         let bestSynergyOmicronSource = null;
 
@@ -1437,6 +1929,7 @@ function renderEmptyCharacterDetails() {
             <p>Select a character to view details</p>
         </div>
     `;
+    updateCharacterIdDisplay(null);
 }
 
 function renderEmptySynergyEditor() {
@@ -1446,6 +1939,19 @@ function renderEmptySynergyEditor() {
             <p>Select a character to view synergy sets</p>
         </div>
     `;
+}
+
+/**
+ * Updates the character ID display in both sidebar subheaders
+ * @param {string|null} characterId - The character ID to display, or null to show default message
+ */
+function updateCharacterIdDisplay(characterId) {
+    const leftDisplay = document.querySelector('#characterIdLeft .character-id-display');
+    const rightDisplay = document.querySelector('#characterIdRight .character-id-display');
+    const displayText = characterId || 'No character selected';
+
+    if (leftDisplay) leftDisplay.textContent = displayText;
+    if (rightDisplay) rightDisplay.textContent = displayText;
 }
 
 function clearCharacterSelection() {
@@ -1505,15 +2011,48 @@ function selectCharacter(character) {
 function renderCharacterDetails(character) {
     const container = document.getElementById('characterDetails');
 
+    // Update character ID display in both sidebars
+    updateCharacterIdDisplay(character.id);
+
     // Use draft values if available, otherwise use character values
     const draftValues = currentDraft || character;
 
-    // Format required zetas from draft
+    // Count total zeta and omicron abilities for this character
+    const totalZetaCount = referenceAbilities.filter(ability =>
+        ability.character_base_id === character.id && ability.is_zeta === true
+    ).length;
+    const totalOmicronCount = referenceAbilities.filter(ability =>
+        ability.character_base_id === character.id && ability.is_omicron === true
+    ).length;
+
+    // Format required zetas display
     let requiredZetasDisplay = 'All (if any)';
-    if (draftValues.requiredZetas !== undefined) {
-        requiredZetasDisplay = (draftValues.requiredZetas.length > 0)
-            ? draftValues.requiredZetas.join(', ')
-            : 'None';
+    if (totalZetaCount === 0) {
+        requiredZetasDisplay = 'None';
+    } else if (draftValues.requiredZetas !== undefined) {
+        const requiredCount = draftValues.requiredZetas.length;
+        if (requiredCount === 0) {
+            requiredZetasDisplay = 'None';
+        } else {
+            requiredZetasDisplay = `${requiredCount} of ${totalZetaCount}`;
+        }
+    } else {
+        requiredZetasDisplay = `All (${totalZetaCount})`;
+    }
+
+    // Format required omicrons display
+    let requiredOmicronsDisplay = 'All (if any)';
+    if (totalOmicronCount === 0) {
+        requiredOmicronsDisplay = 'None';
+    } else if (draftValues.requiredOmicrons !== undefined) {
+        const requiredCount = draftValues.requiredOmicrons.length;
+        if (requiredCount === 0) {
+            requiredOmicronsDisplay = 'None';
+        } else {
+            requiredOmicronsDisplay = `${requiredCount} of ${totalOmicronCount}`;
+        }
+    } else {
+        requiredOmicronsDisplay = `All (${totalOmicronCount})`;
     }
 
     // Check requiresAllZetas (default is true if not explicitly set to false)
@@ -1521,7 +2060,6 @@ function renderCharacterDetails(character) {
 
     const html = `
         <div class="character-info">
-            <div class="character-info-header">${character.id}</div>
             <div class="info-row">
                 <span class="info-label">Base Tier</span>
                 <span class="info-value">${character.baseTier}</span>
@@ -1536,11 +2074,11 @@ function renderCharacterDetails(character) {
             </div>
             <div class="info-row">
                 <span class="info-label">Required Zetas</span>
-                <span class="info-value" style="font-size: 0.85em; word-break: break-all;">${requiredZetasDisplay}</span>
+                <span class="info-value">${requiredZetasDisplay}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Required Omicrons</span>
-                <span class="info-value" style="font-size: 0.85em; word-break: break-all;">${draftValues.requiredOmicrons !== undefined ? (draftValues.requiredOmicrons.length > 0 ? draftValues.requiredOmicrons.join(', ') : 'None') : 'All (if any)'}</span>
+                <span class="info-value">${requiredOmicronsDisplay}</span>
             </div>
         </div>
         
@@ -1609,13 +2147,6 @@ function renderCharacterDetails(character) {
 
     // Render the omicron requirements editor
     renderOmicronEditor(character);
-
-    // Add the Update Character button after all fields
-    container.innerHTML += `
-        <button class="btn btn-primary" id="btnUpdateCharacter" onclick="updateCharacter()" style="margin-top: 20px;" disabled>
-            Update Character
-        </button>
-    `;
 
     // Add event listeners to capture form changes into draft
     setTimeout(() => {
@@ -1799,11 +2330,16 @@ function renderZetaEditor(character) {
             requiredZetas.forEach((zeta, index) => {
                 zetaEditorHtml += `
                     <div class="info-row" style="margin-bottom: 8px; align-items: center;">
-                        <input type="text" class="form-input" 
+                        <input type="text" class="zeta-input" 
+                               data-zeta-index="${index}"
+                               data-zeta-value="${zeta}"
                                value="${zeta}" 
-                               onblur="updateRequiredZeta(${index}, this.value)" 
-                               placeholder="e.g., uniqueskill_VADER01"
-                               style="flex: 1; margin-right: 8px; font-size: 0.85em;">
+                               oninput="showZetaDropdown(this, ${index})"
+                               onfocus="showZetaDropdown(this, ${index})"
+                               onkeydown="handleZetaInputKeydown(event, this, ${index})"
+                               onblur="updateRequiredZetaFromInput(${index}, this)" 
+                               placeholder="Type to search zeta abilities..."
+                               style="flex: 1; font-family: monospace;">
                         <button class="btn btn-danger btn-small" onclick="removeRequiredZeta(${index})">
                             <span class="icon">×</span>
                         </button>
@@ -1814,11 +2350,23 @@ function renderZetaEditor(character) {
             zetaEditorHtml += '</div>';
         }
 
+        // Check if there are any available zeta abilities left
+        const characterId = character.id;
+        const existingZetas = (requiredZetas || []).filter(z => z.trim() !== '');
+        const availableZetas = getAvailableZetaAbilities(characterId, existingZetas);
+        const hasAvailableZetas = availableZetas.length > 0;
+
         zetaEditorHtml += `
-            <button class="btn btn-secondary" onclick="addRequiredZeta()" style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="addRequiredZeta()" style="margin-top: 10px;" ${!hasAvailableZetas ? 'disabled' : ''}>
                 <span class="icon">+</span> Add Required Zeta
             </button>
         `;
+
+        if (!hasAvailableZetas && requiredZetas.length === 0) {
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No zeta abilities available for this character</div>';
+        } else if (!hasAvailableZetas && requiredZetas.length > 0) {
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available zetas have been added</div>';
+        }
 
         zetaEditorHtml += '</div>';
     }
@@ -1930,6 +2478,203 @@ function updateRequiredZeta(index, value) {
     updateStatus('Required Zeta updated - click Update Character to apply', 'warning');
 }
 
+// Update zeta from input blur
+function updateRequiredZetaFromInput(index, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredZetas) return;
+
+    const storedValue = inputElement.dataset.zetaValue;
+    const inputValue = inputElement.value.trim();
+
+    // If no change from stored value, skip
+    if (storedValue === inputValue) {
+        return;
+    }
+
+    updateRequiredZeta(index, inputValue);
+}
+
+// Get available zeta abilities for the selected character
+function getAvailableZetaAbilities(characterId, existingZetas = []) {
+    if (!characterId || referenceAbilities.length === 0) return [];
+
+    return referenceAbilities
+        .filter(ability =>
+            ability.character_base_id === characterId &&
+            ability.is_zeta === true &&
+            !existingZetas.includes(ability.base_id)
+        )
+        .map(ability => ({
+            base_id: ability.base_id,
+            name: ability.name,
+            displayText: `${ability.name} (${ability.base_id})`
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Show zeta dropdown with filtered abilities
+function showZetaDropdown(inputElement, zetaIndex) {
+    hideAllDropdowns();
+
+    if (!selectedCharacter || !currentDraft) return;
+
+    const characterId = selectedCharacter.id;
+    const existingZetas = (currentDraft.requiredZetas || []).filter((z, i) => i !== zetaIndex);
+    const allAbilities = getAvailableZetaAbilities(characterId, existingZetas);
+
+    // Filter based on input text
+    const inputValue = inputElement.value.trim().toLowerCase();
+    const filteredAbilities = inputValue
+        ? allAbilities.filter(a =>
+            a.name.toLowerCase().includes(inputValue) ||
+            a.base_id.toLowerCase().includes(inputValue))
+        : allAbilities;
+
+    // Create dropdown
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `zeta-dropdown_${zetaIndex}`;
+
+    if (allAbilities.length === 0) {
+        // No zeta abilities for this character
+        const emptyOption = document.createElement('div');
+        emptyOption.className = 'dropdown-option';
+        emptyOption.style.fontStyle = 'italic';
+        emptyOption.style.color = '#888';
+        emptyOption.textContent = 'No zeta abilities available for this character';
+        dropdown.appendChild(emptyOption);
+    } else if (filteredAbilities.length === 0) {
+        // No matches for filter
+        const noMatch = document.createElement('div');
+        noMatch.className = 'dropdown-option';
+        noMatch.style.fontStyle = 'italic';
+        noMatch.style.color = '#888';
+        noMatch.textContent = 'No matching abilities found';
+        dropdown.appendChild(noMatch);
+    } else {
+        filteredAbilities.forEach((ability, index) => {
+            const option = document.createElement('div');
+            option.className = 'dropdown-option';
+            option.dataset.index = index;
+            option.dataset.baseId = ability.base_id;
+            option.textContent = ability.displayText;
+
+            option.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent blur
+                e.stopPropagation();
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            });
+
+            option.addEventListener('mouseenter', () => {
+                dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Position dropdown below input
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+
+    document.body.appendChild(dropdown);
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+// Handle zeta selection from dropdown
+function selectZetaFromDropdown(zetaIndex, ability, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredZetas) return;
+
+    // Update the draft
+    currentDraft.requiredZetas[zetaIndex] = ability.base_id;
+
+    // Update the input display (just the base_id)
+    inputElement.value = ability.base_id;
+    inputElement.dataset.zetaValue = ability.base_id;
+
+    refreshDraftDirtyState();
+    updateStatus('Zeta ability selected - click Update Character to apply', 'warning');
+
+    // Re-render to update button state based on remaining available zetas
+    renderCharacterDetails(selectedCharacter);
+
+    hideAllDropdowns();
+}
+
+// Keyboard navigation for zeta dropdown
+function handleZetaInputKeydown(event, inputElement, zetaIndex) {
+    const dropdown = document.getElementById(`zeta-dropdown_${zetaIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showZetaDropdown(inputElement, zetaIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option:not([style*="italic"])');
+    if (options.length === 0) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            hideAllDropdowns();
+        }
+        return;
+    }
+
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption && selectedOption.dataset.baseId) {
+                const ability = {
+                    base_id: selectedOption.dataset.baseId,
+                    displayText: selectedOption.textContent
+                };
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            } else if (options.length === 1 && options[0].dataset.baseId) {
+                const ability = {
+                    base_id: options[0].dataset.baseId,
+                    displayText: options[0].textContent
+                };
+                selectZetaFromDropdown(zetaIndex, ability, inputElement);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
+}
+
 // ============================================
 // Omicron Requirements Editor
 // ============================================
@@ -1971,11 +2716,16 @@ function renderOmicronEditor(character) {
             requiredOmicrons.forEach((omicron, index) => {
                 omicronEditorHtml += `
                     <div class="info-row" style="margin-bottom: 8px; align-items: center;">
-                        <input type="text" class="form-input" 
+                        <input type="text" class="omicron-input" 
+                               data-omicron-index="${index}"
+                               data-omicron-value="${omicron}"
                                value="${omicron}" 
-                               onblur="updateRequiredOmicron(${index}, this.value)" 
-                               placeholder="e.g., specialskill_DARTHMALAK01"
-                               style="flex: 1; margin-right: 8px; font-size: 0.85em;">
+                               oninput="showOmicronDropdown(this, ${index})"
+                               onfocus="showOmicronDropdown(this, ${index})"
+                               onkeydown="handleOmicronInputKeydown(event, this, ${index})"
+                               onblur="updateRequiredOmicronFromInput(${index}, this)"
+                               placeholder="Type to search omicron abilities..."
+                               style="flex: 1; margin-right: 8px; font-family: monospace;">
                         <button class="btn btn-danger btn-small" onclick="removeRequiredOmicron(${index})">
                             <span class="icon">×</span>
                         </button>
@@ -1986,11 +2736,23 @@ function renderOmicronEditor(character) {
             omicronEditorHtml += '</div>';
         }
 
+        // Check if there are any available omicron abilities left
+        const characterId = character.id;
+        const existingOmicrons = (requiredOmicrons || []).filter(o => o.trim() !== '');
+        const availableOmicrons = getAvailableOmicronAbilities(characterId, existingOmicrons);
+        const hasAvailableOmicrons = availableOmicrons.length > 0;
+
         omicronEditorHtml += `
-            <button class="btn btn-secondary" onclick="addRequiredOmicron()" style="margin-top: 10px;">
+            <button class="btn btn-secondary" onclick="addRequiredOmicron()" style="margin-top: 10px;" ${!hasAvailableOmicrons ? 'disabled' : ''}>
                 <span class="icon">+</span> Add Required Omicron
             </button>
         `;
+
+        if (!hasAvailableOmicrons && requiredOmicrons.length === 0) {
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No omicron abilities available for this character</div>';
+        } else if (!hasAvailableOmicrons && requiredOmicrons.length > 0) {
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available omicrons have been added</div>';
+        }
 
         omicronEditorHtml += '</div>';
     }
@@ -2102,6 +2864,202 @@ function updateRequiredOmicron(index, value) {
     updateStatus('Required Omicron updated - click Update Character to apply', 'warning');
 }
 
+function updateRequiredOmicronFromInput(index, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredOmicrons) return;
+
+    const storedValue = inputElement.dataset.omicronValue;
+    const inputValue = inputElement.value.trim();
+
+    // If no change from stored value, skip
+    if (storedValue === inputValue) {
+        return;
+    }
+
+    updateRequiredOmicron(index, inputValue);
+}
+
+// Get available omicron abilities for the selected character
+function getAvailableOmicronAbilities(characterId, existingOmicrons = []) {
+    if (!characterId || referenceAbilities.length === 0) return [];
+
+    return referenceAbilities
+        .filter(ability =>
+            ability.character_base_id === characterId &&
+            ability.is_omicron === true &&
+            !existingOmicrons.includes(ability.base_id)
+        )
+        .map(ability => ({
+            base_id: ability.base_id,
+            name: ability.name,
+            displayText: `${ability.name} (${ability.base_id})`
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Show omicron dropdown with filtered abilities
+function showOmicronDropdown(inputElement, omicronIndex) {
+    hideAllDropdowns();
+
+    if (!selectedCharacter || !currentDraft) return;
+
+    const characterId = selectedCharacter.id;
+    const existingOmicrons = (currentDraft.requiredOmicrons || []).filter((o, i) => i !== omicronIndex);
+    const allAbilities = getAvailableOmicronAbilities(characterId, existingOmicrons);
+
+    // Filter based on input text
+    const inputValue = inputElement.value.trim().toLowerCase();
+    const filteredAbilities = inputValue
+        ? allAbilities.filter(a =>
+            a.name.toLowerCase().includes(inputValue) ||
+            a.base_id.toLowerCase().includes(inputValue))
+        : allAbilities;
+
+    // Create dropdown
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `omicron-dropdown_${omicronIndex}`;
+
+    if (allAbilities.length === 0) {
+        // No omicron abilities for this character
+        const emptyOption = document.createElement('div');
+        emptyOption.className = 'dropdown-option';
+        emptyOption.style.fontStyle = 'italic';
+        emptyOption.style.color = '#888';
+        emptyOption.textContent = 'No omicron abilities available for this character';
+        dropdown.appendChild(emptyOption);
+    } else if (filteredAbilities.length === 0) {
+        // No matches for filter
+        const noMatch = document.createElement('div');
+        noMatch.className = 'dropdown-option';
+        noMatch.style.fontStyle = 'italic';
+        noMatch.style.color = '#888';
+        noMatch.textContent = 'No matching abilities found';
+        dropdown.appendChild(noMatch);
+    } else {
+        filteredAbilities.forEach((ability, index) => {
+            const option = document.createElement('div');
+            option.className = 'dropdown-option';
+            option.dataset.index = index;
+            option.dataset.baseId = ability.base_id;
+            option.textContent = ability.displayText;
+
+            option.addEventListener('mousedown', (e) => {
+                e.preventDefault(); // Prevent blur
+                e.stopPropagation();
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            });
+
+            option.addEventListener('mouseenter', () => {
+                dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Position dropdown below input
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+
+    document.body.appendChild(dropdown);
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+// Handle omicron selection from dropdown
+function selectOmicronFromDropdown(omicronIndex, ability, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.requiredOmicrons) return;
+
+    // Update the draft
+    currentDraft.requiredOmicrons[omicronIndex] = ability.base_id;
+
+    // Update the input display (just the base_id)
+    inputElement.value = ability.base_id;
+    inputElement.dataset.omicronValue = ability.base_id;
+
+    refreshDraftDirtyState();
+    updateStatus('Omicron ability selected - click Update Character to apply', 'warning');
+
+    // Re-render to update button state based on remaining available omicrons
+    renderCharacterDetails(selectedCharacter);
+
+    hideAllDropdowns();
+}
+
+// Keyboard navigation for omicron dropdown
+function handleOmicronInputKeydown(event, inputElement, omicronIndex) {
+    const dropdown = document.getElementById(`omicron-dropdown_${omicronIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showOmicronDropdown(inputElement, omicronIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option:not([style*="italic"])');
+    if (options.length === 0) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            hideAllDropdowns();
+        }
+        return;
+    }
+
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption && selectedOption.dataset.baseId) {
+                const ability = {
+                    base_id: selectedOption.dataset.baseId,
+                    displayText: selectedOption.textContent
+                };
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            } else if (options.length === 1 && options[0].dataset.baseId) {
+                const ability = {
+                    base_id: options[0].dataset.baseId,
+                    displayText: options[0].textContent
+                };
+                selectOmicronFromDropdown(omicronIndex, ability, inputElement);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
+}
+
 // ============================================
 // Synergy Editor
 // ============================================
@@ -2171,7 +3129,7 @@ function renderSynergyCharactersEditor(synergyIndex, synergySet) {
     // Only show Add Character button if limit not reached
     if (canAddCharacter) {
         html += `
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addSynergyCharacter(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Character
@@ -2219,7 +3177,7 @@ function renderSynergyExclusionsEditor(synergyIndex, synergySet) {
                 </div>
             </div>
             <div class="form-help">This synergy set  will be skipped if the specified characters meet the synergy requirements.</div>
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addExclusionCharacter(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Skip
@@ -2296,7 +3254,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
     // Only show Add Category Definition button if limit not reached
     if (canAddCategoryDef) {
         html += `
-            <button class="btn btn-primary btn-small" 
+            <button class="btn btn-secondary btn-small" 
                     onclick="addCategoryDefinition(${synergyIndex})"
                     style="margin-top: 8px; align-self: flex-end;">
                 <span class="icon">+</span> Add Category Definition
@@ -2326,7 +3284,7 @@ function renderSynergyEditor(character) {
             <div class="empty-state">
                 <p>No synergy sets defined</p>
             </div>
-            <button class="btn btn-primary add-synergy-btn" onclick="addSynergySet()">
+            <button class="btn btn-secondary add-synergy-btn" onclick="addSynergySet()">
                 <span class="icon">+</span> Add Synergy Set
             </button>
         `;
@@ -2370,7 +3328,7 @@ function renderSynergyEditor(character) {
                            max="10" 
                            value="${synergySet.synergyEnhancement ?? 0}"
                            ${synergySet.synergyEnhancement === undefined ? 'readonly' : ''}
-                           onchange="updateSynergyEnhancement(${index}, this.value)">
+                           oninput="updateSynergyEnhancement(${index}, this.value)">
                     <div class="form-help">When checked, the specified synergy enhancement will be applied if the synergy set criteria are met.</div>
                 </div>
                 <div class="form-group">
@@ -2387,7 +3345,7 @@ function renderSynergyEditor(character) {
                            max="10" 
                            value="${synergySet.synergyEnhancementOmicron ?? 0}"
                            ${synergySet.synergyEnhancementOmicron === undefined ? 'readonly' : ''}
-                           onchange="updateSynergyOmicronEnhancement(${index}, this.value)">
+                           oninput="updateSynergyOmicronEnhancement(${index}, this.value)">
                     <div class="form-help">When checked, the specified Omicron enhancement will be applied to the synergy characters specified below. NOTE: This will only apply if ${character.id} has an Omicron ability.</div>
                 </div>
                 ${renderSynergyCharactersEditor(index, synergySet)}
@@ -2399,7 +3357,7 @@ function renderSynergyEditor(character) {
 
     html += '</div>';
     html += `
-        <button class="btn btn-primary add-synergy-btn" onclick="addSynergySet()">
+        <button class="btn btn-secondary add-synergy-btn" onclick="addSynergySet()">
             <span class="icon">+</span> Add Synergy Set
         </button>
     `;
@@ -2446,17 +3404,27 @@ function removeSynergySet(index) {
 }
 
 function toggleSynergyEnhancement(index) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
+
     const checkbox = document.getElementById(`chkSynergyEnhancement_${index}`);
     const input = document.getElementById(`inputSynergyEnhancement_${index}`);
 
     if (checkbox.checked) {
         // Enable input - user wants to set a specific value
         input.removeAttribute('readonly');
+        // Set initial value in draft (use current input value or default to 0)
+        const currentValue = parseInt(input.value, 10);
+        currentDraft.synergySets[index].synergyEnhancement = isNaN(currentValue) ? 0 : currentValue;
     } else {
         // Disable input and show default value
         input.setAttribute('readonly', 'readonly');
         input.value = 0;
+        // Remove from draft
+        delete currentDraft.synergySets[index].synergyEnhancement;
     }
+
+    refreshDraftDirtyState();
+    updateStatus('Synergy enhancement toggled - click Update Character to apply', 'warning');
 }
 
 function updateSynergyEnhancement(index, value) {
@@ -2483,17 +3451,27 @@ function updateSynergyEnhancement(index, value) {
 }
 
 function toggleSynergyOmicronEnhancement(index) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
+
     const checkbox = document.getElementById(`chkSynergyOmicron_${index}`);
     const input = document.getElementById(`inputSynergyOmicron_${index}`);
 
     if (checkbox.checked) {
         // Enable input - user wants to set a specific value
         input.removeAttribute('readonly');
+        // Set initial value in draft (use current input value or default to 0)
+        const currentValue = parseInt(input.value, 10);
+        currentDraft.synergySets[index].synergyEnhancementOmicron = isNaN(currentValue) ? 0 : currentValue;
     } else {
         // Disable input and show default value
         input.setAttribute('readonly', 'readonly');
         input.value = 0;
+        // Remove from draft
+        delete currentDraft.synergySets[index].synergyEnhancementOmicron;
     }
+
+    refreshDraftDirtyState();
+    updateStatus('Omicron boost toggled - click Update Character to apply', 'warning');
 }
 
 function updateSynergyOmicronEnhancement(index, value) {
@@ -2612,6 +3590,8 @@ function showCharacterDropdown(inputElement, synergyIndex, charIndex) {
 function hideAllDropdowns() {
     document.querySelectorAll('.character-dropdown').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="tag-dropdown_"]').forEach(dropdown => dropdown.remove());
+    document.querySelectorAll('[id^="zeta-dropdown_"]').forEach(dropdown => dropdown.remove());
+    document.querySelectorAll('[id^="omicron-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('input[data-dropdown-open]').forEach(input => {
         delete input.dataset.dropdownOpen;
     });
@@ -2689,11 +3669,6 @@ function removeSynergyCharacter(synergyIndex, charIndex) {
 
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.characters || charIndex >= synergySet.characters.length) return;
-
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
 
     synergySet.characters.splice(charIndex, 1);
 
@@ -2974,7 +3949,8 @@ function showTagDropdown(inputElement, synergyIndex, catIndex, field) {
         option.textContent = tag;
         option.dataset.index = index;
 
-        option.addEventListener('click', (e) => {
+        option.addEventListener('mousedown', (e) => {
+            e.preventDefault(); // Prevent blur event from firing
             e.stopPropagation();
             insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field);
         });
@@ -3013,8 +3989,9 @@ function insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field) {
     const tagEndIndex = nextCommaIndex === -1 ? inputValue.length : cursorPosition + nextCommaIndex;
 
     // Build new value: before + tag + after
-    const before = inputValue.substring(0, tagStartIndex).trim();
-    const after = inputValue.substring(tagEndIndex).trim();
+    // Trim whitespace AND trailing/leading commas to avoid double commas
+    const before = inputValue.substring(0, tagStartIndex).trim().replace(/,+$/, '').trim();
+    const after = inputValue.substring(tagEndIndex).trim().replace(/^,+/, '').trim();
 
     let newValue;
     if (before && after) {
@@ -3026,6 +4003,8 @@ function insertTagAtCursor(inputElement, tag, synergyIndex, catIndex, field) {
     } else {
         newValue = tag;
     }
+
+    console.log('insertTagAtCursor:', { tag, before, after, newValue, field });
 
     inputElement.value = newValue;
 
@@ -3133,11 +4112,6 @@ function updateSynergyCharacter(synergyIndex, charIndex, value) {
 function addCategoryDefinition(synergyIndex) {
     if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[synergyIndex]) return;
 
-    // Check for unsaved draft changes
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
-
     const synergySet = currentDraft.synergySets[synergyIndex];
 
     // Check if adding a new definition (with default of 1 match) would exceed the limit
@@ -3167,11 +4141,6 @@ function removeCategoryDefinition(synergyIndex, catIndex) {
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.categoryDefinitions || catIndex >= synergySet.categoryDefinitions.length) return;
 
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
-
     synergySet.categoryDefinitions.splice(catIndex, 1);
 
     // Remove categoryDefinitions array if empty
@@ -3193,6 +4162,8 @@ function updateCategoryDefInclude(synergyIndex, catIndex, value) {
     const tags = value.split(',')
         .map(tag => tag.trim())
         .filter(tag => tag.length > 0);
+
+    console.log('updateCategoryDefInclude:', { value, tags });
 
     if (tags.length === 0) {
         alert('Include tags cannot be empty. At least one tag is required.');
@@ -3468,9 +4439,16 @@ function updateSaveButtonState() {
         saveButton.disabled = !hasUnsavedChanges;
     }
 
-    const updateButton = document.getElementById('btnUpdateCharacter');
-    if (updateButton) {
-        updateButton.disabled = !hasDraftChanges();
+    // Update both sidebar Update Character buttons
+    const isDraftDirty = hasDraftChanges();
+    const updateButtonLeft = document.getElementById('btnUpdateCharacterLeft');
+    const updateButtonRight = document.getElementById('btnUpdateCharacterRight');
+
+    if (updateButtonLeft) {
+        updateButtonLeft.disabled = !isDraftDirty;
+    }
+    if (updateButtonRight) {
+        updateButtonRight.disabled = !isDraftDirty;
     }
 }
 
@@ -3488,6 +4466,49 @@ function updateStatus(message, type = 'info') {
 function updateCharacterCount() {
     const countElement = document.getElementById('characterCount');
     countElement.textContent = `${characterData.length} characters`;
+    updateMissingCharacters();
+}
+
+/**
+ * Gets the list of missing character IDs by comparing reference data with existing characters.
+ * @returns {string[]} Array of missing character IDs, sorted alphabetically
+ */
+function getMissingCharacterIds() {
+    if (!referenceCharacters || referenceCharacters.length === 0) {
+        return [];
+    }
+
+    const existingIds = new Set(characterData.map(c => c.id));
+    const missingCharacters = referenceCharacters.filter(refChar => {
+        const refId = refChar.id || refChar.baseId;
+        return refId && !existingIds.has(refId);
+    });
+
+    return missingCharacters
+        .map(refChar => refChar.id || refChar.baseId)
+        .filter(id => id)
+        .sort();
+}
+
+function updateMissingCharacters() {
+    const missingElement = document.getElementById('missingCharacters');
+
+    if (!referenceCharacters || referenceCharacters.length === 0) {
+        missingElement.textContent = 'Reference data loading...';
+        missingElement.style.color = '';
+        return;
+    }
+
+    const missingIds = getMissingCharacterIds();
+    const missingCount = missingIds.length;
+
+    if (missingCount === 0) {
+        missingElement.textContent = 'No missing characters';
+        missingElement.style.color = '';
+    } else {
+        missingElement.textContent = `${missingCount} missing character${missingCount === 1 ? '' : 's'}`;
+        missingElement.style.color = '#f0ad4e';
+    }
 }
 
 function updateValidationStatus(status) {
