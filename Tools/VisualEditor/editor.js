@@ -30,6 +30,7 @@ let isRightSidebarCollapsed = true; // Start collapsed
 let activeFilterCategories = [];
 let activeFilterRoles = [];
 let activeFilterAlignments = [];
+let activeFilterCustomCategories = [];
 
 // ============================================
 // Initialization
@@ -80,7 +81,7 @@ function initializeEventListeners() {
         }
     });
 
-    // Click outside to close all dropdowns (character, exclusion, tag, zeta, and omicron)
+    // Click outside to close all dropdowns (character, exclusion, tag, zeta, omicron, and custom category)
     document.addEventListener('click', (e) => {
         const isCharacterInput = e.target.closest('.character-input');
         const isCharacterDropdown = e.target.closest('.character-dropdown');
@@ -92,8 +93,10 @@ function initializeEventListeners() {
         const isZetaDropdown = e.target.closest('[id^="zeta-dropdown_"]');
         const isOmicronInput = e.target.closest('.omicron-input');
         const isOmicronDropdown = e.target.closest('[id^="omicron-dropdown_"]');
+        const isCustomCategoryInput = e.target.closest('.custom-category-input');
+        const isCustomCategoryDropdown = e.target.closest('[id^="custom-category-dropdown_"]');
 
-        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown && !isOmicronInput && !isOmicronDropdown) {
+        if (!isCharacterInput && !isCharacterDropdown && !isExclusionInput && !isExclusionDropdown && !isTagInput && !isTagDropdown && !isZetaInput && !isZetaDropdown && !isOmicronInput && !isOmicronDropdown && !isCustomCategoryInput && !isCustomCategoryDropdown) {
             hideAllDropdowns();
         }
     });
@@ -139,6 +142,13 @@ function initializeEventListeners() {
                 showTagDropdown(e.target, synergyIndex, catIndex, field);
             }
         }
+        // Custom category input events
+        if (e.target.classList.contains('custom-category-input')) {
+            const index = parseInt(e.target.dataset.categoryIndex);
+            if (!isNaN(index)) {
+                showCustomCategoryDropdown(e.target, index);
+            }
+        }
     });
 
     // Delegate keydown events for character and tag dropdowns
@@ -169,6 +179,13 @@ function initializeEventListeners() {
                 handleTagInputKeydown(e, e.target, synergyIndex, catIndex, field);
             }
         }
+        // Custom category input keydown
+        if (e.target.classList.contains('custom-category-input')) {
+            const index = parseInt(e.target.dataset.categoryIndex);
+            if (!isNaN(index)) {
+                handleCustomCategoryInputKeydown(e, e.target, index);
+            }
+        }
     });
 
     // Delegate focus events to show dropdowns
@@ -197,6 +214,13 @@ function initializeEventListeners() {
             const field = e.target.dataset.field;
             if (!isNaN(synergyIndex) && !isNaN(catIndex) && field) {
                 showTagDropdown(e.target, synergyIndex, catIndex, field);
+            }
+        }
+        // Custom category input focus
+        if (e.target.classList.contains('custom-category-input')) {
+            const index = parseInt(e.target.dataset.categoryIndex);
+            if (!isNaN(index)) {
+                showCustomCategoryDropdown(e.target, index);
             }
         }
     }, true);
@@ -509,6 +533,17 @@ function deepEqualDrafts(draft1, draft2) {
         }
     }
 
+    // Compare categories arrays
+    const cat1 = draft1.categories;
+    const cat2 = draft2.categories;
+    if ((cat1 === undefined) !== (cat2 === undefined)) return false;
+    if (cat1 && cat2) {
+        if (cat1.length !== cat2.length) return false;
+        for (let i = 0; i < cat1.length; i++) {
+            if (cat1[i] !== cat2[i]) return false;
+        }
+    }
+
     // Compare synergySets arrays (deep nested structure)
     const ss1 = draft1.synergySets;
     const ss2 = draft2.synergySets;
@@ -598,6 +633,44 @@ function hasDraftChanges() {
     return draftIsDirty;
 }
 
+function isDraftValid() {
+    if (!currentDraft) return true;
+
+    // Check for empty strings in requiredZetas
+    if (currentDraft.requiredZetas && currentDraft.requiredZetas.some(z => z.trim() === '')) {
+        return false;
+    }
+
+    // Check for empty strings in requiredOmicrons
+    if (currentDraft.requiredOmicrons && currentDraft.requiredOmicrons.some(o => o.trim() === '')) {
+        return false;
+    }
+
+    // Check for empty strings or reserved names in custom categories
+    if (currentDraft.categories) {
+        if (currentDraft.categories.some(cat => cat.trim() === '')) {
+            return false;
+        }
+        if (currentDraft.categories.some(cat => isReservedCategoryName(cat))) {
+            return false;
+        }
+    }
+
+    // Check for empty strings in synergy set characters
+    if (currentDraft.synergySets) {
+        for (const set of currentDraft.synergySets) {
+            if (set.characters && set.characters.some(c => c.trim() === '')) {
+                return false;
+            }
+            if (set.skipIfPresentCharacters && set.skipIfPresentCharacters.some(c => c.trim() === '')) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 function resetDraft() {
     currentDraft = null;
     currentDraftBaseline = null;
@@ -640,6 +713,8 @@ function initializeDraft(character) {
         requiresAllZetas: character.requiresAllZetas,
         requiredOmicrons: character.requiredOmicrons !== undefined ? [...character.requiredOmicrons] : undefined,
         requiresAllOmicrons: character.requiresAllOmicrons,
+        // Clone custom categories array
+        categories: character.categories !== undefined ? [...character.categories] : undefined,
         // Deep clone synergy sets with nested arrays
         synergySets: deepCloneSynergySets(character.synergySets)
     };
@@ -903,6 +978,37 @@ function showFilterModal() {
         alignmentsContainer.appendChild(label);
     });
 
+    // Populate Custom Character Categories
+    const customCategoriesContainer = document.getElementById('filterCustomCategories');
+    customCategoriesContainer.innerHTML = '';
+    const allCustomCategories = new Set();
+    characterData.forEach(char => {
+        if (char.categories && Array.isArray(char.categories)) {
+            char.categories.forEach(cat => allCustomCategories.add(cat));
+        }
+    });
+    const sortedCustomCategories = Array.from(allCustomCategories).sort();
+    if (sortedCustomCategories.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.style.fontStyle = 'italic';
+        emptyMessage.style.color = '#888';
+        emptyMessage.textContent = 'No custom categories defined';
+        customCategoriesContainer.appendChild(emptyMessage);
+    } else {
+        sortedCustomCategories.forEach(category => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = category;
+            checkbox.checked = activeFilterCustomCategories.includes(category);
+            checkbox.addEventListener('change', updateFilterClearButton);
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(category));
+            customCategoriesContainer.appendChild(label);
+        });
+    }
+
     // Update Clear button state
     updateFilterClearButton();
 
@@ -926,13 +1032,17 @@ function applyFilter() {
     const alignmentCheckboxes = document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked');
     const pendingAlignments = Array.from(alignmentCheckboxes).map(cb => cb.value);
 
+    const customCategoryCheckboxes = document.querySelectorAll('#filterCustomCategories input[type="checkbox"]:checked');
+    const pendingCustomCategories = Array.from(customCategoryCheckboxes).map(cb => cb.value);
+
     // Check if selected character would be filtered out
     if (selectedCharacter) {
         const wouldBeFiltered = willCharacterBeFilteredOut(
             selectedCharacter.id,
             pendingCategories,
             pendingRoles,
-            pendingAlignments
+            pendingAlignments,
+            pendingCustomCategories
         );
 
         if (wouldBeFiltered) {
@@ -960,6 +1070,7 @@ function applyFilter() {
     activeFilterCategories = pendingCategories;
     activeFilterRoles = pendingRoles;
     activeFilterAlignments = pendingAlignments;
+    activeFilterCustomCategories = pendingCustomCategories;
 
     // Update indicator
     updateFilterIndicator();
@@ -972,9 +1083,9 @@ function applyFilter() {
 }
 
 // Check if a character would be filtered out by the given filter criteria
-function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments) {
+function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments, filterCustomCategories) {
     // If no filters are active, character won't be filtered out
-    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0) {
+    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0 && filterCustomCategories.length === 0) {
         return false;
     }
 
@@ -1007,6 +1118,16 @@ function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, 
         }
     }
 
+    // Check Custom Character Categories (must have ALL selected custom categories)
+    if (filterCustomCategories.length > 0) {
+        const charData = characterData.find(c => c.id === characterId);
+        if (!charData || !charData.categories) return true;
+        const hasAllCustomCategories = filterCustomCategories.every(filterCat =>
+            charData.categories.includes(filterCat)
+        );
+        if (!hasAllCustomCategories) return true;
+    }
+
     return false;
 }
 
@@ -1015,6 +1136,7 @@ function clearFilterSelections() {
     document.querySelectorAll('#filterCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterRoles input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterAlignments input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterCustomCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
 
     // Update Clear button state
     updateFilterClearButton();
@@ -1024,7 +1146,8 @@ function updateFilterClearButton() {
     const anyChecked =
         document.querySelectorAll('#filterCategories input[type="checkbox"]:checked').length > 0 ||
         document.querySelectorAll('#filterRoles input[type="checkbox"]:checked').length > 0 ||
-        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0;
+        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterCustomCategories input[type="checkbox"]:checked').length > 0;
 
     const clearButton = document.getElementById('btnFilterClear');
     clearButton.disabled = !anyChecked;
@@ -1032,7 +1155,7 @@ function updateFilterClearButton() {
 
 function updateFilterIndicator() {
     const indicator = document.getElementById('filterIndicator');
-    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0 || activeFilterCustomCategories.length > 0;
 
     if (isFilterActive) {
         indicator.classList.add('active');
@@ -1092,6 +1215,16 @@ function getFilteredCharacterIds() {
             }
         }
 
+        // Check Custom Character Categories (AND within group - must have ALL selected custom categories)
+        if (activeFilterCustomCategories.length > 0) {
+            const charData = characterData.find(c => c.id === character.id);
+            if (!charData || !charData.categories) return;
+            const hasAllCustomCategories = activeFilterCustomCategories.every(filterCat =>
+                charData.categories.includes(filterCat)
+            );
+            if (!hasAllCustomCategories) return;
+        }
+
         // If we made it here, character matches all criteria
         matchingIds.add(character.id);
     });
@@ -1108,7 +1241,7 @@ function renderTierGrid() {
 
     // Update header text to show filter status
     const gridHeader = document.querySelector('.tier-grid-header h2');
-    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0 || activeFilterCustomCategories.length > 0;
     gridHeader.textContent = isFilterActive ? 'Tier Grid (Filtered)' : 'Tier Grid';
 
     // Get filtered character IDs if filter is active
@@ -2080,6 +2213,10 @@ function renderCharacterDetails(character) {
                 <span class="info-label">Required Omicrons</span>
                 <span class="info-value">${requiredOmicronsDisplay}</span>
             </div>
+            <div class="info-row">
+                <span class="info-label">Custom Categories</span>
+                <span class="info-value">${draftValues.categories && draftValues.categories.length > 0 ? 'Yes' : 'No'}</span>
+            </div>
         </div>
         
         <div class="form-group">
@@ -2147,6 +2284,9 @@ function renderCharacterDetails(character) {
 
     // Render the omicron requirements editor
     renderOmicronEditor(character);
+
+    // Render the custom categories editor
+    renderCustomCategoriesEditor(character);
 
     // Add event listeners to capture form changes into draft
     setTimeout(() => {
@@ -2237,7 +2377,12 @@ function updateCharacter() {
 
     // Apply draft to character - zeta requirements
     if (currentDraft.requiredZetas !== undefined) {
-        selectedCharacter.requiredZetas = [...currentDraft.requiredZetas];
+        const filteredZetas = currentDraft.requiredZetas.filter(z => z.trim() !== '');
+        if (filteredZetas.length > 0) {
+            selectedCharacter.requiredZetas = filteredZetas;
+        } else {
+            delete selectedCharacter.requiredZetas;
+        }
     } else {
         delete selectedCharacter.requiredZetas;
     }
@@ -2250,7 +2395,12 @@ function updateCharacter() {
 
     // Apply draft to character - omicron requirements
     if (currentDraft.requiredOmicrons !== undefined) {
-        selectedCharacter.requiredOmicrons = [...currentDraft.requiredOmicrons];
+        const filteredOmicrons = currentDraft.requiredOmicrons.filter(o => o.trim() !== '');
+        if (filteredOmicrons.length > 0) {
+            selectedCharacter.requiredOmicrons = filteredOmicrons;
+        } else {
+            delete selectedCharacter.requiredOmicrons;
+        }
     } else {
         delete selectedCharacter.requiredOmicrons;
     }
@@ -2263,17 +2413,36 @@ function updateCharacter() {
 
     // Apply draft to character - synergy sets (deep copy)
     if (currentDraft.synergySets) {
-        selectedCharacter.synergySets = currentDraft.synergySets.map(set => ({
-            ...set,
-            characters: set.characters ? [...set.characters] : undefined,
-            categoryDefinitions: set.categoryDefinitions ? set.categoryDefinitions.map(catDef => ({
-                ...catDef,
-                include: catDef.include ? [...catDef.include] : undefined,
-                exclude: catDef.exclude ? [...catDef.exclude] : undefined
-            })) : undefined
-        }));
+        selectedCharacter.synergySets = currentDraft.synergySets.map(set => {
+            // Filter empty strings from character arrays
+            const filteredCharacters = set.characters ? set.characters.filter(c => c.trim() !== '') : undefined;
+            const filteredSkipIfPresent = set.skipIfPresentCharacters ? set.skipIfPresentCharacters.filter(c => c.trim() !== '') : undefined;
+
+            return {
+                ...set,
+                characters: filteredCharacters && filteredCharacters.length > 0 ? filteredCharacters : undefined,
+                skipIfPresentCharacters: filteredSkipIfPresent && filteredSkipIfPresent.length > 0 ? filteredSkipIfPresent : undefined,
+                categoryDefinitions: set.categoryDefinitions ? set.categoryDefinitions.map(catDef => ({
+                    ...catDef,
+                    include: catDef.include ? [...catDef.include] : undefined,
+                    exclude: catDef.exclude ? [...catDef.exclude] : undefined
+                })) : undefined
+            };
+        });
     } else {
         delete selectedCharacter.synergySets;
+    }
+
+    // Apply draft to character - custom categories
+    if (currentDraft.categories && currentDraft.categories.length > 0) {
+        const filteredCategories = currentDraft.categories.filter(cat => cat.trim() !== '');
+        if (filteredCategories.length > 0) {
+            selectedCharacter.categories = filteredCategories;
+        } else {
+            delete selectedCharacter.categories;
+        }
+    } else {
+        delete selectedCharacter.categories;
     }
 
     hasUnsavedChanges = true;
@@ -3061,6 +3230,383 @@ function handleOmicronInputKeydown(event, inputElement, omicronIndex) {
 }
 
 // ============================================
+// Custom Character Categories Editor
+// ============================================
+function renderCustomCategoriesEditor(character) {
+    const container = document.getElementById('characterDetails');
+
+    // Use draft values if available, otherwise use character values
+    const draftValues = currentDraft || character;
+    const categories = draftValues.categories || [];
+
+    let customCategoriesHtml = `
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+            <label class="form-label">Custom Character Categories</label>
+            <div class="form-help">Assign custom categories to this character for filtering and synergy matching</div>
+        </div>
+    `;
+
+    if (categories.length === 0) {
+        customCategoriesHtml += `
+            <div class="empty-state" style="margin: 10px 0;">
+                <p style="font-size: 0.9em; color: #888;">No custom categories assigned</p>
+            </div>
+        `;
+    } else {
+        customCategoriesHtml += '<div class="form-group">';
+        categories.forEach((category, index) => {
+            customCategoriesHtml += `
+                <div class="info-row" style="margin-bottom: 8px; align-items: center;">
+                    <input type="text" class="form-input custom-category-input" 
+                           id="customCategoryInput_${index}"
+                           data-category-index="${index}"
+                           data-category-value="${category}"
+                           value="${category}" 
+                           placeholder="Type to search categories..."
+                           onblur="updateCustomCategoryFromInput(${index}, this)"
+                           style="flex: 1; font-family: monospace;">
+                    <button class="btn btn-danger btn-small" onclick="removeCustomCategory(${index})" style="margin-left: 8px;">
+                        <span class="icon">×</span>
+                    </button>
+                </div>
+            `;
+        });
+        customCategoriesHtml += '</div>';
+    }
+
+    customCategoriesHtml += `
+        <button class="btn btn-secondary" onclick="addCustomCategory()" style="margin-top: 10px;">
+            <span class="icon">+</span> Add Custom Category
+        </button>
+    `;
+
+    container.innerHTML += customCategoriesHtml;
+}
+
+// Check if a category name conflicts with reserved names (Categories, Roles, Alignments)
+function isReservedCategoryName(categoryName) {
+    const normalized = categoryName.trim().toLowerCase();
+
+    // Check against reference categories
+    if (referenceCategories.some(cat => cat.toLowerCase() === normalized)) {
+        return true;
+    }
+
+    // Check against reference roles
+    if (referenceRoles.some(role => role.toLowerCase() === normalized)) {
+        return true;
+    }
+
+    // Check against reference alignments
+    if (referenceAlignments.some(align => align.toLowerCase() === normalized)) {
+        return true;
+    }
+
+    return false;
+}
+
+// Get all unique custom categories from character data
+function getAllCustomCategories() {
+    const allCategories = new Set();
+    characterData.forEach(char => {
+        if (char.categories && Array.isArray(char.categories)) {
+            char.categories.forEach(cat => allCategories.add(cat));
+        }
+    });
+    return Array.from(allCategories).sort();
+}
+
+// Get available custom categories (excluding already assigned ones)
+function getAvailableCustomCategories(existingCategories = []) {
+    const allCategories = getAllCustomCategories();
+    return allCategories.filter(cat => !existingCategories.includes(cat));
+}
+
+// Show custom category dropdown with filtered options
+function showCustomCategoryDropdown(inputElement, categoryIndex) {
+    hideAllDropdowns();
+
+    if (!selectedCharacter || !currentDraft) return;
+
+    // Get existing categories (excluding the one being edited)
+    const existingCategories = (currentDraft.categories || [])
+        .filter((c, i) => i !== categoryIndex && c.trim() !== '');
+
+    // Get all available categories
+    const allCategories = getAvailableCustomCategories(existingCategories);
+
+    // Filter based on input text (preserve original case)
+    const inputValue = inputElement.value.trim();
+    const inputValueLower = inputValue.toLowerCase();
+    const filteredCategories = inputValue
+        ? allCategories.filter(cat => cat.toLowerCase().includes(inputValueLower))
+        : allCategories;
+
+    // Create dropdown
+    const dropdown = document.createElement('div');
+    dropdown.className = 'character-dropdown';
+    dropdown.id = `custom-category-dropdown_${categoryIndex}`;
+
+    // Check if input value is a new category (not in existing list)
+    const isNewCategory = inputValue &&
+        !allCategories.some(cat => cat.toLowerCase() === inputValueLower) &&
+        !existingCategories.some(cat => cat.toLowerCase() === inputValueLower);
+
+    // Check if the new category name is reserved
+    const isReservedName = inputValue && isReservedCategoryName(inputValue);
+
+    if (isNewCategory && !isReservedName) {
+        // Show option to create new category
+        const newOption = document.createElement('div');
+        newOption.className = 'dropdown-option';
+        newOption.dataset.index = '0';
+        newOption.dataset.value = inputValue;
+        newOption.innerHTML = `<em>Create new: "${inputValue}"</em>`;
+
+        newOption.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            selectCustomCategoryFromDropdown(categoryIndex, inputValue, inputElement);
+        });
+
+        newOption.addEventListener('mouseenter', () => {
+            dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+            newOption.classList.add('selected');
+        });
+
+        dropdown.appendChild(newOption);
+    } else if (isReservedName) {
+        // Show message that this name is reserved
+        const reservedOption = document.createElement('div');
+        reservedOption.className = 'dropdown-option';
+        reservedOption.style.fontStyle = 'italic';
+        reservedOption.style.color = '#d9534f';
+        reservedOption.textContent = `"${inputValue}" conflicts with existing Category, Role, or Alignment`;
+        dropdown.appendChild(reservedOption);
+    }
+
+    if (filteredCategories.length === 0 && !isNewCategory && !isReservedName) {
+        const noMatch = document.createElement('div');
+        noMatch.className = 'dropdown-option';
+        noMatch.style.fontStyle = 'italic';
+        noMatch.style.color = '#888';
+        noMatch.textContent = inputValue ? 'Type to create a new category' : 'No categories available';
+        dropdown.appendChild(noMatch);
+    } else if (filteredCategories.length > 0) {
+        const startIndex = (isNewCategory && !isReservedName) ? 1 : 0;
+        filteredCategories.forEach((category, index) => {
+            const option = document.createElement('div');
+            option.className = 'dropdown-option';
+            option.dataset.index = startIndex + index;
+            option.dataset.value = category;
+            option.textContent = category;
+
+            option.addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectCustomCategoryFromDropdown(categoryIndex, category, inputElement);
+            });
+
+            option.addEventListener('mouseenter', () => {
+                dropdown.querySelectorAll('.dropdown-option').forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+            });
+
+            dropdown.appendChild(option);
+        });
+    }
+
+    // Position dropdown below input
+    const inputRect = inputElement.getBoundingClientRect();
+    dropdown.style.position = 'fixed';
+    dropdown.style.top = `${inputRect.bottom + 2}px`;
+    dropdown.style.left = `${inputRect.left}px`;
+    dropdown.style.width = `${inputRect.width}px`;
+    dropdown.style.maxHeight = '200px';
+    dropdown.style.overflowY = 'auto';
+
+    document.body.appendChild(dropdown);
+    inputElement.dataset.dropdownOpen = 'true';
+}
+
+// Handle custom category selection from dropdown
+function selectCustomCategoryFromDropdown(categoryIndex, category, inputElement) {
+    if (!selectedCharacter || !currentDraft) return;
+
+    // Ensure categories array exists
+    if (!currentDraft.categories) {
+        currentDraft.categories = [];
+    }
+
+    // Update the draft
+    currentDraft.categories[categoryIndex] = category;
+
+    // Update the input display
+    inputElement.value = category;
+    inputElement.dataset.categoryValue = category;
+
+    refreshDraftDirtyState();
+    updateStatus('Category selected - click Update Character to apply', 'warning');
+
+    // Re-render to update UI
+    renderCharacterDetails(selectedCharacter);
+    renderSynergyEditor(selectedCharacter);
+
+    hideAllDropdowns();
+}
+
+// Keyboard navigation for custom category dropdown
+function handleCustomCategoryInputKeydown(event, inputElement, categoryIndex) {
+    const dropdown = document.getElementById(`custom-category-dropdown_${categoryIndex}`);
+
+    if (!dropdown) {
+        if (event.key === 'ArrowDown' || event.key === 'Enter') {
+            showCustomCategoryDropdown(inputElement, categoryIndex);
+            event.preventDefault();
+        }
+        return;
+    }
+
+    const options = dropdown.querySelectorAll('.dropdown-option:not([style*="italic"])');
+    if (options.length === 0) {
+        if (event.key === 'Escape') {
+            event.preventDefault();
+            hideAllDropdowns();
+        }
+        return;
+    }
+
+    const selectedOption = dropdown.querySelector('.dropdown-option.selected');
+    let currentIndex = selectedOption ? parseInt(selectedOption.dataset.index) : -1;
+
+    switch (event.key) {
+        case 'ArrowDown':
+            event.preventDefault();
+            currentIndex = Math.min(currentIndex + 1, options.length - 1);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'ArrowUp':
+            event.preventDefault();
+            currentIndex = Math.max(currentIndex - 1, 0);
+            options.forEach(opt => opt.classList.remove('selected'));
+            if (options[currentIndex]) {
+                options[currentIndex].classList.add('selected');
+                options[currentIndex].scrollIntoView({ block: 'nearest' });
+            }
+            break;
+
+        case 'Enter':
+            event.preventDefault();
+            if (selectedOption && selectedOption.dataset.value) {
+                selectCustomCategoryFromDropdown(categoryIndex, selectedOption.dataset.value, inputElement);
+            } else if (options.length === 1 && options[0].dataset.value) {
+                selectCustomCategoryFromDropdown(categoryIndex, options[0].dataset.value, inputElement);
+            }
+            break;
+
+        case 'Escape':
+            event.preventDefault();
+            hideAllDropdowns();
+            break;
+    }
+}
+
+function addCustomCategory() {
+    if (!selectedCharacter || !currentDraft) return;
+
+    if (!currentDraft.categories) {
+        currentDraft.categories = [];
+    }
+
+    // Add empty string for user to fill in
+    currentDraft.categories.push('');
+
+    refreshDraftDirtyState();
+    updateStatus('Category field added - click Update Character to apply', 'warning');
+
+    // Re-render
+    renderCharacterDetails(selectedCharacter);
+    renderSynergyEditor(selectedCharacter);
+}
+
+function removeCustomCategory(index) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.categories) return;
+
+    // Remove the category at the specified index
+    currentDraft.categories.splice(index, 1);
+
+    // Remove array if empty
+    if (currentDraft.categories.length === 0) {
+        delete currentDraft.categories;
+    }
+
+    refreshDraftDirtyState();
+    updateStatus('Category removed - click Update Character to apply', 'warning');
+
+    // Re-render
+    renderCharacterDetails(selectedCharacter);
+    renderSynergyEditor(selectedCharacter);
+}
+
+function updateCustomCategory(index, value) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.categories) return;
+
+    // Trim whitespace
+    value = value.trim();
+
+    // Auto-remove if empty
+    if (value === '') {
+        removeCustomCategory(index);
+        return;
+    }
+
+    // Check for duplicates
+    const isDuplicate = currentDraft.categories.some((cat, i) =>
+        i !== index && cat.toLowerCase() === value.toLowerCase()
+    );
+
+    if (isDuplicate) {
+        alert('This category is already assigned. Duplicates are not allowed.');
+        renderCharacterDetails(selectedCharacter);
+        renderSynergyEditor(selectedCharacter);
+        return;
+    }
+
+    // Check if the name conflicts with reserved names
+    const isReserved = isReservedCategoryName(value);
+
+    // Update the value (even if invalid, so user can see the error)
+    currentDraft.categories[index] = value;
+
+    refreshDraftDirtyState();
+
+    if (isReserved) {
+        updateStatus('Invalid category: conflicts with existing Category, Role, or Alignment', 'error');
+    } else {
+        updateStatus('Category updated - click Update Character to apply', 'warning');
+    }
+}
+
+function updateCustomCategoryFromInput(index, inputElement) {
+    if (!selectedCharacter || !currentDraft || !currentDraft.categories) return;
+
+    const storedValue = inputElement.dataset.categoryValue;
+    const inputValue = inputElement.value.trim();
+
+    // If no change from stored value, skip
+    if (storedValue === inputValue) {
+        return;
+    }
+
+    updateCustomCategory(index, inputValue);
+}
+
+// ============================================
 // Synergy Editor
 // ============================================
 
@@ -3592,6 +4138,7 @@ function hideAllDropdowns() {
     document.querySelectorAll('[id^="tag-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="zeta-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('[id^="omicron-dropdown_"]').forEach(dropdown => dropdown.remove());
+    document.querySelectorAll('[id^="custom-category-dropdown_"]').forEach(dropdown => dropdown.remove());
     document.querySelectorAll('input[data-dropdown-open]').forEach(input => {
         delete input.dataset.dropdownOpen;
     });
@@ -3706,11 +4253,6 @@ function removeExclusionCharacter(synergyIndex, exclIndex) {
 
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.skipIfPresentCharacters || exclIndex >= synergySet.skipIfPresentCharacters.length) return;
-
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
 
     synergySet.skipIfPresentCharacters.splice(exclIndex, 1);
 
@@ -4441,14 +4983,15 @@ function updateSaveButtonState() {
 
     // Update both sidebar Update Character buttons
     const isDraftDirty = hasDraftChanges();
+    const isValid = isDraftValid();
     const updateButtonLeft = document.getElementById('btnUpdateCharacterLeft');
     const updateButtonRight = document.getElementById('btnUpdateCharacterRight');
 
     if (updateButtonLeft) {
-        updateButtonLeft.disabled = !isDraftDirty;
+        updateButtonLeft.disabled = !isDraftDirty || !isValid;
     }
     if (updateButtonRight) {
-        updateButtonRight.disabled = !isDraftDirty;
+        updateButtonRight.disabled = !isDraftDirty || !isValid;
     }
 }
 
