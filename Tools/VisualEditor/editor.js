@@ -4254,11 +4254,6 @@ function removeExclusionCharacter(synergyIndex, exclIndex) {
     const synergySet = currentDraft.synergySets[synergyIndex];
     if (!synergySet.skipIfPresentCharacters || exclIndex >= synergySet.skipIfPresentCharacters.length) return;
 
-    // Check for unsaved draft changes (gate before destructive action)
-    if (!confirmDiscardDrafts()) {
-        return;
-    }
-
     synergySet.skipIfPresentCharacters.splice(exclIndex, 1);
 
     // Remove array if empty
