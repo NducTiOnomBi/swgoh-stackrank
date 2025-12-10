@@ -30,6 +30,7 @@ let isRightSidebarCollapsed = true; // Start collapsed
 let activeFilterCategories = [];
 let activeFilterRoles = [];
 let activeFilterAlignments = [];
+let activeFilterCustomCategories = [];
 
 // ============================================
 // Initialization
@@ -903,6 +904,37 @@ function showFilterModal() {
         alignmentsContainer.appendChild(label);
     });
 
+    // Populate Custom Character Categories
+    const customCategoriesContainer = document.getElementById('filterCustomCategories');
+    customCategoriesContainer.innerHTML = '';
+    const allCustomCategories = new Set();
+    characterData.forEach(char => {
+        if (char.categories && Array.isArray(char.categories)) {
+            char.categories.forEach(cat => allCustomCategories.add(cat));
+        }
+    });
+    const sortedCustomCategories = Array.from(allCustomCategories).sort();
+    if (sortedCustomCategories.length === 0) {
+        const emptyMessage = document.createElement('p');
+        emptyMessage.style.fontStyle = 'italic';
+        emptyMessage.style.color = '#888';
+        emptyMessage.textContent = 'No custom categories defined';
+        customCategoriesContainer.appendChild(emptyMessage);
+    } else {
+        sortedCustomCategories.forEach(category => {
+            const label = document.createElement('label');
+            const checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.value = category;
+            checkbox.checked = activeFilterCustomCategories.includes(category);
+            checkbox.addEventListener('change', updateFilterClearButton);
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(category));
+            customCategoriesContainer.appendChild(label);
+        });
+    }
+
     // Update Clear button state
     updateFilterClearButton();
 
@@ -926,13 +958,17 @@ function applyFilter() {
     const alignmentCheckboxes = document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked');
     const pendingAlignments = Array.from(alignmentCheckboxes).map(cb => cb.value);
 
+    const customCategoryCheckboxes = document.querySelectorAll('#filterCustomCategories input[type="checkbox"]:checked');
+    const pendingCustomCategories = Array.from(customCategoryCheckboxes).map(cb => cb.value);
+
     // Check if selected character would be filtered out
     if (selectedCharacter) {
         const wouldBeFiltered = willCharacterBeFilteredOut(
             selectedCharacter.id,
             pendingCategories,
             pendingRoles,
-            pendingAlignments
+            pendingAlignments,
+            pendingCustomCategories
         );
 
         if (wouldBeFiltered) {
@@ -960,6 +996,7 @@ function applyFilter() {
     activeFilterCategories = pendingCategories;
     activeFilterRoles = pendingRoles;
     activeFilterAlignments = pendingAlignments;
+    activeFilterCustomCategories = pendingCustomCategories;
 
     // Update indicator
     updateFilterIndicator();
@@ -972,9 +1009,9 @@ function applyFilter() {
 }
 
 // Check if a character would be filtered out by the given filter criteria
-function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments) {
+function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, filterAlignments, filterCustomCategories) {
     // If no filters are active, character won't be filtered out
-    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0) {
+    if (filterCategories.length === 0 && filterRoles.length === 0 && filterAlignments.length === 0 && filterCustomCategories.length === 0) {
         return false;
     }
 
@@ -1007,6 +1044,16 @@ function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, 
         }
     }
 
+    // Check Custom Character Categories (must have ALL selected custom categories)
+    if (filterCustomCategories.length > 0) {
+        const charData = characterData.find(c => c.id === characterId);
+        if (!charData || !charData.categories) return true;
+        const hasAllCustomCategories = filterCustomCategories.every(filterCat =>
+            charData.categories.includes(filterCat)
+        );
+        if (!hasAllCustomCategories) return true;
+    }
+
     return false;
 }
 
@@ -1015,6 +1062,7 @@ function clearFilterSelections() {
     document.querySelectorAll('#filterCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterRoles input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterAlignments input[type="checkbox"]').forEach(cb => cb.checked = false);
+    document.querySelectorAll('#filterCustomCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
 
     // Update Clear button state
     updateFilterClearButton();
@@ -1024,7 +1072,8 @@ function updateFilterClearButton() {
     const anyChecked =
         document.querySelectorAll('#filterCategories input[type="checkbox"]:checked').length > 0 ||
         document.querySelectorAll('#filterRoles input[type="checkbox"]:checked').length > 0 ||
-        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0;
+        document.querySelectorAll('#filterAlignments input[type="checkbox"]:checked').length > 0 ||
+        document.querySelectorAll('#filterCustomCategories input[type="checkbox"]:checked').length > 0;
 
     const clearButton = document.getElementById('btnFilterClear');
     clearButton.disabled = !anyChecked;
@@ -1032,7 +1081,7 @@ function updateFilterClearButton() {
 
 function updateFilterIndicator() {
     const indicator = document.getElementById('filterIndicator');
-    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0 || activeFilterCustomCategories.length > 0;
 
     if (isFilterActive) {
         indicator.classList.add('active');
@@ -1092,6 +1141,16 @@ function getFilteredCharacterIds() {
             }
         }
 
+        // Check Custom Character Categories (AND within group - must have ALL selected custom categories)
+        if (activeFilterCustomCategories.length > 0) {
+            const charData = characterData.find(c => c.id === character.id);
+            if (!charData || !charData.categories) return;
+            const hasAllCustomCategories = activeFilterCustomCategories.every(filterCat =>
+                charData.categories.includes(filterCat)
+            );
+            if (!hasAllCustomCategories) return;
+        }
+
         // If we made it here, character matches all criteria
         matchingIds.add(character.id);
     });
@@ -1108,7 +1167,7 @@ function renderTierGrid() {
 
     // Update header text to show filter status
     const gridHeader = document.querySelector('.tier-grid-header h2');
-    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0;
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 || activeFilterAlignments.length > 0 || activeFilterCustomCategories.length > 0;
     gridHeader.textContent = isFilterActive ? 'Tier Grid (Filtered)' : 'Tier Grid';
 
     // Get filtered character IDs if filter is active
