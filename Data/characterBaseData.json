@@ -1023,7 +1023,61 @@
     },
     {
       "id": "BRUTUS",
-      "baseTier": 17
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "CAPTAINSILVO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 8,
+          "characters": [
+            "GLHONDO",
+            "CAPTAINSILVO",
+            "HONDO",
+            "VANE"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     },
     {
       "id": "BT1",
@@ -1323,7 +1377,62 @@
     },
     {
       "id": "CAPTAINSILVO",
-      "baseTier": 17
+      "baseTier": 16,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 10,
+          "characters": [
+            "GLHONDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "CAPTAINTARPALS",
@@ -3763,7 +3872,7 @@
     },
     {
       "id": "HONDO",
-      "baseTier": 12,
+      "baseTier": 11,
       "synergySets": [
         {
           "synergyEnhancement": 2,
@@ -3778,6 +3887,65 @@
               ],
               "numberMatchesRequired": 3
             }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CAPTAINSILVO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "GLHONDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ],
+          "skipIfPresentCharacters": [
+            "MAZKANATA"
           ]
         }
       ]
@@ -4306,7 +4474,18 @@
     },
     {
       "id": "ITHANO",
-      "baseTier": 14
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "MAZKANATA",
+            "KIX",
+            "QUIGGOLD",
+            "SM33"
+          ]
+        }
+      ]
     },
     {
       "id": "JABBATHEHUTT",
@@ -4821,7 +5000,46 @@
     },
     {
       "id": "KIX",
-      "baseTier": 17
+      "baseTier": 16,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CAPTAINSILVO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "MAZKANATA",
+            "QUIGGOLD",
+            "SM33",
+            "ITHANO"
+          ]
+        }
+      ]
     },
     {
       "id": "KRRSANTAN",
@@ -5369,7 +5587,24 @@
     },
     {
       "id": "MAZKANATA",
-      "baseTier": 17
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "synergyEnhancementOmicron": 3,
+          "characters": [
+            "ITHANO",
+            "KIX",
+            "QUIGGOLD",
+            "SM33"
+          ]
+        }
+      ],
+      "requiredOmicrons": [
+        "leaderability_mazkanata"
+      ],
+      "requiresAllOmicrons": false,
+      "omicronEnhancement": 3
     },
     {
       "id": "MERRIN",
@@ -6321,7 +6556,53 @@
     },
     {
       "id": "QUIGGOLD",
-      "baseTier": 17
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirates"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CAPTAINSILVO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirates"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ],
+      "requiresAllOmicrons": false,
+      "omicronEnhancement": 0
     },
     {
       "id": "QUIGONJINN",
@@ -6688,7 +6969,7 @@
     },
     {
       "id": "SANASTARROS",
-      "baseTier": 12,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 1,
@@ -7172,7 +7453,58 @@
     },
     {
       "id": "SM33",
-      "baseTier": 17
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 8,
+          "characters": [
+            "GLHONDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ],
+          "skipIfPresentCharacters": [
+            "MAZKANATA"
+          ]
+        }
+      ],
+      "requiredOmicrons": [
+        "uniqueskill_SM3301"
+      ],
+      "requiresAllOmicrons": false
     },
     {
       "id": "SMUGGLERCHEWBACCA",
@@ -7909,7 +8241,57 @@
     },
     {
       "id": "VANE",
-      "baseTier": 17
+      "baseTier": 16,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "ITHANO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "MAZKANATA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ],
+          "skipIfPresentCharacters": [
+            "GLHONDO"
+          ]
+        },
+        {
+          "synergyEnhancement": 10,
+          "characters": [
+            "GLHONDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ],
+          "skipIfPresentCharacters": [
+            "MAZKANATA"
+          ]
+        }
+      ]
     },
     {
       "id": "VANGUARDTEMPLEGUARD",
