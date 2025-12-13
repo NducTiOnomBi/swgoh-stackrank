@@ -190,9 +190,10 @@ try {
                     continue
                 }
 
-                # Save to file
-                Set-Content -Path $dataFilePath -Value $body -Encoding UTF8 -NoNewline
-                Write-Host "  Data saved successfully" -ForegroundColor Green
+                # Save to file (UTF-8 without BOM)
+                $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+                [System.IO.File]::WriteAllText($dataFilePath, $body, $utf8NoBom)
+                Write-Host "  Data saved successfully (UTF-8 without BOM)" -ForegroundColor Green
 
                 $successMsg = @{ success = $true; message = "Data saved successfully" } | ConvertTo-Json
                 $buffer = [System.Text.Encoding]::UTF8.GetBytes($successMsg)
