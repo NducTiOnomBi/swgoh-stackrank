@@ -5601,7 +5601,7 @@
         }
       ],
       "requiredOmicrons": [
-        "leaderability_mazkanata"
+        "leaderskill_MAZKANATA"
       ],
       "requiresAllOmicrons": false,
       "omicronEnhancement": 3
