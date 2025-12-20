@@ -8286,9 +8286,6 @@
               ],
               "numberMatchesRequired": 3
             }
-          ],
-          "skipIfPresentCharacters": [
-            "MAZKANATA"
           ]
         }
       ]
