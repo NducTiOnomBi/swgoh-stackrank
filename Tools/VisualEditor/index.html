@@ -174,25 +174,49 @@
                 </div>
                 <div class="modal-body">
                     <div class="filter-group">
-                        <h4>Categories</h4>
+                        <div class="filter-group-header">
+                            <h4>Categories</h4>
+                            <div class="filter-operator-toggle">
+                                <button type="button" class="btn btn-small operator-btn" id="operatorCategoriesAnd" onclick="setFilterOperator('Categories', 'AND')">AND</button>
+                                <button type="button" class="btn btn-small operator-btn" id="operatorCategoriesOr" onclick="setFilterOperator('Categories', 'OR')">OR</button>
+                            </div>
+                        </div>
                         <div class="filter-checkboxes" id="filterCategories">
                             <!-- Category checkboxes will be inserted here -->
                         </div>
                     </div>
                     <div class="filter-group">
-                        <h4>Roles</h4>
+                        <div class="filter-group-header">
+                            <h4>Roles</h4>
+                            <div class="filter-operator-toggle">
+                                <button type="button" class="btn btn-small operator-btn" id="operatorRolesAnd" onclick="setFilterOperator('Roles', 'AND')">AND</button>
+                                <button type="button" class="btn btn-small operator-btn" id="operatorRolesOr" onclick="setFilterOperator('Roles', 'OR')">OR</button>
+                            </div>
+                        </div>
                         <div class="filter-checkboxes" id="filterRoles">
                             <!-- Role checkboxes will be inserted here -->
                         </div>
                     </div>
                     <div class="filter-group">
-                        <h4>Alignments</h4>
+                        <div class="filter-group-header">
+                            <h4>Alignments</h4>
+                            <div class="filter-operator-toggle">
+                                <button type="button" class="btn btn-small operator-btn" id="operatorAlignmentsAnd" onclick="setFilterOperator('Alignments', 'AND')">AND</button>
+                                <button type="button" class="btn btn-small operator-btn" id="operatorAlignmentsOr" onclick="setFilterOperator('Alignments', 'OR')">OR</button>
+                            </div>
+                        </div>
                         <div class="filter-checkboxes" id="filterAlignments">
                             <!-- Alignment checkboxes will be inserted here -->
                         </div>
                     </div>
                     <div class="filter-group">
-                        <h4>Custom Character Categories</h4>
+                        <div class="filter-group-header">
+                            <h4>Custom Character Categories</h4>
+                            <div class="filter-operator-toggle">
+                                <button type="button" class="btn btn-small operator-btn" id="operatorCustomCategoriesAnd" onclick="setFilterOperator('CustomCategories', 'AND')">AND</button>
+                                <button type="button" class="btn btn-small operator-btn" id="operatorCustomCategoriesOr" onclick="setFilterOperator('CustomCategories', 'OR')">OR</button>
+                            </div>
+                        </div>
                         <div class="filter-checkboxes" id="filterCustomCategories">
                             <!-- Custom category checkboxes will be inserted here -->
                         </div>

@@ -32,6 +32,12 @@ let activeFilterRoles = [];
 let activeFilterAlignments = [];
 let activeFilterCustomCategories = [];
 
+// Filter operators (AND/OR per set)
+let filterOperatorCategories = 'AND';
+let filterOperatorRoles = 'OR';
+let filterOperatorAlignments = 'OR';
+let filterOperatorCustomCategories = 'AND';
+
 // ============================================
 // Initialization
 // ============================================
@@ -922,6 +928,31 @@ function submitNewCharacter() {
 // ============================================
 // Filter Modal
 // ============================================
+function setFilterOperator(filterSet, operator) {
+    // Update state
+    if (filterSet === 'Categories') {
+        filterOperatorCategories = operator;
+    } else if (filterSet === 'Roles') {
+        filterOperatorRoles = operator;
+    } else if (filterSet === 'Alignments') {
+        filterOperatorAlignments = operator;
+    } else if (filterSet === 'CustomCategories') {
+        filterOperatorCustomCategories = operator;
+    }
+
+    // Update button visual states
+    const andBtn = document.getElementById(`operator${filterSet}And`);
+    const orBtn = document.getElementById(`operator${filterSet}Or`);
+
+    if (operator === 'AND') {
+        andBtn.classList.add('active');
+        orBtn.classList.remove('active');
+    } else {
+        orBtn.classList.add('active');
+        andBtn.classList.remove('active');
+    }
+}
+
 function showFilterModal() {
     const modal = document.getElementById('filterModal');
 
@@ -1008,6 +1039,12 @@ function showFilterModal() {
             customCategoriesContainer.appendChild(label);
         });
     }
+
+    // Initialize operator button states
+    setFilterOperator('Categories', filterOperatorCategories);
+    setFilterOperator('Roles', filterOperatorRoles);
+    setFilterOperator('Alignments', filterOperatorAlignments);
+    setFilterOperator('CustomCategories', filterOperatorCustomCategories);
 
     // Update Clear button state
     updateFilterClearButton();
@@ -1096,36 +1133,83 @@ function willCharacterBeFilteredOut(characterId, filterCategories, filterRoles, 
         return true;
     }
 
-    // Check Categories (must have ALL selected categories)
+    // Check Categories based on operator
     if (filterCategories.length > 0) {
-        const hasAllCategories = filterCategories.every(filterCat =>
-            refChar.categories && refChar.categories.includes(filterCat)
-        );
-        if (!hasAllCategories) return true;
+        if (filterOperatorCategories === 'AND') {
+            // AND: must have ALL selected categories
+            const hasAllCategories = filterCategories.every(filterCat =>
+                refChar.categories && refChar.categories.includes(filterCat)
+            );
+            if (!hasAllCategories) return true;
+        } else {
+            // OR: must have AT LEAST ONE selected category
+            const hasAnyCategory = filterCategories.some(filterCat =>
+                refChar.categories && refChar.categories.includes(filterCat)
+            );
+            if (!hasAnyCategory) return true;
+        }
     }
 
-    // Check Roles (must match one of the selected roles)
+    // Check Roles based on operator
     if (filterRoles.length > 0) {
-        if (!refChar.role || !filterRoles.includes(refChar.role)) {
-            return true;
+        if (filterOperatorRoles === 'AND') {
+            // AND: must match ALL selected roles
+            // Since a character can only have ONE role, AND with multiple roles is impossible
+            if (filterRoles.length > 1) {
+                // Impossible condition - character cannot be multiple roles simultaneously
+                return true;
+            }
+            // Single role selected - character must match it
+            if (!refChar.role || !filterRoles.includes(refChar.role)) {
+                return true;
+            }
+        } else {
+            // OR: must match AT LEAST ONE selected role
+            if (!refChar.role || !filterRoles.includes(refChar.role)) {
+                return true;
+            }
         }
     }
 
-    // Check Alignments (must match one of the selected alignments)
+    // Check Alignments based on operator
     if (filterAlignments.length > 0) {
-        if (!refChar.alignment || !filterAlignments.includes(refChar.alignment)) {
-            return true;
+        if (filterOperatorAlignments === 'AND') {
+            // AND: must match ALL selected alignments
+            // Since a character can only have ONE alignment, AND with multiple alignments is impossible
+            if (filterAlignments.length > 1) {
+                // Impossible condition - character cannot have multiple alignments simultaneously
+                return true;
+            }
+            // Single alignment selected - character must match it
+            if (!refChar.alignment || !filterAlignments.includes(refChar.alignment)) {
+                return true;
+            }
+        } else {
+            // OR: must match AT LEAST ONE selected alignment
+            if (!refChar.alignment || !filterAlignments.includes(refChar.alignment)) {
+                return true;
+            }
         }
     }
 
-    // Check Custom Character Categories (must have ALL selected custom categories)
+    // Check Custom Character Categories based on operator
     if (filterCustomCategories.length > 0) {
         const charData = characterData.find(c => c.id === characterId);
         if (!charData || !charData.categories) return true;
-        const hasAllCustomCategories = filterCustomCategories.every(filterCat =>
-            charData.categories.includes(filterCat)
-        );
-        if (!hasAllCustomCategories) return true;
+
+        if (filterOperatorCustomCategories === 'AND') {
+            // AND: must have ALL selected custom categories
+            const hasAllCustomCategories = filterCustomCategories.every(filterCat =>
+                charData.categories.includes(filterCat)
+            );
+            if (!hasAllCustomCategories) return true;
+        } else {
+            // OR: must have AT LEAST ONE selected custom category
+            const hasAnyCustomCategory = filterCustomCategories.some(filterCat =>
+                charData.categories.includes(filterCat)
+            );
+            if (!hasAnyCustomCategory) return true;
+        }
     }
 
     return false;
@@ -1137,6 +1221,12 @@ function clearFilterSelections() {
     document.querySelectorAll('#filterRoles input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterAlignments input[type="checkbox"]').forEach(cb => cb.checked = false);
     document.querySelectorAll('#filterCustomCategories input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    // Reset operators to AND
+    setFilterOperator('Categories', 'AND');
+    setFilterOperator('Roles', 'AND');
+    setFilterOperator('Alignments', 'AND');
+    setFilterOperator('CustomCategories', 'AND');
 
     // Update Clear button state
     updateFilterClearButton();
@@ -1191,38 +1281,83 @@ function getFilteredCharacterIds() {
         // If no reference character found, skip (can't match)
         if (!refChar) return;
 
-        // Check Categories (AND within group - must have ALL selected categories)
+        // Check Categories based on operator
         if (activeFilterCategories.length > 0) {
-            const hasAllCategories = activeFilterCategories.every(filterCat =>
-                refChar.categories && refChar.categories.includes(filterCat)
-            );
-            if (!hasAllCategories) return;
+            if (filterOperatorCategories === 'AND') {
+                // AND: must have ALL selected categories
+                const hasAllCategories = activeFilterCategories.every(filterCat =>
+                    refChar.categories && refChar.categories.includes(filterCat)
+                );
+                if (!hasAllCategories) return;
+            } else {
+                // OR: must have AT LEAST ONE selected category
+                const hasAnyCategory = activeFilterCategories.some(filterCat =>
+                    refChar.categories && refChar.categories.includes(filterCat)
+                );
+                if (!hasAnyCategory) return;
+            }
         }
 
-        // Check Roles (AND within group - must match ALL selected roles)
-        // Since role is a single string, this means if any role is selected, character must match one of them
+        // Check Roles based on operator
         if (activeFilterRoles.length > 0) {
-            if (!refChar.role || !activeFilterRoles.includes(refChar.role)) {
-                return;
+            if (filterOperatorRoles === 'AND') {
+                // AND: must match ALL selected roles
+                // Since a character can only have ONE role, AND with multiple roles is impossible
+                if (activeFilterRoles.length > 1) {
+                    // Impossible condition - skip this character
+                    return;
+                }
+                // Single role selected - character must match it
+                if (!refChar.role || !activeFilterRoles.includes(refChar.role)) {
+                    return;
+                }
+            } else {
+                // OR: must match AT LEAST ONE selected role
+                if (!refChar.role || !activeFilterRoles.includes(refChar.role)) {
+                    return;
+                }
             }
         }
 
-        // Check Alignments (AND within group - must match ALL selected alignments)
-        // Since alignment is a single string, this means if any alignment is selected, character must match one of them
+        // Check Alignments based on operator
         if (activeFilterAlignments.length > 0) {
-            if (!refChar.alignment || !activeFilterAlignments.includes(refChar.alignment)) {
-                return;
+            if (filterOperatorAlignments === 'AND') {
+                // AND: must match ALL selected alignments
+                // Since a character can only have ONE alignment, AND with multiple alignments is impossible
+                if (activeFilterAlignments.length > 1) {
+                    // Impossible condition - skip this character
+                    return;
+                }
+                // Single alignment selected - character must match it
+                if (!refChar.alignment || !activeFilterAlignments.includes(refChar.alignment)) {
+                    return;
+                }
+            } else {
+                // OR: must match AT LEAST ONE selected alignment
+                if (!refChar.alignment || !activeFilterAlignments.includes(refChar.alignment)) {
+                    return;
+                }
             }
         }
 
-        // Check Custom Character Categories (AND within group - must have ALL selected custom categories)
+        // Check Custom Character Categories based on operator
         if (activeFilterCustomCategories.length > 0) {
             const charData = characterData.find(c => c.id === character.id);
             if (!charData || !charData.categories) return;
-            const hasAllCustomCategories = activeFilterCustomCategories.every(filterCat =>
-                charData.categories.includes(filterCat)
-            );
-            if (!hasAllCustomCategories) return;
+
+            if (filterOperatorCustomCategories === 'AND') {
+                // AND: must have ALL selected custom categories
+                const hasAllCustomCategories = activeFilterCustomCategories.every(filterCat =>
+                    charData.categories.includes(filterCat)
+                );
+                if (!hasAllCustomCategories) return;
+            } else {
+                // OR: must have AT LEAST ONE selected custom category
+                const hasAnyCustomCategory = activeFilterCustomCategories.some(filterCat =>
+                    charData.categories.includes(filterCat)
+                );
+                if (!hasAnyCustomCategory) return;
+            }
         }
 
         // If we made it here, character matches all criteria
