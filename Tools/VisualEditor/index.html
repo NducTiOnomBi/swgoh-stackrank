@@ -16,6 +16,9 @@
                     <button id="btnAddCharacter" class="btn btn-success">
                         <span class="icon">+</span> Add Character
                     </button>
+                    <button id="btnVisualize" class="btn btn-secondary">
+                        <span class="icon">📊</span> Visualize
+                    </button>
                     <button id="btnValidate" class="btn btn-secondary">
                         <span class="icon">✓</span> Validate
                     </button>
@@ -226,6 +229,34 @@
                     <button class="btn btn-secondary" id="btnFilterClear" onclick="clearFilterSelections()" disabled>Clear</button>
                     <button class="btn btn-secondary" onclick="closeFilterModal()">Close</button>
                     <button class="btn btn-primary" onclick="applyFilter()">Apply</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Tier Distribution Visualization -->
+        <div id="tierDistributionModal" class="modal" style="display: none;">
+            <div class="modal-content modal-content-wide">
+                <div class="modal-header">
+                    <h3>Tier Distribution</h3>
+                    <button class="modal-close" onclick="closeTierDistributionModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="tier-distribution-controls">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="vizIncludeSynergy">
+                            Include Synergy
+                        </label>
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="vizIncludeOmicron">
+                            Include Omicron
+                        </label>
+                    </div>
+                    <div id="tierDistributionChart" class="tier-distribution-chart">
+                        <!-- Chart will be rendered here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeTierDistributionModal()">Close</button>
                 </div>
             </div>
         </div>

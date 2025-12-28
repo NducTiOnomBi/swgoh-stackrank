@@ -911,6 +911,65 @@ body {
 }
 
 /* ============================================
+   Tier Distribution Visualization
+   ============================================ */
+.tier-distribution-controls {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-main);
+    border-radius: var(--border-radius);
+}
+
+.tier-distribution-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: var(--spacing-md);
+    background-color: var(--color-bg-main);
+    border-radius: var(--border-radius);
+}
+
+.tier-bar-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 60px;
+    gap: var(--spacing-md);
+    align-items: center;
+    min-height: 24px;
+}
+
+.tier-bar-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    text-align: right;
+}
+
+.tier-bar-container {
+    background-color: var(--color-bg-card);
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    height: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.tier-bar-fill {
+    background: linear-gradient(90deg, var(--color-primary), var(--color-primary-hover));
+    height: 100%;
+    transition: width 0.3s ease;
+    min-width: 2px;
+}
+
+.tier-bar-count {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-align: center;
+}
+
+/* ============================================
    Empty State
    ============================================ */
 .empty-state {

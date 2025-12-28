@@ -58,6 +58,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 function initializeEventListeners() {
     // Header actions
     document.getElementById('btnAddCharacter').addEventListener('click', addNewCharacter);
+    document.getElementById('btnVisualize').addEventListener('click', showTierDistributionModal);
     document.getElementById('btnValidate').addEventListener('click', validateData);
     document.getElementById('btnExport').addEventListener('click', exportData);
     document.getElementById('btnSave').addEventListener('click', saveData);
@@ -1365,6 +1366,167 @@ function getFilteredCharacterIds() {
     });
 
     return matchingIds;
+}
+
+// ============================================
+// Tier Distribution Visualization Modal
+// ============================================
+function showTierDistributionModal() {
+    const modal = document.getElementById('tierDistributionModal');
+
+    // Initialize toggles to match current view state
+    document.getElementById('vizIncludeSynergy').checked = includeSynergy;
+    document.getElementById('vizIncludeOmicron').checked = includeOmicron;
+
+    // Add event listeners for toggles
+    const synergyToggle = document.getElementById('vizIncludeSynergy');
+    const omicronToggle = document.getElementById('vizIncludeOmicron');
+
+    synergyToggle.onchange = renderTierDistributionChart;
+    omicronToggle.onchange = renderTierDistributionChart;
+
+    // Render initial chart
+    renderTierDistributionChart();
+
+    // Show modal
+    modal.style.display = 'flex';
+}
+
+function closeTierDistributionModal() {
+    const modal = document.getElementById('tierDistributionModal');
+    modal.style.display = 'none';
+}
+
+function computeTierDistribution() {
+    const vizIncludeSynergy = document.getElementById('vizIncludeSynergy').checked;
+    const vizIncludeOmicron = document.getElementById('vizIncludeOmicron').checked;
+
+    // Initialize counts for tiers 1-19
+    const tierCounts = new Array(19).fill(0);
+
+    // Get filtered character IDs if filter is active
+    const isFilterActive = activeFilterCategories.length > 0 || activeFilterRoles.length > 0 ||
+        activeFilterAlignments.length > 0 || activeFilterCustomCategories.length > 0;
+    let filteredIds = null;
+    if (isFilterActive) {
+        filteredIds = getFilteredCharacterIds();
+    }
+
+    // Calculate tier for each character
+    characterData.forEach(character => {
+        // Skip character if filter is active and character doesn't match
+        if (filteredIds !== null && !filteredIds.has(character.id)) {
+            return;
+        }
+
+        let finalTier = character.baseTier;
+        let appliedOmicronBonus = 0;
+
+        // Apply omicron bonus if enabled
+        if (vizIncludeOmicron) {
+            // Check if character has omicron abilities
+            const hasOmicronAbilities = referenceAbilities.some(ability =>
+                ability.character_base_id === character.id && ability.is_omicron === true
+            );
+
+            // Personal omicron
+            let personalOmicron = 0;
+            if (character.omicronEnhancement !== undefined) {
+                personalOmicron = character.omicronEnhancement;
+            } else if (hasOmicronAbilities) {
+                personalOmicron = 1;
+            }
+
+            // Check for synergy omicron bonuses from other characters
+            let bestSynergyOmicronBonus = 0;
+            characterData.forEach(otherChar => {
+                if (!otherChar.synergySets || otherChar.synergySets.length === 0) return;
+
+                otherChar.synergySets.forEach(synergySet => {
+                    const synergyOmicronBonus = synergySet.synergyEnhancementOmicron ?? 0;
+                    if (synergyOmicronBonus === 0) return;
+
+                    if (doesSynergyOmicronApplyToCharacter(synergySet, character)) {
+                        if (synergyOmicronBonus > bestSynergyOmicronBonus) {
+                            bestSynergyOmicronBonus = synergyOmicronBonus;
+                        }
+                    }
+                });
+            });
+
+            // Apply the largest omicron bonus
+            appliedOmicronBonus = Math.max(personalOmicron, bestSynergyOmicronBonus);
+            finalTier -= appliedOmicronBonus;
+        }
+
+        // Apply synergy enhancement if enabled
+        if (vizIncludeSynergy && character.synergySets && character.synergySets.length > 0) {
+            const synergyTiers = calculateSynergyTiers(character);
+
+            let bestSynergy = null;
+            if (vizIncludeOmicron && synergyTiers.bestOmicron !== null) {
+                bestSynergy = synergyTiers.bestOmicron;
+            } else if (synergyTiers.bestStandard !== null) {
+                bestSynergy = synergyTiers.bestStandard;
+            }
+
+            if (bestSynergy !== null) {
+                finalTier = character.baseTier - appliedOmicronBonus - bestSynergy.synergyEnhancement;
+            }
+        }
+
+        // Clamp tier to valid range (1-19)
+        finalTier = Math.max(1, Math.min(19, finalTier));
+
+        // Increment count for this tier (tier is 1-indexed, array is 0-indexed)
+        tierCounts[finalTier - 1]++;
+    });
+
+    return tierCounts;
+}
+
+function renderTierDistributionChart() {
+    const container = document.getElementById('tierDistributionChart');
+    const tierCounts = computeTierDistribution();
+    const maxCount = Math.max(...tierCounts, 1); // Avoid division by zero
+
+    // Clear existing chart
+    container.innerHTML = '';
+
+    // Create horizontal bar chart
+    tierCounts.forEach((count, index) => {
+        const tier = index + 1;
+
+        const barRow = document.createElement('div');
+        barRow.className = 'tier-bar-row';
+
+        // Tier label
+        const label = document.createElement('div');
+        label.className = 'tier-bar-label';
+        label.textContent = `Tier ${tier}`;
+        barRow.appendChild(label);
+
+        // Bar container
+        const barContainer = document.createElement('div');
+        barContainer.className = 'tier-bar-container';
+
+        // Bar fill
+        const barFill = document.createElement('div');
+        barFill.className = 'tier-bar-fill';
+        const percentage = (count / maxCount) * 100;
+        barFill.style.width = `${percentage}%`;
+        barContainer.appendChild(barFill);
+
+        barRow.appendChild(barContainer);
+
+        // Count label
+        const countLabel = document.createElement('div');
+        countLabel.className = 'tier-bar-count';
+        countLabel.textContent = count;
+        barRow.appendChild(countLabel);
+
+        container.appendChild(barRow);
+    });
 }
 
 // ============================================
