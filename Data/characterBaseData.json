@@ -2400,7 +2400,6 @@
       "id": "DEATHTROOPER",
       "baseTier": 14,
       "requiresAllZetas": false,
-      "requiredZetas": [],
       "synergySets": [
         {
           "synergyEnhancement": 4,
@@ -2479,6 +2478,20 @@
                 "Leader"
               ],
               "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MOFFGIDEONS3"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 3
             }
           ]
         }
@@ -2611,7 +2624,16 @@
     },
     {
       "id": "DIRECTORKRENNIC",
-      "baseTier": 15
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "DEATHTROOPER"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     },
     {
       "id": "DISGUISEDCLONETROOPER",
@@ -3331,10 +3353,9 @@
       "id": "GARSAXON",
       "baseTier": 18,
       "requiresAllZetas": false,
-      "requiredZetas": [],
       "synergySets": [
         {
-          "synergyEnhancement": 6,
+          "synergyEnhancement": 8,
           "characters": [
             "MAULS7",
             "IMPERIALSUPERCOMMANDO"
@@ -3603,7 +3624,7 @@
     },
     {
       "id": "GRANDMOFFTARKIN",
-      "baseTier": 13,
+      "baseTier": 12,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -4444,14 +4465,14 @@
     },
     {
       "id": "IMPERIALPROBEDROID",
-      "baseTier": 12
+      "baseTier": 15
     },
     {
       "id": "IMPERIALSUPERCOMMANDO",
       "baseTier": 18,
       "synergySets": [
         {
-          "synergyEnhancement": 6,
+          "synergyEnhancement": 8,
           "characters": [
             "MAULS7",
             "GARSAXON"
@@ -6683,7 +6704,7 @@
     },
     {
       "id": "RANGETROOPER",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 6,
@@ -7208,7 +7229,7 @@
     },
     {
       "id": "SECONDSISTER",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -7237,15 +7258,9 @@
           ]
         },
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 3,
           "characters": [
             "GRANDINQUISITOR"
-          ]
-        },
-        {
-          "synergyEnhancement": 6,
-          "characters": [
-            "THIRDSISTER"
           ]
         }
       ]
@@ -8038,7 +8053,23 @@
     },
     {
       "id": "TIEFIGHTERPILOT",
-      "baseTier": 15
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "MOFFGIDEONS3"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "TRENCH",
