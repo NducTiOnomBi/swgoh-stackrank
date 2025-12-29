@@ -1587,7 +1587,6 @@
       "id": "CC2224",
       "baseTier": 14,
       "requiresAllZetas": false,
-      "requiredZetas": [],
       "synergySets": [
         {
           "synergyEnhancement": 4,
@@ -1609,10 +1608,14 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "Light Side"
               ],
               "numberMatchesRequired": 3
             }
+          ],
+          "skipIfPresentCharacters": [
+            "GENERALSKYWALKER"
           ]
         }
       ]
@@ -1796,10 +1799,14 @@
           "categoryDefinitions": [
             {
               "include": [
-                "Clone Trooper"
+                "Clone Trooper",
+                "Light Side"
               ],
               "numberMatchesRequired": 3
             }
+          ],
+          "skipIfPresentCharacters": [
+            "GENERALSKYWALKER"
           ]
         }
       ]
