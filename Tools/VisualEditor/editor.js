@@ -1647,6 +1647,9 @@ function calculateFinalTier(character) {
         }
     }
 
+    // Clamp final tier to valid range (1-19)
+    finalTier = Math.max(1, Math.min(19, finalTier));
+
     return {
         finalTier: finalTier,
         appliedOmicronBonus: appliedOmicronBonus,
