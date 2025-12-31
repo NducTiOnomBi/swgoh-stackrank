@@ -2151,7 +2151,12 @@
     {
       "baseTier": 4,
       "id": "DARTHBANE",
-      "omicronEnhancement": 1
+      "omicronEnhancement": 1,
+      "requiredZetas": [
+        "uniqueskill_DARTHBANE01",
+        "basicskill_DARTHBANE"
+      ],
+      "requiresAllZetas": false
     },
     {
       "id": "DARTHMALAK",
