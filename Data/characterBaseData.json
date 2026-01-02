@@ -495,7 +495,7 @@
     },
     {
       "id": "BADBATCHHUNTER",
-      "baseTier": 15,
+      "baseTier": 14,
       "synergySets": [
         {
           "synergyEnhancement": 6,
@@ -543,7 +543,7 @@
     },
     {
       "id": "BADBATCHTECH",
-      "baseTier": 15,
+      "baseTier": 14,
       "synergySets": [
         {
           "synergyEnhancement": 6,
