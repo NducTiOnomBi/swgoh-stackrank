@@ -1811,7 +1811,7 @@
           ]
         },
         {
-          "synergyEnhancement": 6,
+          "synergyEnhancement": 5,
           "characters": [
             "CAPTAINREX",
             "HERASYNDULLAS3"
@@ -4264,7 +4264,7 @@
     },
     {
       "id": "HUYANG",
-      "baseTier": 13,
+      "baseTier": 14,
       "synergySets": [
         {
           "synergyEnhancement": 1,
@@ -8714,7 +8714,7 @@
     },
     {
       "id": "ZEBS3",
-      "baseTier": 16,
+      "baseTier": 17,
       "synergySets": [
         {
           "synergyEnhancement": 6,
