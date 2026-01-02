@@ -484,46 +484,58 @@
             "BADBATCHTECH",
             "BADBATCHWRECKER"
           ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "QUEENAMIDALA"
+          ]
         }
       ]
     },
     {
       "id": "BADBATCHHUNTER",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 6,
-          "characters": [
-            "BADBATCHECHO",
-            "BADBATCHTECH",
-            "BADBATCHWRECKER"
-          ]
-        },
-        {
-          "synergyEnhancement": 2,
           "categoryDefinitions": [
             {
               "include": [
                 "Bad Batch"
               ],
-              "numberMatchesRequired": 4
+              "numberMatchesRequired": 1,
+              "exclude": [
+                "Order 66 Raid"
+              ]
             }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "BADBATCHECHO",
+            "BADBATCHTECH",
+            "BADBATCHWRECKER"
           ]
         }
       ]
     },
     {
       "id": "BADBATCHOMEGA",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 4,
           "categoryDefinitions": [
             {
               "include": [
                 "Bad Batch"
               ],
-              "numberMatchesRequired": 4
+              "numberMatchesRequired": 4,
+              "exclude": [
+                "Order 66 Raid"
+              ]
             }
           ]
         }
@@ -531,7 +543,7 @@
     },
     {
       "id": "BADBATCHTECH",
-      "baseTier": 14,
+      "baseTier": 15,
       "synergySets": [
         {
           "synergyEnhancement": 6,
@@ -540,12 +552,23 @@
               "include": [
                 "Bad Batch"
               ],
-              "numberMatchesRequired": 4
+              "numberMatchesRequired": 4,
+              "exclude": [
+                "Order 66 Raid"
+              ]
             }
           ]
         },
         {
           "synergyEnhancement": 6,
+          "characters": [
+            "BADBATCHECHO",
+            "BADBATCHHUNTER",
+            "BADBATCHWRECKER"
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
           "characters": [
             "BADBATCHECHO",
             "BADBATCHHUNTER",
@@ -560,9 +583,23 @@
       "synergySets": [
         {
           "synergyEnhancement": 5,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch"
+              ],
+              "numberMatchesRequired": 1,
+              "exclude": [
+                "Order 66 Raid"
+              ]
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
           "characters": [
-            "BADBATCHECHO",
             "BADBATCHHUNTER",
+            "BADBATCHECHO",
             "BADBATCHTECH"
           ]
         }
@@ -598,15 +635,18 @@
     },
     {
       "id": "BATCHERS3",
-      "baseTier": 13,
+      "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 2,
-          "characters": [
-            "OMEGAS3",
-            "HUNTERS3",
-            "WRECKERS3",
-            "CROSSHAIRS3"
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch",
+                "Order 66 Raid"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -1925,15 +1965,18 @@
     },
     {
       "id": "CROSSHAIRS3",
-      "baseTier": 11,
+      "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 2,
-          "characters": [
-            "OMEGAS3",
-            "HUNTERS3",
-            "WRECKERS3",
-            "BATCHERS3"
+          "synergyEnhancement": 7,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch",
+                "Order 66 Raid"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -4203,15 +4246,18 @@
     },
     {
       "id": "HUNTERS3",
-      "baseTier": 12,
+      "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
-          "characters": [
-            "OMEGAS3",
-            "WRECKERS3",
-            "CROSSHAIRS3",
-            "BATCHERS3"
+          "synergyEnhancement": 6,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch",
+                "Order 66 Raid"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -6068,15 +6114,18 @@
     },
     {
       "id": "OMEGAS3",
-      "baseTier": 12,
+      "baseTier": 14,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
-          "characters": [
-            "HUNTERS3",
-            "CROSSHAIRS3",
-            "WRECKERS3",
-            "BATCHERS3"
+          "synergyEnhancement": 7,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch",
+                "Order 66 Raid"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -8513,15 +8562,18 @@
     },
     {
       "id": "WRECKERS3",
-      "baseTier": 12,
+      "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
-          "characters": [
-            "OMEGAS3",
-            "HUNTERS3",
-            "CROSSHAIRS3",
-            "BATCHERS3"
+          "synergyEnhancement": 6,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bad Batch",
+                "Order 66 Raid"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
