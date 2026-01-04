@@ -68,7 +68,7 @@ The browser will open automatically to `http://localhost:8080` (or Codespaces UR
 #### UI Overview
 
 - **Center Panel**: 19-column tier grid with drag-and-drop character cards
-- **Left Sidebar**: Character details (base tier, omicron enhancement, calculated tiers)
+- **Left Sidebar**: Character details (base tier, omicron boost, calculated tiers)
 - **Right Sidebar**: Synergy set editor (add/remove/view synergy configurations)
 - **Header Actions**: Add Character, Validate, Export JSON, Save Changes
 - **Status Bar**: Operation status, character count, validation status
@@ -79,13 +79,13 @@ Each character card shows:
 
 - **Base**: Character's assigned base tier (1-19)
 - **Best Std**: Best standard synergy tier (Base - Omicron - Best Synergy Enhancement)
-- **Best Omi**: Best omicron synergy tier (Base - Omicron - Best Omicron Enhancement)
+- **Best Omi**: Best omicron synergy tier (Base - Omicron - Best Omicron Boost)
 
 **Example Tooltip (hover over synergy tier):**
 
 ```text
 Base Tier (8)
-- Omicron Enhancement (1)
+- Omicron Boost (1)
 - Best Synergy (4 from VADER, PALPATINE, 3× Empire)
 = Final Tier (3)
 ```

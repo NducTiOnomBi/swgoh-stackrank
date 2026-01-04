@@ -59,7 +59,7 @@ The main data file is [`Data/characterBaseData.json`](./Data/characterBaseData.j
 
 - **200+ SWGOH characters** with tier rankings (1-19, where 1 = best)
 - **Synergy configurations** for team-based tier improvements
-- **Omicron enhancements** for characters with omicron abilities
+- **Omicron boosts** for characters with omicron abilities
 - **Zeta requirements** for unlocking certain synergies
 
 ## Deployment Pipeline

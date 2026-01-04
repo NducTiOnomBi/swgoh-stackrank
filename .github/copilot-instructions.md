@@ -54,7 +54,7 @@ Each synergy set reduces the effective tier when conditions are met:
 ```json
 {
     "synergyEnhancement": 3, // 0-10 (tier improvement) - at least one of synergyEnhancement or synergyEnhancementOmicron required
-    "synergyEnhancementOmicron": 2, // Optional: 0-10 (additional omicron enhancement)
+    "synergyEnhancementOmicron": 2, // Optional: 0-10 (additional omicron boost)
     "characters": ["VADER", "EMPEROR"], // Optional: specific character IDs
     "skipIfPresentCharacters": ["BADBATCHOMEGA"], // Optional: character IDs that prevent synergy activation if present
     "categoryDefinitions": [

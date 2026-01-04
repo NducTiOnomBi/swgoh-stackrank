@@ -29,7 +29,7 @@ The **Visual Editor** provides a modern, browser-based interface for managing ch
 5. The editor opens automatically in your browser
 6. Make changes using the drag-and-drop interface:
    - Drag characters between tier columns to change base tiers
-   - Select a character to edit omicron enhancements and synergy sets
+   - Select a character to edit omicron boosts and synergy sets
    - Use tooltips to understand synergy tier calculations
 7. Click "Validate" to check your changes (9 validation rules)
 8. Click "Save Changes" to persist changes to `Data/characterBaseData.json`
