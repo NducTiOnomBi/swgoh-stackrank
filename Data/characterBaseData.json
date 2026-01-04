@@ -1058,8 +1058,7 @@
             }
           ]
         }
-      ],
-      "omicronEnhancement": 0
+      ]
     },
     {
       "id": "BRUTUS",
@@ -6521,7 +6520,6 @@
     {
       "id": "POGGLETHELESSER",
       "baseTier": 11,
-      "omicronEnhancement": 0,
       "synergySets": [
         {
           "synergyEnhancement": 3,
@@ -6679,8 +6677,7 @@
           ]
         }
       ],
-      "requiresAllOmicrons": false,
-      "omicronEnhancement": 0
+      "requiresAllOmicrons": false
     },
     {
       "id": "QUIGONJINN",
