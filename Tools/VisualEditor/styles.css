@@ -318,6 +318,7 @@ body {
     display: flex;
     gap: var(--spacing-md);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .view-controls label {
@@ -326,6 +327,28 @@ body {
     gap: var(--spacing-sm);
     cursor: pointer;
     user-select: none;
+}
+
+.omicron-type-dropdown {
+    min-width: 150px;
+    padding: 6px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-bg-card);
+    font-size: 0.875rem;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: border-color 0.2s;
+}
+
+.omicron-type-dropdown:hover {
+    border-color: var(--color-primary);
+}
+
+.omicron-type-dropdown:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .status-bar {
@@ -920,6 +943,12 @@ body {
     padding: var(--spacing-md);
     background-color: var(--color-bg-main);
     border-radius: var(--border-radius);
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tier-distribution-controls .omicron-type-selector {
+    margin-left: auto;
 }
 
 .tier-distribution-chart {

@@ -5,7 +5,22 @@ let characterData = [];
 let selectedCharacter = null;
 let includeSynergy = false;
 let includeOmicron = false;
+let selectedOmicronTypes = ['GAC', 'TB', 'TW']; // Default omicron types to include
+let selectedOmicronModeSet = new Set([9, 14, 15, 7, 8]); // Cached Set of omicron mode values for performance
 let hasUnsavedChanges = false;
+
+// Omicron mode mapping from API (omicron_mode field) to selectable types
+const OMICRON_MODE_MAP = {
+    'GAC': [9, 14, 15],
+    'TB': [7],
+    'TW': [8],
+    'Raid': [4],
+    'Conquest': [11],
+    'GC': [12]
+};
+
+// Performance: Index of omicron abilities by character ID and mode
+let omicronAbilityIndex = new Map(); // Map<characterId, Set<omicron_mode>>
 
 // Draft state for staging character edits before committing
 let currentDraft = null;
@@ -45,6 +60,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Initialize event listeners
     initializeEventListeners();
 
+    // Initialize omicron mode set from defaults
+    updateOmicronModeSet();
+
     // Load reference data and character data in parallel
     await Promise.all([
         loadReferenceData(),
@@ -76,6 +94,22 @@ function initializeEventListeners() {
     document.getElementById('chkIncludeOmicron').addEventListener('change', (e) => {
         includeOmicron = e.target.checked;
         renderTierGrid();
+    });
+
+    // Omicron type multi-select dropdown with debouncing for performance
+    let omicronTypeTimeout = null;
+    document.getElementById('omicronTypeSelector').addEventListener('change', (e) => {
+        const select = e.target;
+        selectedOmicronTypes = Array.from(select.selectedOptions).map(opt => opt.value);
+
+        // Update cached mode set for fast lookups
+        updateOmicronModeSet();
+
+        // Debounce re-render to batch rapid changes
+        if (omicronTypeTimeout) clearTimeout(omicronTypeTimeout);
+        omicronTypeTimeout = setTimeout(() => {
+            renderTierGrid();
+        }, 75);
     });
 
     document.getElementById('btnFilter').addEventListener('click', showFilterModal);
@@ -280,6 +314,9 @@ async function loadReferenceData() {
         if (abilitiesRes.ok) {
             referenceAbilities = await abilitiesRes.json();
             console.log(`Loaded ${referenceAbilities.length} reference abilities`);
+
+            // Build omicron ability index for performance
+            buildOmicronAbilityIndex();
         }
 
         if (categoriesRes.ok) {
@@ -309,6 +346,32 @@ async function loadReferenceData() {
         // Still update the display even if reference data failed
         updateMissingCharacters();
     }
+}
+
+function updateOmicronModeSet() {
+    selectedOmicronModeSet.clear();
+    selectedOmicronTypes.forEach(type => {
+        const modes = OMICRON_MODE_MAP[type];
+        if (modes) {
+            modes.forEach(mode => selectedOmicronModeSet.add(mode));
+        }
+    });
+}
+
+function buildOmicronAbilityIndex() {
+    omicronAbilityIndex.clear();
+
+    referenceAbilities.forEach(ability => {
+        if (ability.is_omicron === true && ability.omicron_mode !== undefined) {
+            const charId = ability.character_base_id;
+            if (!omicronAbilityIndex.has(charId)) {
+                omicronAbilityIndex.set(charId, new Set());
+            }
+            omicronAbilityIndex.get(charId).add(ability.omicron_mode);
+        }
+    });
+
+    console.log(`Built omicron ability index for ${omicronAbilityIndex.size} characters`);
 }
 
 async function loadCharacterData() {
@@ -1378,12 +1441,21 @@ function showTierDistributionModal() {
     document.getElementById('vizIncludeSynergy').checked = includeSynergy;
     document.getElementById('vizIncludeOmicron').checked = includeOmicron;
 
+    // Initialize omicron type dropdown to match current selections
+    const vizSelect = document.getElementById('vizOmicronTypeSelector');
+    Array.from(vizSelect.options).forEach(option => {
+        option.selected = selectedOmicronTypes.includes(option.value);
+    });
+
     // Add event listeners for toggles
     const synergyToggle = document.getElementById('vizIncludeSynergy');
     const omicronToggle = document.getElementById('vizIncludeOmicron');
 
     synergyToggle.onchange = renderTierDistributionChart;
     omicronToggle.onchange = renderTierDistributionChart;
+
+    // Add event listener for omicron type dropdown
+    vizSelect.onchange = renderTierDistributionChart;
 
     // Render initial chart
     renderTierDistributionChart();
@@ -1401,6 +1473,10 @@ function computeTierDistribution() {
     const vizIncludeSynergy = document.getElementById('vizIncludeSynergy').checked;
     const vizIncludeOmicron = document.getElementById('vizIncludeOmicron').checked;
 
+    // Get selected omicron types from visualization modal dropdown
+    const vizSelect = document.getElementById('vizOmicronTypeSelector');
+    const vizSelectedOmicronTypes = Array.from(vizSelect.selectedOptions).map(opt => opt.value);
+
     // Initialize counts for tiers 1-19
     const tierCounts = new Array(19).fill(0);
 
@@ -1411,6 +1487,27 @@ function computeTierDistribution() {
     if (isFilterActive) {
         filteredIds = getFilteredCharacterIds();
     }
+
+    // Build mode set once for visualization context (optimized - cache outside loop)
+    const vizModeSet = new Set();
+    vizSelectedOmicronTypes.forEach(type => {
+        const modes = OMICRON_MODE_MAP[type];
+        if (modes) modes.forEach(mode => vizModeSet.add(mode));
+    });
+
+    // Helper function to check if character has omicron abilities matching selected types (optimized)
+    const hasMatchingOmicronAbilities = (characterId) => {
+        if (vizModeSet.size === 0) return false;
+
+        const characterModes = omicronAbilityIndex.get(characterId);
+        if (!characterModes) return false;
+
+        // Check if any of the character's omicron modes match selected modes
+        for (const mode of characterModes) {
+            if (vizModeSet.has(mode)) return true;
+        }
+        return false;
+    };
 
     // Calculate tier for each character
     characterData.forEach(character => {
@@ -1424,14 +1521,12 @@ function computeTierDistribution() {
 
         // Apply omicron bonus if enabled
         if (vizIncludeOmicron) {
-            // Check if character has omicron abilities
-            const hasOmicronAbilities = referenceAbilities.some(ability =>
-                ability.character_base_id === character.id && ability.is_omicron === true
-            );
+            // Check if character has omicron abilities matching selected types
+            const hasOmicronAbilities = hasMatchingOmicronAbilities(character.id);
 
             // Personal omicron
             let personalOmicron = 0;
-            if (character.omicronEnhancement !== undefined) {
+            if (character.omicronEnhancement !== undefined && hasOmicronAbilities) {
                 personalOmicron = character.omicronEnhancement;
             } else if (hasOmicronAbilities) {
                 personalOmicron = 1;
@@ -1441,6 +1536,9 @@ function computeTierDistribution() {
             let bestSynergyOmicronBonus = 0;
             characterData.forEach(otherChar => {
                 if (!otherChar.synergySets || otherChar.synergySets.length === 0) return;
+
+                // Only consider synergy omicrons from characters with matching omicron types
+                if (!hasMatchingOmicronAbilities(otherChar.id)) return;
 
                 otherChar.synergySets.forEach(synergySet => {
                     const synergyOmicronBonus = synergySet.synergyEnhancementOmicron ?? 0;
@@ -1579,16 +1677,28 @@ function calculateFinalTier(character) {
     let appliedOmicronBonus = 0;
     let omicronSource = null; // null, 'character', or character ID that provides synergy omicron
 
+    // Helper function to check if character has omicron abilities matching selected types (optimized)
+    const hasMatchingOmicronAbilities = (characterId) => {
+        if (selectedOmicronModeSet.size === 0) return false;
+
+        const characterModes = omicronAbilityIndex.get(characterId);
+        if (!characterModes) return false;
+
+        // Check if any of the character's omicron modes match selected modes
+        for (const mode of characterModes) {
+            if (selectedOmicronModeSet.has(mode)) return true;
+        }
+        return false;
+    };
+
     // Determine the best omicron enhancement to apply (max of personal vs synergy)
     if (includeOmicron) {
-        // Check if character has omicron abilities (for default omicron boost calculation)
-        const hasOmicronAbilities = referenceAbilities.some(ability =>
-            ability.character_base_id === character.id && ability.is_omicron === true
-        );
+        // Check if character has omicron abilities matching selected types
+        const hasOmicronAbilities = hasMatchingOmicronAbilities(character.id);
 
-        // Personal omicron: use defined value, or default to 1 if character has omicron abilities, otherwise 0
+        // Personal omicron: use defined value, or default to 1 if character has matching omicron abilities, otherwise 0
         let personalOmicron = 0;
-        if (character.omicronEnhancement !== undefined) {
+        if (character.omicronEnhancement !== undefined && hasOmicronAbilities) {
             personalOmicron = character.omicronEnhancement;
         } else if (hasOmicronAbilities) {
             // StackRank service auto-applies 1 tier boost for characters with omicron abilities
@@ -1601,6 +1711,9 @@ function calculateFinalTier(character) {
         // Scan all characters to see if any reference this character in a synergy set with synergyEnhancementOmicron
         characterData.forEach(otherChar => {
             if (!otherChar.synergySets || otherChar.synergySets.length === 0) return;
+
+            // Only consider synergy omicrons from characters with matching omicron types
+            if (!hasMatchingOmicronAbilities(otherChar.id)) return;
 
             otherChar.synergySets.forEach(synergySet => {
                 // Check if this synergy set has synergyEnhancementOmicron
