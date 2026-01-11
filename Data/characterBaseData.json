@@ -2930,6 +2930,21 @@
               "numberMatchesRequired": 2
             }
           ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
         }
       ]
     },
@@ -2948,6 +2963,21 @@
           "characters": [
             "REYJEDITRAINING",
             "BB8"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
           ],
           "categoryDefinitions": [
             {
@@ -3169,10 +3199,15 @@
         {
           "synergyEnhancement": 3,
           "characters": [
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
         }
       ]
@@ -6510,9 +6545,15 @@
           "synergyEnhancement": 3,
           "characters": [
             "FINN",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6836,9 +6877,15 @@
           "synergyEnhancement": 3,
           "characters": [
             "FINN",
-            "POE",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6928,9 +6975,15 @@
           "synergyEnhancement": 5,
           "characters": [
             "FINN",
-            "POE",
-            "RESISTANCETROOPER",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -8752,10 +8805,15 @@
         {
           "synergyEnhancement": 5,
           "characters": [
-            "FINN",
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO"
+            "FINN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
         }
       ]
