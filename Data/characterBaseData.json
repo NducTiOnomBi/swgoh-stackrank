@@ -6427,14 +6427,7 @@
       "id": "PHASMA",
       "baseTier": 14,
       "requiresAllZetas": false,
-      "requiredZetas": [],
       "synergySets": [
-        {
-          "synergyEnhancement": 5,
-          "characters": [
-            "SUPREMELEADERKYLOREN"
-          ]
-        },
         {
           "synergyEnhancement": 3,
           "characters": [
