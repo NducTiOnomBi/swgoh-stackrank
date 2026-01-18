@@ -617,6 +617,9 @@
           "synergyEnhancement": 3,
           "characters": [
             "JEDIKNIGHTREVAN"
+          ],
+          "skipIfPresentCharacters": [
+            "GRANDMASTERLUKE"
           ]
         }
       ]
