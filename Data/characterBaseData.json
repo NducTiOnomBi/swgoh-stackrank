@@ -2911,16 +2911,31 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "GLREY"
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
           ],
           "categoryDefinitions": [
             {
@@ -2938,16 +2953,31 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "GLREY"
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
           ],
           "categoryDefinitions": [
             {
@@ -3152,7 +3182,7 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -3167,12 +3197,17 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
         }
       ]
@@ -6491,7 +6526,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8",
@@ -6507,12 +6542,18 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "FINN",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6735,7 +6776,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING"
           ],
@@ -6818,7 +6859,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -6833,12 +6874,18 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "FINN",
-            "POE",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6848,7 +6895,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -6928,9 +6975,15 @@
           "synergyEnhancement": 5,
           "characters": [
             "FINN",
-            "POE",
-            "RESISTANCETROOPER",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -8752,11 +8805,52 @@
         {
           "synergyEnhancement": 5,
           "characters": [
-            "FINN",
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO"
+            "FINN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
+        },
+        {
+          "characters": [
+            "FINN"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "EPIXFINN"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "EPIXPOE"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "POE"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "ROSETICO"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "RESISTANCETROOPER"
+          ],
+          "synergyEnhancementOmicron": 1
         }
       ]
     },
