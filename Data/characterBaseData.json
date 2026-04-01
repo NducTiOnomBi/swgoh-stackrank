@@ -4511,7 +4511,13 @@
           ],
           "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "IMAGUNDI",
@@ -4603,7 +4609,13 @@
           ],
           "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "ITHANO",
@@ -5744,7 +5756,13 @@
           ],
           "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "MAULS7",
@@ -7955,7 +7973,13 @@
           ],
           "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "STRANGER",
@@ -8505,7 +8529,13 @@
             }
           ]
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "VANE",
@@ -8778,7 +8808,13 @@
           ],
           "synergyEnhancementOmicron": 1
         }
-      ]
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "YOUNGCHEWBACCA",
