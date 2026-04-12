@@ -2,7 +2,18 @@
   "characterBaseData": [
     {
       "id": "4LOM",
-      "baseTier": 17
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "FENNECSHAND",
+            "BOBAFETTSCION",
+            "ASAJJDARKDISCIPLE"
+          ]
+        }
+      ]
     },
     {
       "id": "50RT",
@@ -22,6 +33,15 @@
               ],
               "numberMatchesRequired": 1
             }
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO",
+            "BASTILASHAN"
           ]
         }
       ]
@@ -638,9 +658,25 @@
       "baseTier": 8,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "JEDIKNIGHTREVAN"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -914,6 +950,16 @@
           "characters": [
             "FENNECSHAND"
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "4LOM",
+            "FENNECSHAND",
+            "ASAJJDARKDISCIPLE"
+          ],
+          "synergyEnhancementOmicron": 0
         }
       ]
     },
@@ -3183,6 +3229,15 @@
               "numberMatchesRequired": 1
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "4LOM",
+            "ASAJJDARKDISCIPLE",
+            "BOBAFETTSCION"
+          ]
         }
       ]
     },
@@ -4822,12 +4877,28 @@
     },
     {
       "id": "JEDIKNIGHTREVAN",
-      "baseTier": 5,
+      "baseTier": 6,
       "synergySets": [
         {
           "synergyEnhancement": 1,
           "characters": [
             "GRANDMASTERLUKE"
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "SATELESHAN",
+            "BASTILASHAN",
+            "JOLEEBINDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -4948,6 +5019,22 @@
               "numberMatchesRequired": 3
             }
           ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "BASTILASHAN",
+            "JEDIKNIGHTREVAN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
         }
       ]
     },
@@ -4999,6 +5086,15 @@
             "MARAJADE",
             "STARKILLER",
             "VISASMARR"
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "BASTILASHAN",
+            "JOLEEBINDO"
           ]
         }
       ]
@@ -7239,6 +7335,29 @@
       ]
     },
     {
+      "id": "SATELESHAN",
+      "baseTier": 6,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO",
+            "BASTILASHAN"
+          ],
+          "synergyEnhancementOmicron": 1,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "SAVAGEOPRESS",
       "baseTier": 12,
       "omicronEnhancement": 3,
@@ -9084,7 +9203,19 @@
     },
     {
       "id": "ZUCKUSS",
-      "baseTier": 17
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "BOBAFETTSCION",
+            "ASAJJDARKDISCIPLE",
+            "4LOM",
+            "FENNECSHAND"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     }
   ]
 }
