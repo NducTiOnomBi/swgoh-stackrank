@@ -181,6 +181,29 @@ jobs:
                   Write-Host "✓ PowerShell validation passed"
                   Write-Host "::endgroup::"
 
+            - name: Run Pester tests
+              shell: pwsh
+              run: |
+                  Write-Host "::group::Running Pester tests"
+
+                  Install-Module -Name Pester -MinimumVersion 5.0.0 -Force -SkipPublisherCheck -Scope CurrentUser
+                  Import-Module Pester -MinimumVersion 5.0.0
+
+                  $config = & ./Tests/.pester.ps1
+                  $config.Run.Exit = $true
+                  $config.TestResult.OutputPath = './TestResults/testResults.xml'
+                  Invoke-Pester -Configuration $config
+
+                  Write-Host "::endgroup::"
+
+            - name: Upload Pester test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pester-test-results
+                  path: TestResults/testResults.xml
+                  if-no-files-found: ignore
+
             - name: Check JSON formatting (2-space indentation)
               run: |
                   echo "::group::Checking JSON formatting"
