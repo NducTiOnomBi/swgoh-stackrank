@@ -267,6 +267,32 @@ Describe 'VisualEditorFunctions' {
             ($errors | Where-Object { $_ -match 'numberMatchesRequired' }).Count | Should -BeGreaterThan 0
         }
 
+        It 'Should return error when synergy set exceeds 4-slot limit' {
+            $data = @(
+                [PSCustomObject]@{
+                    id = 'ALPHA'
+                    baseTier = 5
+                    synergySets = @(
+                        [PSCustomObject]@{
+                            synergyEnhancement = 3
+                            characters = @('BRAVO', 'CHARLIE', 'DELTA')
+                            categoryDefinitions = @(
+                                [PSCustomObject]@{
+                                    include = @('Sith')
+                                    numberMatchesRequired = 2
+                                }
+                            )
+                        }
+                    )
+                },
+                [PSCustomObject]@{ id = 'BRAVO'; baseTier = 10 },
+                [PSCustomObject]@{ id = 'CHARLIE'; baseTier = 10 },
+                [PSCustomObject]@{ id = 'DELTA'; baseTier = 10 }
+            )
+            $errors = @(Test-CharacterData -CharacterArray $data)
+            ($errors | Where-Object { $_ -match 'slot limit' }).Count | Should -BeGreaterThan 0
+        }
+
         It 'Should accumulate multiple errors' {
             $data = @(
                 [PSCustomObject]@{ id = 'BRAVO'; baseTier = 0 },
@@ -274,6 +300,21 @@ Describe 'VisualEditorFunctions' {
             )
             $errors = Test-CharacterData -CharacterArray $data
             $errors.Count | Should -BeGreaterThan 1
+        }
+
+        It 'Should serialize single error as JSON array (not string)' {
+            # Reproduces the "errors.forEach is not a function" bug where
+            # PowerShell unwraps a single-element array to a plain string,
+            # causing ConvertTo-Json to emit a string instead of an array.
+            $data = @(
+                [PSCustomObject]@{ id = 'ALPHA'; baseTier = 25 }
+            )
+            $errors = Test-CharacterData -CharacterArray $data
+            $result = @{ valid = $false; errors = @($errors) }
+            $json = $result | ConvertTo-Json
+            # Verify the JSON contains "errors": [...] not "errors": "..."
+            $json | Should -Match '"errors":\s*\[' -Because 'errors must be a JSON array even with a single error'
+            $json | Should -Not -Match '"errors":\s*"' -Because 'errors must not be serialized as a plain string'
         }
 
         It 'Should pass valid data with synergy sets' {
