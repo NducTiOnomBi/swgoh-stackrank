@@ -71,6 +71,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Build category tag index after both data sources are loaded
     buildCategoryTagIndex();
+
+    // Run validation automatically so users see data issues immediately
+    validateData();
 });
 
 function initializeEventListeners() {
