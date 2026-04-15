@@ -81,9 +81,14 @@ try {
         Start-Process $baseUrl
     }
 
-    # Main server loop
+    # Main server loop — use async GetContext so Ctrl+C can interrupt
     while ($listener.IsListening) {
-        $context = $listener.GetContext()
+        $contextTask = $listener.GetContextAsync()
+
+        # Poll until a request arrives; short wait lets Ctrl+C interrupt between iterations
+        while (-not $contextTask.AsyncWaitHandle.WaitOne(500)) { }
+
+        $context = $contextTask.GetAwaiter().GetResult()
         $request = $context.Request
         $response = $context.Response
 
@@ -253,6 +258,12 @@ try {
         }
     }
 }
+catch [System.Net.HttpListenerException] {
+    # Expected when listener is stopped during Ctrl+C shutdown
+}
+catch [System.OperationCanceledException] {
+    # Expected when async operation is cancelled during shutdown
+}
 catch {
     Write-Host ""
     Write-Host "ERROR: Failed to start server" -ForegroundColor Red
@@ -262,8 +273,8 @@ catch {
 finally {
     if ($listener.IsListening) {
         $listener.Stop()
-        Write-Host ""
-        Write-Host "Server stopped" -ForegroundColor Yellow
     }
     $listener.Close()
+    Write-Host ""
+    Write-Host "Server stopped" -ForegroundColor Yellow
 }
