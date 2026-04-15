@@ -4715,8 +4715,15 @@
           "characters": [
             "MAZKANATA",
             "KIX",
-            "QUIGGOLD",
-            "SM33"
+            "QUIGGOLD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -5900,7 +5907,7 @@
     },
     {
       "id": "MAZKANATA",
-      "baseTier": 15,
+      "baseTier": 13,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -5908,8 +5915,15 @@
           "characters": [
             "ITHANO",
             "KIX",
-            "QUIGGOLD",
-            "SM33"
+            "QUIGGOLD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ],
