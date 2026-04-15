@@ -1,0 +1,45 @@
+name: Validate PowerShell Scripts
+
+on:
+    pull_request:
+        branches: [main]
+        paths:
+            - "Tools/**/*.ps1"
+            - "Tools/**/*.psm1"
+            - "Tests/**/*.ps1"
+            - "Tests/**/*.psm1"
+    workflow_dispatch:
+
+permissions:
+    contents: read
+
+jobs:
+    pester-tests:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Install Pester
+              shell: pwsh
+              run: |
+                  Install-Module -Name Pester -MinimumVersion 5.0.0 -Force -SkipPublisherCheck -Scope CurrentUser
+                  Import-Module Pester -MinimumVersion 5.0.0
+                  Write-Host "Pester $((Get-Module Pester).Version) installed"
+
+            - name: Run Pester tests
+              shell: pwsh
+              run: |
+                  $config = & ./Tests/.pester.ps1
+                  $config.Run.Exit = $true
+                  $config.TestResult.OutputPath = './TestResults/testResults.xml'
+                  Invoke-Pester -Configuration $config
+
+            - name: Upload Pester test results
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                  name: pester-test-results
+                  path: TestResults/testResults.xml
+                  if-no-files-found: ignore
