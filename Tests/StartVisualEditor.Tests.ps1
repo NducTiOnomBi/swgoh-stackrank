@@ -343,24 +343,28 @@ Describe 'VisualEditorFunctions' {
     }
 
     Context 'Get-StaticFilePath' {
+        BeforeAll {
+            $editorBase = Join-Path $TestDrive 'editor'
+        }
+
         It 'Should return index.html for root path' {
-            $result = Get-StaticFilePath -UrlPath '/' -EditorPath 'C:\editor'
-            $result | Should -Be 'C:\editor\index.html'
+            $result = Get-StaticFilePath -UrlPath '/' -EditorPath $editorBase
+            $result | Should -Be (Join-Path $editorBase 'index.html')
         }
 
         It 'Should return index.html for empty path' {
-            $result = Get-StaticFilePath -UrlPath '' -EditorPath 'C:\editor'
-            $result | Should -Be 'C:\editor\index.html'
+            $result = Get-StaticFilePath -UrlPath '' -EditorPath $editorBase
+            $result | Should -Be (Join-Path $editorBase 'index.html')
         }
 
         It 'Should resolve normal file path' {
-            $result = Get-StaticFilePath -UrlPath '/styles.css' -EditorPath 'C:\editor'
-            $result | Should -Be 'C:\editor\styles.css'
+            $result = Get-StaticFilePath -UrlPath '/styles.css' -EditorPath $editorBase
+            $result | Should -Be (Join-Path $editorBase 'styles.css')
         }
 
         It 'Should resolve nested path' {
-            $result = Get-StaticFilePath -UrlPath '/sub/file.js' -EditorPath 'C:\editor'
-            $result | Should -Be 'C:\editor\sub\file.js'
+            $result = Get-StaticFilePath -UrlPath '/sub/file.js' -EditorPath $editorBase
+            $result | Should -Be (Join-Path $editorBase 'sub' 'file.js')
         }
     }
 }
