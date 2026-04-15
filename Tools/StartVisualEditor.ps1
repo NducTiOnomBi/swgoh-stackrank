@@ -28,6 +28,8 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
+Import-Module (Join-Path $PSScriptRoot "VisualEditorFunctions.psm1") -Force
+
 # Determine script root and data paths
 $scriptRoot = Split-Path -Parent $PSScriptRoot
 $dataFilePath = Join-Path $scriptRoot "Data\characterBaseData.json"
@@ -47,12 +49,7 @@ if (!(Test-Path $editorPath)) {
 
 # Detect GitHub Codespaces environment
 $isCodespaces = $null -ne $env:CODESPACES
-$baseUrl = if ($isCodespaces) {
-    "https://$env:CODESPACE_NAME-$Port.$env:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"
-}
-else {
-    "http://localhost:$Port"
-}
+$baseUrl = Get-BaseUrl -Port $Port -IsCodespaces $isCodespaces -CodespaceName $env:CODESPACE_NAME -PortForwardingDomain $env:GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN
 
 Write-Host "================================================" -ForegroundColor Cyan
 Write-Host "SWGOH StackRank Visual Editor Server" -ForegroundColor Cyan
@@ -71,12 +68,7 @@ Write-Host ""
 
 # Create HTTP listener
 $listener = New-Object System.Net.HttpListener
-$listenerPrefix = if ($isCodespaces) {
-    "http://+:$Port/"  # Codespaces requires wildcard binding for port forwarding
-}
-else {
-    "http://localhost:$Port/"  # Local development avoids admin privileges
-}
+$listenerPrefix = Get-ListenerPrefix -Port $Port -IsCodespaces $isCodespaces
 $listener.Prefixes.Add($listenerPrefix)
 
 try {
@@ -143,41 +135,10 @@ try {
                     continue
                 }
 
-                # Extract character array (handle both wrapped and direct array formats)
-                $characterArray = if ($jsonData.characterBaseData) {
-                    $jsonData.characterBaseData
-                }
-                elseif ($jsonData -is [Array]) {
-                    $jsonData
-                }
-                else {
-                    $null
-                }
+                # Extract character array and validate
+                $characterArray = ConvertTo-CharacterArray -JsonData $jsonData
 
-                # Basic validation: check for required fields
-                $validationErrors = @()
-                if ($null -eq $characterArray) {
-                    $validationErrors += "Data is null or empty, or missing 'characterBaseData' property"
-                }
-                elseif ($characterArray -isnot [Array]) {
-                    $validationErrors += "Character data must be an array"
-                }
-                else {
-                    foreach ($char in $characterArray) {
-                        if ([string]::IsNullOrWhiteSpace($char.id)) {
-                            $validationErrors += "Character missing 'id' field"
-                            break
-                        }
-                        if ($null -eq $char.baseTier) {
-                            $validationErrors += "Character '$($char.id)' missing 'baseTier' field"
-                            break
-                        }
-                        if ($char.baseTier -lt 1 -or $char.baseTier -gt 19) {
-                            $validationErrors += "Character '$($char.id)' has invalid baseTier: $($char.baseTier) (must be 1-19)"
-                            break
-                        }
-                    }
-                }
+                $validationErrors = Test-CharacterData -CharacterArray $characterArray
 
                 if ($validationErrors.Count -gt 0) {
                     $errorMsg = @{ error = "Validation failed"; details = $validationErrors } | ConvertTo-Json
@@ -223,128 +184,9 @@ try {
                     continue
                 }
 
-                # Extract character array (handle both wrapped and direct array formats)
-                $characterArray = if ($jsonData.characterBaseData) {
-                    $jsonData.characterBaseData
-                }
-                elseif ($jsonData -is [Array]) {
-                    $jsonData
-                }
-                else {
-                    $null
-                }
-
-                # Perform validation checks
-                $validationErrors = @()
-
-                # Check if data is array
-                if ($null -eq $characterArray) {
-                    $validationErrors += "Data is null or empty, or missing 'characterBaseData' property"
-                }
-                elseif ($characterArray -isnot [Array]) {
-                    $validationErrors += "Character data must be an array"
-                }
-                else {
-                    # Build character ID index for cross-reference validation
-                    $characterIds = @{}
-                    foreach ($char in $characterArray) {
-                        if (![string]::IsNullOrWhiteSpace($char.id)) {
-                            $characterIds[$char.id] = $true
-                        }
-                    }
-
-                    # Validate each character
-                    $previousId = ""
-                    $seenIds = @{}
-                    
-                    foreach ($char in $characterArray) {
-                        $charId = $char.id
-
-                        # Check required fields
-                        if ([string]::IsNullOrWhiteSpace($charId)) {
-                            $validationErrors += "Character missing 'id' field"
-                            continue
-                        }
-                        if ($null -eq $char.baseTier) {
-                            $validationErrors += "Character '$charId' missing 'baseTier' field"
-                            continue
-                        }
-
-                        # Check for duplicates
-                        if ($seenIds.ContainsKey($charId)) {
-                            $validationErrors += "Duplicate character ID: $charId"
-                        }
-                        $seenIds[$charId] = $true
-
-                        # Check alphabetical order
-                        if ($previousId -ne "" -and $charId -lt $previousId) {
-                            $validationErrors += "Characters not in alphabetical order: '$previousId' should come after '$charId'"
-                        }
-                        $previousId = $charId
-
-                        # Check tier range
-                        if ($char.baseTier -lt 1 -or $char.baseTier -gt 19) {
-                            $validationErrors += "Character '$charId' has invalid baseTier: $($char.baseTier) (must be 1-19)"
-                        }
-
-                        # Check omicronEnhancement range if present
-                        if ($null -ne $char.omicronEnhancement) {
-                            if ($char.omicronEnhancement -lt 0 -or $char.omicronEnhancement -gt 10) {
-                                $validationErrors += "Character '$charId' has invalid omicronEnhancement: $($char.omicronEnhancement) (must be 0-10)"
-                            }
-                        }
-
-                        # Validate synergy sets
-                        if ($null -ne $char.synergySets -and $char.synergySets -is [Array]) {
-                            $setIndex = 0
-                            foreach ($synergySet in $char.synergySets) {
-                                $setIndex++
-
-                                # Check that at least one enhancement type exists
-                                $hasStandard = $null -ne $synergySet.synergyEnhancement
-                                $hasOmicron = $null -ne $synergySet.synergyEnhancementOmicron
-                                
-                                if (!$hasStandard -and !$hasOmicron) {
-                                    $validationErrors += "Character '$charId' synergy set #$setIndex missing both synergyEnhancement and synergyEnhancementOmicron"
-                                }
-
-                                # Check enhancement ranges
-                                if ($hasStandard) {
-                                    if ($synergySet.synergyEnhancement -lt 0 -or $synergySet.synergyEnhancement -gt 10) {
-                                        $validationErrors += "Character '$charId' synergy set #$setIndex has invalid synergyEnhancement: $($synergySet.synergyEnhancement) (must be 0-10)"
-                                    }
-                                }
-                                if ($hasOmicron) {
-                                    if ($synergySet.synergyEnhancementOmicron -lt 0 -or $synergySet.synergyEnhancementOmicron -gt 10) {
-                                        $validationErrors += "Character '$charId' synergy set #$setIndex has invalid synergyEnhancementOmicron: $($synergySet.synergyEnhancementOmicron) (must be 0-10)"
-                                    }
-                                }
-
-                                # Check character cross-references
-                                if ($null -ne $synergySet.characters -and $synergySet.characters -is [Array]) {
-                                    foreach ($refCharId in $synergySet.characters) {
-                                        if (!$characterIds.ContainsKey($refCharId)) {
-                                            $validationErrors += "Character '$charId' synergy set #$setIndex references non-existent character: $refCharId"
-                                        }
-                                    }
-                                }
-
-                                # Check numberMatchesRequired range
-                                if ($null -ne $synergySet.categoryDefinitions -and $synergySet.categoryDefinitions -is [Array]) {
-                                    $catIndex = 0
-                                    foreach ($catDef in $synergySet.categoryDefinitions) {
-                                        $catIndex++
-                                        if ($null -ne $catDef.numberMatchesRequired) {
-                                            if ($catDef.numberMatchesRequired -lt 1 -or $catDef.numberMatchesRequired -gt 4) {
-                                                $validationErrors += "Character '$charId' synergy set #$setIndex category #$catIndex has invalid numberMatchesRequired: $($catDef.numberMatchesRequired) (must be 1-4)"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                # Extract character array and validate
+                $characterArray = ConvertTo-CharacterArray -JsonData $jsonData
+                $validationErrors = Test-CharacterData -CharacterArray $characterArray
 
                 # Return validation results
                 $result = if ($validationErrors.Count -eq 0) {
@@ -363,25 +205,13 @@ try {
             }
             # Serve static files
             else {
-                $filePath = if ($path -eq "/" -or $path -eq "") {
-                    Join-Path $editorPath "index.html"
-                }
-                else {
-                    Join-Path $editorPath $path.TrimStart('/')
-                }
+                $filePath = Get-StaticFilePath -UrlPath $path -EditorPath $editorPath
 
                 if (Test-Path $filePath) {
                     $content = Get-Content $filePath -Raw -Encoding UTF8
                     $buffer = [System.Text.Encoding]::UTF8.GetBytes($content)
 
-                    # Set content type based on file extension
-                    $contentType = switch ([System.IO.Path]::GetExtension($filePath)) {
-                        ".html" { "text/html; charset=utf-8" }
-                        ".js" { "application/javascript; charset=utf-8" }
-                        ".css" { "text/css; charset=utf-8" }
-                        ".json" { "application/json; charset=utf-8" }
-                        default { "text/plain; charset=utf-8" }
-                    }
+                    $contentType = Get-ContentType -Extension ([System.IO.Path]::GetExtension($filePath))
 
                     $response.ContentType = $contentType
                     $response.ContentLength64 = $buffer.Length

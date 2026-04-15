@@ -725,9 +725,13 @@ Tools/
   ReadBaseDataSynergyToXLS.ps1 # Export with synergy calculations
   ReadXLStoBaseDataJson.ps1    # Import Excel changes to JSON
   ValidateCharacterData.ps1    # Local validation script
+  StartVisualEditor.ps1        # Visual editor HTTP server
+  VisualEditorFunctions.psm1   # Shared functions for visual editor (testable module)
+  VisualEditor/                # Visual editor frontend (HTML/JS/CSS)
 
 Tests/
   ValidateCharacterData.Tests.ps1  # Pester tests for validation script
+  StartVisualEditor.Tests.ps1      # Pester tests for visual editor functions
   .pester.ps1                      # Pester configuration file
 
 .github/
