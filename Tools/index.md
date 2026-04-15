@@ -553,5 +553,6 @@ data/characterBaseData/42/id must match pattern "^[A-Z0-9_]+$"
 
 - **JSON Schema**: See `Data/characterBaseData.schema.json` for complete validation rules
 - **PR Validation Workflow**: See `.github/workflows/validate-pr.yml` for CI validation logic
+- **Pester Tests**: See `Tests/` for Pester test files and configuration
 - **Copilot Instructions**: See `.github/copilot-instructions.md` for AI-assisted development guidelines
 - **Contributing Guidelines**: See `CONTRIBUTING.md` for general contribution process
