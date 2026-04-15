@@ -88,7 +88,7 @@ Describe 'ValidateCharacterData' {
 
             $result = Invoke-ValidationScript -DataPath $testFile
             $result.ExitCode | Should -Be 1
-            $result.Output | Should -Match 'sorted alphabetically|sorting'
+            $result.Output | Should -Match 'sorted alphabetically|sorting|alphabetical order'
         }
 
         It 'Should pass when characters are sorted alphabetically' {

@@ -114,7 +114,8 @@ function ConvertTo-CharacterArray {
     }
 
     if ($null -ne $JsonData.characterBaseData) {
-        return $JsonData.characterBaseData
+        # Force to array in case PowerShell unwrapped a single-element array
+        return @($JsonData.characterBaseData)
     }
     elseif ($JsonData -is [Array]) {
         return $JsonData
@@ -177,6 +178,11 @@ function Test-CharacterData {
             continue
         }
 
+        # Check character ID format (uppercase letters, numbers, underscores only)
+        if ($charId -notmatch '^[A-Z0-9_]+$') {
+            $validationErrors += "Character '$charId' has invalid ID format (must be uppercase letters, numbers, and underscores only)"
+        }
+
         # Check for duplicates
         if ($seenIds.ContainsKey($charId)) {
             $validationErrors += "Duplicate character ID: $charId"
@@ -236,6 +242,15 @@ function Test-CharacterData {
                     }
                 }
 
+                # Check skipIfPresentCharacters cross-references
+                if ($null -ne $synergySet.skipIfPresentCharacters -and $synergySet.skipIfPresentCharacters -is [Array]) {
+                    foreach ($refCharId in $synergySet.skipIfPresentCharacters) {
+                        if (!$characterIds.ContainsKey($refCharId)) {
+                            $validationErrors += "Character '$charId' synergy set #$setIndex skipIfPresentCharacters references non-existent character: $refCharId"
+                        }
+                    }
+                }
+
                 # Check numberMatchesRequired range
                 if ($null -ne $synergySet.categoryDefinitions -and $synergySet.categoryDefinitions -is [Array]) {
                     $catIndex = 0
@@ -247,6 +262,24 @@ function Test-CharacterData {
                             }
                         }
                     }
+                }
+
+                # Check synergy slot limit: characters + sum(numberMatchesRequired) <= 4
+                $charSlots = 0
+                if ($null -ne $synergySet.characters -and $synergySet.characters -is [Array]) {
+                    $charSlots = $synergySet.characters.Count
+                }
+                $categorySlots = 0
+                if ($null -ne $synergySet.categoryDefinitions -and $synergySet.categoryDefinitions -is [Array]) {
+                    foreach ($catDef in $synergySet.categoryDefinitions) {
+                        if ($null -ne $catDef.numberMatchesRequired) {
+                            $categorySlots += $catDef.numberMatchesRequired
+                        }
+                    }
+                }
+                $totalSlots = $charSlots + $categorySlots
+                if ($totalSlots -gt 4) {
+                    $validationErrors += "Character '$charId' synergy set #$setIndex exceeds 4-slot limit: $charSlots character(s) + $categorySlots category match(es) = $totalSlots"
                 }
             }
         }

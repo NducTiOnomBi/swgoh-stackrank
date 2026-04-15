@@ -146,7 +146,7 @@ try {
                 $validationErrors = Test-CharacterData -CharacterArray $characterArray
 
                 if ($validationErrors.Count -gt 0) {
-                    $errorMsg = @{ error = "Validation failed"; details = $validationErrors } | ConvertTo-Json
+                    $errorMsg = @{ error = "Validation failed"; details = @($validationErrors) } | ConvertTo-Json
                     $buffer = [System.Text.Encoding]::UTF8.GetBytes($errorMsg)
                     $response.ContentType = "application/json; charset=utf-8"
                     $response.ContentLength64 = $buffer.Length
@@ -198,7 +198,7 @@ try {
                     @{ valid = $true; errors = @() }
                 }
                 else {
-                    @{ valid = $false; errors = $validationErrors }
+                    @{ valid = $false; errors = @($validationErrors) }
                 }
 
                 $resultJson = $result | ConvertTo-Json
