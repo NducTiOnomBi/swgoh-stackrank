@@ -183,6 +183,16 @@ function Test-CharacterData {
             $validationErrors += "Character '$charId' has invalid ID format (must be uppercase letters, numbers, and underscores only)"
         }
 
+        # Check for unknown properties
+        $knownProperties = @('id', 'baseTier', 'synergySets', 'requiresAllZetas', 'requiredZetas',
+            'requiresAllOmicrons', 'requiredOmicrons', 'omicronEnhancement', 'categories',
+            'ignoreSynergyRequirements', 'ignoreRequirements')
+        foreach ($prop in $char.PSObject.Properties.Name) {
+            if ($prop -notin $knownProperties) {
+                $validationErrors += "Character '$charId' has unknown property: '$prop'"
+            }
+        }
+
         # Check for duplicates
         if ($seenIds.ContainsKey($charId)) {
             $validationErrors += "Duplicate character ID: $charId"

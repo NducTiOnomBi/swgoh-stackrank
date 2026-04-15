@@ -293,6 +293,14 @@ Describe 'VisualEditorFunctions' {
             ($errors | Where-Object { $_ -match 'slot limit' }).Count | Should -BeGreaterThan 0
         }
 
+        It 'Should return error for unknown character property' {
+            $data = @(
+                [PSCustomObject]@{ id = 'ALPHA'; baseTier = 5; omicronBoost = 2 }
+            )
+            $errors = @(Test-CharacterData -CharacterArray $data)
+            ($errors | Where-Object { $_ -match "unknown property.*'omicronBoost'" }).Count | Should -BeGreaterThan 0
+        }
+
         It 'Should accumulate multiple errors' {
             $data = @(
                 [PSCustomObject]@{ id = 'BRAVO'; baseTier = 0 },
