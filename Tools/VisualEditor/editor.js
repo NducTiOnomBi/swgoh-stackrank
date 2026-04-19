@@ -1,4 +1,42 @@
 // ============================================
+// Theme Management
+// ============================================
+const VALID_THEMES = ['default', 'dark', 'swgoh'];
+
+function safeGetTheme() {
+    try {
+        return localStorage.getItem('swgoh-theme');
+    } catch (e) {
+        return null;
+    }
+}
+
+function initializeTheme() {
+    const saved = safeGetTheme();
+    const theme = VALID_THEMES.includes(saved) ? saved : 'default';
+    applyTheme(theme);
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+        themeSelect.value = theme;
+        themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
+    }
+}
+
+function changeTheme(theme) {
+    if (!VALID_THEMES.includes(theme)) theme = 'default';
+    applyTheme(theme);
+    try { localStorage.setItem('swgoh-theme', theme); } catch (e) { /* storage unavailable */ }
+}
+
+function applyTheme(theme) {
+    const themeClasses = VALID_THEMES.filter(t => t !== 'default').map(t => 'theme-' + t);
+    document.documentElement.classList.remove(...themeClasses);
+    if (theme !== 'default') {
+        document.documentElement.classList.add('theme-' + theme);
+    }
+}
+
+// ============================================
 // Application State
 // ============================================
 let characterData = [];
@@ -57,6 +95,9 @@ let filterOperatorCustomCategories = 'AND';
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme first (sync the dropdown with the already-applied theme)
+    initializeTheme();
+
     // Initialize event listeners
     initializeEventListeners();
 
@@ -1089,7 +1130,7 @@ function showFilterModal() {
     if (sortedCustomCategories.length === 0) {
         const emptyMessage = document.createElement('p');
         emptyMessage.style.fontStyle = 'italic';
-        emptyMessage.style.color = '#888';
+        emptyMessage.style.color = 'var(--color-muted)';
         emptyMessage.textContent = 'No custom categories defined';
         customCategoriesContainer.appendChild(emptyMessage);
     } else {
@@ -2888,7 +2929,7 @@ function renderZetaEditor(character) {
     const requiredZetas = draftValues.requiredZetas || [];
 
     let zetaEditorHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label" style="display: flex; align-items: center; cursor: pointer;">
                 <input type="checkbox" id="chkRequiresAllZetas" 
                        ${requiresAllChecked ? 'checked' : ''} 
@@ -2906,7 +2947,7 @@ function renderZetaEditor(character) {
         if (requiredZetas.length === 0) {
             zetaEditorHtml += `
                 <div class="empty-state" style="margin: 10px 0;">
-                    <p style="font-size: 0.9em; color: #888;">No specific zetas required (None case)</p>
+                    <p style="font-size: 0.9em; color: var(--color-muted);">No specific zetas required (None case)</p>
                 </div>
             `;
         } else {
@@ -2948,9 +2989,9 @@ function renderZetaEditor(character) {
         `;
 
         if (!hasAvailableZetas && requiredZetas.length === 0) {
-            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No zeta abilities available for this character</div>';
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">No zeta abilities available for this character</div>';
         } else if (!hasAvailableZetas && requiredZetas.length > 0) {
-            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available zetas have been added</div>';
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">All available zetas have been added</div>';
         }
 
         zetaEditorHtml += '</div>';
@@ -3124,7 +3165,7 @@ function showZetaDropdown(inputElement, zetaIndex) {
         const emptyOption = document.createElement('div');
         emptyOption.className = 'dropdown-option';
         emptyOption.style.fontStyle = 'italic';
-        emptyOption.style.color = '#888';
+        emptyOption.style.color = 'var(--color-muted)';
         emptyOption.textContent = 'No zeta abilities available for this character';
         dropdown.appendChild(emptyOption);
     } else if (filteredAbilities.length === 0) {
@@ -3132,7 +3173,7 @@ function showZetaDropdown(inputElement, zetaIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = 'No matching abilities found';
         dropdown.appendChild(noMatch);
     } else {
@@ -3274,7 +3315,7 @@ function renderOmicronEditor(character) {
     const requiredOmicrons = draftValues.requiredOmicrons || [];
 
     let omicronEditorHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label" style="display: flex; align-items: center; cursor: pointer;">
                 <input type="checkbox" id="chkRequiresAllOmicrons" 
                        ${requiresAllChecked ? 'checked' : ''} 
@@ -3292,7 +3333,7 @@ function renderOmicronEditor(character) {
         if (requiredOmicrons.length === 0) {
             omicronEditorHtml += `
                 <div class="empty-state" style="margin: 10px 0;">
-                    <p style="font-size: 0.9em; color: #888;">No specific omicrons required (None case)</p>
+                    <p style="font-size: 0.9em; color: var(--color-muted);">No specific omicrons required (None case)</p>
                 </div>
             `;
         } else {
@@ -3334,9 +3375,9 @@ function renderOmicronEditor(character) {
         `;
 
         if (!hasAvailableOmicrons && requiredOmicrons.length === 0) {
-            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No omicron abilities available for this character</div>';
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">No omicron abilities available for this character</div>';
         } else if (!hasAvailableOmicrons && requiredOmicrons.length > 0) {
-            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available omicrons have been added</div>';
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">All available omicrons have been added</div>';
         }
 
         omicronEditorHtml += '</div>';
@@ -3509,7 +3550,7 @@ function showOmicronDropdown(inputElement, omicronIndex) {
         const emptyOption = document.createElement('div');
         emptyOption.className = 'dropdown-option';
         emptyOption.style.fontStyle = 'italic';
-        emptyOption.style.color = '#888';
+        emptyOption.style.color = 'var(--color-muted)';
         emptyOption.textContent = 'No omicron abilities available for this character';
         dropdown.appendChild(emptyOption);
     } else if (filteredAbilities.length === 0) {
@@ -3517,7 +3558,7 @@ function showOmicronDropdown(inputElement, omicronIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = 'No matching abilities found';
         dropdown.appendChild(noMatch);
     } else {
@@ -3656,7 +3697,7 @@ function renderCustomCategoriesEditor(character) {
     const categories = draftValues.categories || [];
 
     let customCategoriesHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label">Custom Character Categories</label>
             <div class="form-help">Assign custom categories to this character for filtering and synergy matching</div>
         </div>
@@ -3665,7 +3706,7 @@ function renderCustomCategoriesEditor(character) {
     if (categories.length === 0) {
         customCategoriesHtml += `
             <div class="empty-state" style="margin: 10px 0;">
-                <p style="font-size: 0.9em; color: #888;">No custom categories assigned</p>
+                <p style="font-size: 0.9em; color: var(--color-muted);">No custom categories assigned</p>
             </div>
         `;
     } else {
@@ -3796,7 +3837,7 @@ function showCustomCategoryDropdown(inputElement, categoryIndex) {
         const reservedOption = document.createElement('div');
         reservedOption.className = 'dropdown-option';
         reservedOption.style.fontStyle = 'italic';
-        reservedOption.style.color = '#d9534f';
+        reservedOption.style.color = 'var(--color-danger)';
         reservedOption.textContent = `"${inputValue}" conflicts with existing Category, Role, or Alignment`;
         dropdown.appendChild(reservedOption);
     }
@@ -3805,7 +3846,7 @@ function showCustomCategoryDropdown(inputElement, categoryIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = inputValue ? 'Type to create a new category' : 'No categories available';
         dropdown.appendChild(noMatch);
     } else if (filteredCategories.length > 0) {
@@ -4098,7 +4139,7 @@ function renderSynergyCharactersEditor(synergyIndex, synergySet) {
             </button>`;
     } else {
         html += `
-            <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
+            <div style="margin-top: 8px; font-size: 12px; color: var(--color-muted); font-style: italic;">
                 Cannot add more characters (limit: characters + required matches = 4)
             </div>`;
     }
@@ -4163,7 +4204,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
 
     categoryDefs.forEach((catDef, catIndex) => {
         html += `
-                <div style="border: 1px solid #ddd; padding: 12px; border-radius: 4px; background: #f9f9f9;">
+                <div style="border: 1px solid var(--color-border); padding: 12px; border-radius: 4px; background: var(--color-bg-secondary);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong>Definition #${catIndex + 1}</strong>
                         <button class="btn btn-danger btn-small" 
@@ -4174,7 +4215,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div>
-                            <label style="font-size: 12px; color: #666;">Include Tags (comma-separated):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Include Tags (comma-separated):</label>
                             <input type="text" 
                                    class="tag-input"
                                    data-synergy-index="${synergyIndex}"
@@ -4186,7 +4227,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                                    placeholder="Empire, Sith, Dark Side">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666;">Exclude Tags (comma-separated, optional):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Exclude Tags (comma-separated, optional):</label>
                             <input type="text" 
                                    class="tag-input"
                                    data-synergy-index="${synergyIndex}"
@@ -4198,7 +4239,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                                    placeholder="Jedi, Light Side">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666;">Number Matches Required (1-4):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Number Matches Required (1-4):</label>
                             <input type="number" 
                                    min="1" 
                                    max="4" 
@@ -4223,7 +4264,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
             </button>`;
     } else {
         html += `
-            <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
+            <div style="margin-top: 8px; font-size: 12px; color: var(--color-muted); font-style: italic;">
                 Cannot add more category definitions (limit: characters + required matches = 4)
             </div>`;
     }
@@ -5466,7 +5507,7 @@ function updateMissingCharacters() {
         missingElement.style.color = '';
     } else {
         missingElement.textContent = `${missingCount} missing character${missingCount === 1 ? '' : 's'}`;
-        missingElement.style.color = '#f0ad4e';
+        missingElement.style.color = 'var(--color-warning-accent)';
     }
 }
 
