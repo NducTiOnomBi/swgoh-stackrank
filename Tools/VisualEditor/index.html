@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SWGOH StackRank - Visual Editor</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        // Apply saved theme before first paint to prevent flash of light theme.
+        // NOTE: Theme names duplicated here because editor.js hasn't loaded yet.
+        // Keep in sync with VALID_THEMES in editor.js.
+        (function() {
+            try {
+                var theme = localStorage.getItem('swgoh-theme');
+                if (theme === 'dark' || theme === 'swgoh') {
+                    document.documentElement.classList.add('theme-' + theme);
+                }
+            } catch (e) { /* localStorage unavailable — fall back to default theme */ }
+        })();
+    </script>
 </head>
 <body>
     <div id="app">
@@ -13,6 +26,14 @@
             <div class="header-content">
                 <h1>SWGOH StackRank Visual Editor</h1>
                 <div class="header-actions">
+                    <div class="theme-selector">
+                        <label for="themeSelect">🎨</label>
+                        <select id="themeSelect">
+                            <option value="default">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="swgoh">SWGOH</option>
+                        </select>
+                    </div>
                     <button id="btnAddCharacter" class="btn btn-success">
                         <span class="icon">+</span> Add Character
                     </button>
