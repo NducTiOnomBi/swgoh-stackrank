@@ -1692,6 +1692,21 @@
       ]
     },
     {
+      "id": "CASSIANUNDERCOVER",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "KLEYA",
+            "LUTHENRAEL",
+            "CINTA",
+            "VEL"
+          ]
+        }
+      ]
+    },
+    {
       "id": "CC2224",
       "baseTier": 14,
       "requiresAllZetas": false,
@@ -1891,6 +1906,21 @@
               ],
               "numberMatchesRequired": 2
             }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CINTA",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "CASSIANUNDERCOVER",
+            "KLEYA",
+            "LUTHENRAEL",
+            "VEL"
           ]
         }
       ]
@@ -2678,6 +2708,23 @@
       ]
     },
     {
+      "id": "DEDRAMEERO",
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "ISB"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "DENGAR",
       "baseTier": 13,
       "synergySets": [
@@ -2750,6 +2797,17 @@
             "DEATHTROOPER"
           ],
           "synergyEnhancementOmicron": 1
+        },
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "ISB"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
         }
       ]
     },
@@ -4662,7 +4720,20 @@
     },
     {
       "id": "IMPERIALPROBEDROID",
-      "baseTier": 15
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "ISB"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "IMPERIALSUPERCOMMANDO",
@@ -5324,6 +5395,21 @@
       ]
     },
     {
+      "id": "KLEYA",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "CASSIANUNDERCOVER",
+            "LUTHENRAEL",
+            "CINTA",
+            "VEL"
+          ]
+        }
+      ]
+    },
+    {
       "id": "KRRSANTAN",
       "baseTier": 11,
       "synergySets": [
@@ -5374,6 +5460,23 @@
                 "Scoundrel"
               ],
               "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "KXSECURITYDROID",
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "ISB"
+              ],
+              "numberMatchesRequired": 4
             }
           ]
         }
@@ -5646,6 +5749,15 @@
               "numberMatchesRequired": 3
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "CASSIANUNDERCOVER",
+            "KLEYA",
+            "CINTA",
+            "VEL"
+          ]
         }
       ]
     },
@@ -5782,6 +5894,23 @@
                 "Geonosian"
               ],
               "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "MAJORPARTAGAZ",
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 0,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "ISB"
+              ],
+              "numberMatchesRequired": 4
             }
           ]
         }
@@ -8850,6 +8979,21 @@
               ],
               "numberMatchesRequired": 3
             }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VEL",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "LUTHENRAEL",
+            "KLEYA",
+            "CINTA",
+            "CASSIANUNDERCOVER"
           ]
         }
       ]
