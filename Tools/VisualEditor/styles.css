@@ -23,6 +23,19 @@
     --color-border: #e5e7eb;
     --color-border-dark: #d1d5db;
     
+    --color-bg-secondary: #f3f4f6;
+    --color-bg-hover: #f3f4f6;
+    --color-focus-ring: rgba(59, 130, 246, 0.15);
+    --color-overlay-surface: rgba(255, 255, 255, 0.9);
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.5);
+    --color-success-bg: #d1fae5;
+    --color-success-text: #065f46;
+    --color-danger-bg: #fee2e2;
+    --color-danger-text: #991b1b;
+    --color-drop-target-bg: #eff6ff;
+    --color-muted: #888888;
+    --color-warning-accent: #f0ad4e;
+    
     --spacing-xs: 0.25rem;
     --spacing-sm: 0.5rem;
     --spacing-md: 1rem;
@@ -34,6 +47,96 @@
     --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     
     --tier-spacing: 3; /* Visual spacing every N tiers */
+
+    color-scheme: light;
+}
+
+/* ============================================
+   Dark Theme
+   ============================================ */
+.theme-dark {
+    --color-primary: #60a5fa;
+    --color-primary-hover: #3b82f6;
+    --color-secondary: #6b7280;
+    --color-secondary-hover: #9ca3af;
+    --color-success: #34d399;
+    --color-danger: #f87171;
+    --color-warning: #fbbf24;
+
+    --color-bg-main: #111827;
+    --color-bg-sidebar: #1f2937;
+    --color-bg-card: #374151;
+    --color-bg-header: #0f172a;
+    --color-bg-secondary: #1f2937;
+    --color-bg-hover: #374151;
+
+    --color-text-primary: #f3f4f6;
+    --color-text-secondary: #d1d5db;
+    --color-text-light: #9ca3af;
+    --color-text-inverse: #ffffff;
+
+    --color-border: #4b5563;
+    --color-border-dark: #6b7280;
+
+    --color-focus-ring: rgba(96, 165, 250, 0.25);
+    --color-overlay-surface: rgba(17, 24, 39, 0.95);
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.7);
+    --color-success-bg: #064e3b;
+    --color-success-text: #6ee7b7;
+    --color-danger-bg: #7f1d1d;
+    --color-danger-text: #fca5a5;
+    --color-drop-target-bg: #1e3a8a;
+    --color-muted: #9ca3af;
+    --color-warning-accent: #fbbf24;
+
+    --box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+    --box-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+    color-scheme: dark;
+}
+
+/* ============================================
+   SWGOH Theme
+   ============================================ */
+.theme-swgoh {
+    --color-primary: #23c8f5;
+    --color-primary-hover: #3cb2ff;
+    --color-secondary: #4a6a8f;
+    --color-secondary-hover: #5a7ba3;
+    --color-success: #87f76d;
+    --color-danger: #ff7676;
+    --color-warning: #f5a623;
+
+    --color-bg-main: #0f1a2e;
+    --color-bg-sidebar: #131d31;
+    --color-bg-card: #162340;
+    --color-bg-header: #0c1525;
+    --color-bg-secondary: #1a2a47;
+    --color-bg-hover: #1e3050;
+
+    --color-text-primary: #e8edf5;
+    --color-text-secondary: #8ba3c7;
+    --color-text-light: #5a7ba3;
+    --color-text-inverse: #f5f5f5;
+
+    --color-border: #1a3a5c;
+    --color-border-dark: #1a5281;
+
+    --color-focus-ring: rgba(35, 200, 245, 0.25);
+    --color-overlay-surface: rgba(15, 26, 46, 0.95);
+    --color-overlay-backdrop: rgba(0, 0, 0, 0.7);
+    --color-success-bg: #0d2a1a;
+    --color-success-text: #87f76d;
+    --color-danger-bg: #2a0f0f;
+    --color-danger-text: #ff7676;
+    --color-drop-target-bg: #122543;
+    --color-muted: #5a7ba3;
+    --color-warning-accent: #f5a623;
+
+    --box-shadow: 0 1px 3px 0 rgba(29, 147, 198, 0.2), 0 1px 2px 0 rgba(29, 147, 198, 0.1);
+    --box-shadow-lg: 0 10px 15px -3px rgba(29, 147, 198, 0.3), 0 4px 6px -2px rgba(29, 147, 198, 0.15);
+
+    color-scheme: dark;
 }
 
 * {
@@ -348,7 +451,7 @@ body {
 .omicron-type-dropdown:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .status-bar {
@@ -410,7 +513,7 @@ body {
 
 .tier-column.drag-over {
     border-color: var(--color-primary);
-    background-color: #eff6ff;
+    background-color: var(--color-drop-target-bg);
 }
 
 /* ============================================
@@ -440,7 +543,7 @@ body {
 
 .character-card.selected {
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .character-card.dragging-touch {
@@ -562,7 +665,7 @@ body {
     right: -4px;
     width: 8px;
     height: 8px;
-    background-color: #f0c040;
+    background-color: var(--color-warning);
     border-radius: 50%;
     display: none;
 }
@@ -605,7 +708,7 @@ body {
 .form-textarea:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .form-textarea {
@@ -706,7 +809,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: var(--color-overlay-backdrop);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -807,7 +910,7 @@ body {
 
 .missing-character-item.selected {
     background-color: var(--color-primary);
-    color: var(--color-text-primary);
+    color: var(--color-text-inverse);
 }
 
 .missing-character-item.hidden {
@@ -852,18 +955,18 @@ body {
    ============================================ */
 .validation-success {
     padding: var(--spacing-md);
-    background-color: #d1fae5;
+    background-color: var(--color-success-bg);
     border: 1px solid var(--color-success);
     border-radius: var(--border-radius);
-    color: #065f46;
+    color: var(--color-success-text);
 }
 
 .validation-errors {
     padding: var(--spacing-md);
-    background-color: #fee2e2;
+    background-color: var(--color-danger-bg);
     border: 1px solid var(--color-danger);
     border-radius: var(--border-radius);
-    color: #991b1b;
+    color: var(--color-danger-text);
 }
 
 .validation-errors ul {
@@ -909,7 +1012,7 @@ body {
 .character-input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 /* ============================================
@@ -1016,7 +1119,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: var(--color-overlay-surface);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -1066,4 +1169,120 @@ body {
     .character-name {
         font-size: 0.75rem;
     }
+}
+
+/* ============================================
+   Theme Selector Styles
+   ============================================ */
+.theme-selector {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.theme-selector label {
+    font-size: 0.85rem;
+    color: var(--color-text-inverse);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    white-space: nowrap;
+}
+
+.theme-selector select {
+    padding: 4px 8px;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-text-inverse);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.theme-selector select:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 1px;
+}
+
+.theme-selector select:hover {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.theme-selector select option {
+    background: var(--color-bg-header);
+    color: var(--color-text-inverse);
+}
+
+/* ============================================
+   SWGOH Theme — Component Enhancements
+   ============================================ */
+.theme-swgoh .app-header {
+    background: linear-gradient(135deg, #0c1525 0%, #141e34 50%, #0c1525 100%);
+    border-bottom: 1px solid rgba(35, 200, 245, 0.25);
+}
+
+.theme-swgoh .sidebar-left,
+.theme-swgoh .sidebar-right {
+    border-color: rgba(26, 82, 129, 0.4);
+}
+
+.theme-swgoh .tier-column {
+    border-color: rgba(26, 82, 129, 0.25);
+}
+
+.theme-swgoh .character-card {
+    border-color: rgba(26, 82, 129, 0.35);
+}
+
+.theme-swgoh .character-card:hover {
+    border-color: rgba(35, 200, 245, 0.35);
+    box-shadow: 0 0 8px rgba(157, 255, 255, 0.1);
+}
+
+.theme-swgoh .character-card.selected {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 12px rgba(157, 255, 255, 0.2);
+}
+
+.theme-swgoh .btn {
+    color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+    border: none;
+}
+
+.theme-swgoh .btn-primary {
+    background: linear-gradient(135deg, #1d93c6 0%, #23c8f5 100%);
+}
+
+.theme-swgoh .btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, #1a7898 0%, #1d93c6 100%);
+    box-shadow: 0 0 12px rgba(157, 255, 255, 0.25);
+}
+
+.theme-swgoh .btn-success {
+    background: linear-gradient(135deg, #2a8a4a 0%, #87f76d 100%);
+}
+
+.theme-swgoh .btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #228a3e 0%, #6ddb55 100%);
+    box-shadow: 0 0 12px rgba(135, 247, 109, 0.3);
+}
+
+.theme-swgoh .app-header h1 {
+    text-shadow:
+        0 0 8px rgba(35, 200, 245, 0.6),
+        0 0 20px rgba(35, 200, 245, 0.3),
+        0 0 40px rgba(157, 255, 255, 0.15);
+}
+
+.theme-swgoh .form-input:focus,
+.theme-swgoh .form-select:focus,
+.theme-swgoh .form-textarea:focus {
+    box-shadow: 0 0 0 3px rgba(35, 200, 245, 0.2);
+}
+
+.theme-swgoh .modal-content {
+    border: 1px solid rgba(35, 200, 245, 0.15);
 }

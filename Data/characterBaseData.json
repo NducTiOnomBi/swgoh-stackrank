@@ -2,7 +2,18 @@
   "characterBaseData": [
     {
       "id": "4LOM",
-      "baseTier": 17
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "FENNECSHAND",
+            "BOBAFETTSCION",
+            "ASAJJDARKDISCIPLE"
+          ]
+        }
+      ]
     },
     {
       "id": "50RT",
@@ -22,6 +33,15 @@
               ],
               "numberMatchesRequired": 1
             }
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO",
+            "BASTILASHAN"
           ]
         }
       ]
@@ -348,7 +368,31 @@
     },
     {
       "id": "ASAJJDARKDISCIPLE",
-      "baseTier": 14
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "characters": [
+            "BOBAFETTSCION",
+            "FENNECSHAND"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Bounty Hunter"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ],
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "ASAJVENTRESS",
@@ -614,9 +658,25 @@
       "baseTier": 8,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "JEDIKNIGHTREVAN"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -890,6 +950,16 @@
           "characters": [
             "FENNECSHAND"
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "4LOM",
+            "FENNECSHAND",
+            "ASAJJDARKDISCIPLE"
+          ],
+          "synergyEnhancementOmicron": 0
         }
       ]
     },
@@ -1362,7 +1432,6 @@
       "synergySets": [
         {
           "synergyEnhancement": 3,
-          "synergyEnhancementOmicron": 2,
           "characters": [
             "CLONESERGEANTPHASEI",
             "CC2224"
@@ -2895,9 +2964,24 @@
       "baseTier": 8,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "MARAJADE"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "VADERDUELSEND",
+            "MARAJADE"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -2911,16 +2995,31 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "GLREY"
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
           ],
           "categoryDefinitions": [
             {
@@ -2938,16 +3037,31 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
+          "synergyEnhancement": 4,
           "characters": [
             "GLREY"
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "FINN",
+            "ZORIIBLISS_V2"
           ],
           "categoryDefinitions": [
             {
@@ -3115,6 +3229,15 @@
               "numberMatchesRequired": 1
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "ZUCKUSS",
+            "4LOM",
+            "ASAJJDARKDISCIPLE",
+            "BOBAFETTSCION"
+          ]
         }
       ]
     },
@@ -3152,7 +3275,7 @@
       "baseTier": 11,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -3167,12 +3290,17 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
         }
       ]
@@ -4461,7 +4589,24 @@
     },
     {
       "id": "IG90",
-      "baseTier": 17
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "DOCTORAPHRA",
+            "BT1",
+            "TRIPLEZERO"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "IMAGUNDI",
@@ -4543,7 +4688,23 @@
     },
     {
       "id": "INQUISITORBARRISS",
-      "baseTier": 17
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "SECONDSISTER",
+            "NINTHSISTER"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "ITHANO",
@@ -4554,8 +4715,15 @@
           "characters": [
             "MAZKANATA",
             "KIX",
-            "QUIGGOLD",
-            "SM33"
+            "QUIGGOLD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -4716,12 +4884,28 @@
     },
     {
       "id": "JEDIKNIGHTREVAN",
-      "baseTier": 5,
+      "baseTier": 6,
       "synergySets": [
         {
           "synergyEnhancement": 1,
           "characters": [
             "GRANDMASTERLUKE"
+          ]
+        },
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "SATELESHAN",
+            "BASTILASHAN",
+            "JOLEEBINDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ]
@@ -4842,6 +5026,22 @@
               "numberMatchesRequired": 3
             }
           ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "BASTILASHAN",
+            "JEDIKNIGHTREVAN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
         }
       ]
     },
@@ -4893,6 +5093,15 @@
             "MARAJADE",
             "STARKILLER",
             "VISASMARR"
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "SATELESHAN",
+            "JEDIKNIGHTREVAN",
+            "BASTILASHAN",
+            "JOLEEBINDO"
           ]
         }
       ]
@@ -5588,10 +5797,27 @@
       "baseTier": 8,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "EMPERORPALPATINE"
-          ]
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "EMPERORPALPATINE",
+            "VADERDUELSEND"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ],
+          "synergyEnhancementOmicron": 1
         }
       ]
     },
@@ -5656,12 +5882,32 @@
       ]
     },
     {
+      "id": "MAULHATEFUELED",
+      "baseTier": 5,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "STRANGER",
+            "STARKILLER"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
+    },
+    {
       "id": "MAULS7",
       "baseTier": 5
     },
     {
       "id": "MAZKANATA",
-      "baseTier": 15,
+      "baseTier": 13,
       "synergySets": [
         {
           "synergyEnhancement": 5,
@@ -5669,8 +5915,15 @@
           "characters": [
             "ITHANO",
             "KIX",
-            "QUIGGOLD",
-            "SM33"
+            "QUIGGOLD"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Pirate"
+              ],
+              "numberMatchesRequired": 1
+            }
           ]
         }
       ],
@@ -6041,6 +6294,13 @@
           "synergyEnhancement": 4,
           "characters": [
             "THIRDSISTER"
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "SECONDSISTER",
+            "INQUISITORBARRISS"
           ]
         }
       ]
@@ -6427,14 +6687,7 @@
       "id": "PHASMA",
       "baseTier": 14,
       "requiresAllZetas": false,
-      "requiredZetas": [],
       "synergySets": [
-        {
-          "synergyEnhancement": 5,
-          "characters": [
-            "SUPREMELEADERKYLOREN"
-          ]
-        },
         {
           "synergyEnhancement": 3,
           "characters": [
@@ -6491,7 +6744,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8",
@@ -6507,12 +6760,18 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "FINN",
-            "RESISTANCETROOPER",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6578,6 +6837,13 @@
               ],
               "numberMatchesRequired": 3
             }
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "STORMTROOPERHAN",
+            "STORMTROOPERLUKE"
           ]
         }
       ]
@@ -6735,7 +7001,7 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING"
           ],
@@ -6818,7 +7084,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -6833,12 +7099,18 @@
           ]
         },
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "FINN",
-            "POE",
-            "ROSETICO",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -6848,7 +7120,7 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 3,
+          "synergyEnhancement": 2,
           "characters": [
             "REYJEDITRAINING",
             "BB8"
@@ -6928,9 +7200,15 @@
           "synergyEnhancement": 5,
           "characters": [
             "FINN",
-            "POE",
-            "RESISTANCETROOPER",
             "ZORIIBLISS_V2"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 2
+            }
           ]
         }
       ]
@@ -7065,6 +7343,29 @@
                 "Pirate"
               ],
               "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "SATELESHAN",
+      "baseTier": 6,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "JEDIKNIGHTREVAN",
+            "JOLEEBINDO",
+            "BASTILASHAN"
+          ],
+          "synergyEnhancementOmicron": 1,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Old Republic"
+              ],
+              "numberMatchesRequired": 1
             }
           ]
         }
@@ -7315,6 +7616,13 @@
           "synergyEnhancement": 3,
           "characters": [
             "GRANDINQUISITOR"
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "INQUISITORBARRISS",
+            "NINTHSISTER"
           ]
         }
       ]
@@ -7742,7 +8050,18 @@
     {
       "id": "STARKILLER",
       "baseTier": 5,
-      "omicronEnhancement": 1
+      "omicronEnhancement": 1,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "STRANGER",
+            "MAULHATEFUELED"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     },
     {
       "id": "STORMTROOPER",
@@ -7810,16 +8129,50 @@
             "HOTHHAN",
             "HOTHLEIA"
           ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "STORMTROOPERLUKE",
+            "PRINCESSLEIA"
+          ]
         }
       ]
     },
     {
       "id": "STORMTROOPERLUKE",
-      "baseTier": 14
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "PRINCESSLEIA",
+            "STORMTROOPERHAN"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "STRANGER",
-      "baseTier": 5
+      "baseTier": 5,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "MAULHATEFUELED",
+            "STARKILLER"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     },
     {
       "id": "SUNFAC",
@@ -7917,6 +8270,20 @@
                 "Wookiee"
               ],
               "numberMatchesRequired": 4
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "YODACHEWBACCA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Wookiee"
+              ],
+              "numberMatchesRequired": 3
             }
           ]
         }
@@ -8322,7 +8689,31 @@
     },
     {
       "id": "VADERDUELSEND",
-      "baseTier": 14
+      "baseTier": 8,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "EMPERORPALPATINE",
+            "MARAJADE"
+          ],
+          "synergyEnhancementOmicron": 1,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Empire"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "VANE",
@@ -8578,7 +8969,30 @@
     },
     {
       "id": "YODACHEWBACCA",
-      "baseTier": 14
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "TARFFUL"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Wookiee"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "YOUNGCHEWBACCA",
@@ -8752,17 +9166,70 @@
         {
           "synergyEnhancement": 5,
           "characters": [
-            "FINN",
-            "POE",
-            "RESISTANCETROOPER",
-            "ROSETICO"
+            "FINN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Resistance"
+              ],
+              "numberMatchesRequired": 3
+            }
           ]
+        },
+        {
+          "characters": [
+            "FINN"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "EPIXFINN"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "EPIXPOE"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "POE"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "ROSETICO"
+          ],
+          "synergyEnhancementOmicron": 1
+        },
+        {
+          "characters": [
+            "RESISTANCETROOPER"
+          ],
+          "synergyEnhancementOmicron": 1
         }
       ]
     },
     {
       "id": "ZUCKUSS",
-      "baseTier": 17
+      "baseTier": 11,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "BOBAFETTSCION",
+            "ASAJJDARKDISCIPLE",
+            "4LOM",
+            "FENNECSHAND"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ]
     }
   ]
 }

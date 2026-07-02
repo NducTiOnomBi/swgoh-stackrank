@@ -103,6 +103,28 @@ The PowerShell HTTP server provides these REST API endpoints:
 
 See [VisualEditor/README.md](VisualEditor/README.md) for complete documentation, troubleshooting, and architecture details.
 
+### VisualEditorFunctions.psm1
+
+A PowerShell module containing shared business logic extracted from `StartVisualEditor.ps1` for testability. This module is imported automatically by the server script.
+
+#### Exported Functions
+
+| Function | Purpose |
+|---|---|
+| `Get-ContentType` | Maps file extensions to MIME content types |
+| `Get-BaseUrl` | Builds server URL (local vs GitHub Codespaces) |
+| `Get-ListenerPrefix` | Returns HTTP listener prefix based on environment |
+| `ConvertTo-CharacterArray` | Extracts character array from JSON (wrapped or direct format) |
+| `Test-CharacterData` | Validates character data (fields, ranges, duplicates, sorting, synergies, cross-refs) |
+| `Get-StaticFilePath` | Resolves URL path to filesystem path within the editor directory |
+
+#### Testing
+
+```powershell
+# Run tests for this module
+Invoke-Pester -Path .\Tests\StartVisualEditor.Tests.ps1 -Output Detailed
+```
+
 ### ValidateCharacterData.ps1
 
 The ValidateCharacterData.ps1 PowerShell script performs comprehensive validation of the characterBaseData.json file to ensure data integrity before committing changes. This script runs the same validation logic as the automated PR checks in GitHub Actions.
@@ -553,5 +575,6 @@ data/characterBaseData/42/id must match pattern "^[A-Z0-9_]+$"
 
 - **JSON Schema**: See `Data/characterBaseData.schema.json` for complete validation rules
 - **PR Validation Workflow**: See `.github/workflows/validate-pr.yml` for CI validation logic
+- **Pester Tests**: See `Tests/` for Pester test files and configuration
 - **Copilot Instructions**: See `.github/copilot-instructions.md` for AI-assisted development guidelines
 - **Contributing Guidelines**: See `CONTRIBUTING.md` for general contribution process

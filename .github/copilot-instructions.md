@@ -13,11 +13,11 @@ This repository manages character tier ranking data for the **StackRank algorith
 
 ### Technology Stack
 
--   **Languages**: PowerShell, JSON
--   **Tools**: Microsoft Excel (data editing), PowerShell 5.1+
--   **CI/CD**: GitHub Actions → Azure DevOps → Azure App Service
--   **Hosting**: Azure App Service
--   **Deployment**: Dev environment at `https://dev-swgoh-stackrank-westus.azurewebsites.net`
+- **Languages**: PowerShell, JSON
+- **Tools**: Microsoft Excel (data editing), PowerShell 5.1+
+- **CI/CD**: GitHub Actions → Azure DevOps → Azure App Service
+- **Hosting**: Azure App Service
+- **Deployment**: Dev environment at `https://dev-swgoh-stackrank-westus.azurewebsites.net`
 
 ### Key Workflows
 
@@ -38,14 +38,14 @@ All changes to [`Data/characterBaseData.json`](Data/characterBaseData.json) **MU
 
 #### Required Fields
 
--   **`id`**: String, uppercase letters/numbers/underscores only (e.g., `ANAKINKNIGHT`, `R2D2_LEGENDARY`)
--   **`baseTier`**: Integer, range 1-19 (where 1 = highest/best tier)
+- **`id`**: String, uppercase letters/numbers/underscores only (e.g., `ANAKINKNIGHT`, `R2D2_LEGENDARY`)
+- **`baseTier`**: Integer, range 1-19 (where 1 = highest/best tier)
 
 #### Optional Fields
 
--   **`synergySets`**: Array of synergy configurations (see below)
--   **`requiresAllZetas`**: Boolean flag for zeta requirements
--   **`requiredZetas`**: Array of zeta ability IDs
+- **`synergySets`**: Array of synergy configurations (see below)
+- **`requiresAllZetas`**: Boolean flag for zeta requirements
+- **`requiredZetas`**: Array of zeta ability IDs
 
 #### Synergy Set Structure
 
@@ -114,26 +114,26 @@ if ($characterId -notmatch '^[A-Z0-9_]+$') {
 
 **NEVER hardcode sensitive values:**
 
--   ❌ **NO**: Hardcoded tokens, passwords, API keys
--   ✅ **YES**: Use GitHub Secrets (`${{ secrets.SECRET_NAME }}`)
--   ✅ **YES**: Use environment variables in workflows
--   ⚠️ **CAUTION**: Mask sensitive output in logs
+- ❌ **NO**: Hardcoded tokens, passwords, API keys
+- ✅ **YES**: Use GitHub Secrets (`${{ secrets.SECRET_NAME }}`)
+- ✅ **YES**: Use environment variables in workflows
+- ⚠️ **CAUTION**: Mask sensitive output in logs
 
 **Current secrets in use:**
 
--   `AZDO_PAT`: Azure DevOps Personal Access Token
--   `AZDO_ORG`: Azure DevOps organization name
--   `AZDO_PROJECT`: Azure DevOps project name
--   `AZDO_REPO`: Azure DevOps repository name
--   `GITHUB_TOKEN`: Automatic token for GitHub API
+- `AZDO_PAT`: Azure DevOps Personal Access Token
+- `AZDO_ORG`: Azure DevOps organization name
+- `AZDO_PROJECT`: Azure DevOps project name
+- `AZDO_REPO`: Azure DevOps repository name
+- `GITHUB_TOKEN`: Automatic token for GitHub API
 
 ### File Management
 
 **Prevent accidental commits of local files:**
 
--   Output files should go to `c:\output\` (excluded via `.gitignore`)
--   Excel temp files (`~$*.xlsx`) must never be committed
--   Only [`Data/characterBaseData.json`](Data/characterBaseData.json) should be tracked in Data folder
+- Output files should go to `c:\output\` (excluded via `.gitignore`)
+- Excel temp files (`~$*.xlsx`) must never be committed
+- Only [`Data/characterBaseData.json`](Data/characterBaseData.json) should be tracked in Data folder
 
 ---
 
@@ -172,9 +172,9 @@ finally {
 
 **Avoid hardcoded absolute paths:**
 
--   ❌ **NO**: `c:\specific\hardcoded\path.json`
--   ✅ **YES**: `$PSScriptRoot\..\Data\file.json` (relative to script)
--   ✅ **YES**: Accept paths as parameters with sensible defaults
+- ❌ **NO**: `c:\specific\hardcoded\path.json`
+- ✅ **YES**: `$PSScriptRoot\..\Data\file.json` (relative to script)
+- ✅ **YES**: Accept paths as parameters with sensible defaults
 
 ### Excel COM Automation
 
@@ -218,6 +218,172 @@ finally {
     PS> .\Script.ps1 -ParameterName "value"
     Description of what this example does
 #>
+```
+
+## ✅ Testing & Quality
+
+### TDD Workflow
+
+All new features and bug fixes **must** follow Test-Driven Development. Never write implementation code without a failing test that demands it.
+
+#### Red → Green → Refactor
+
+1. **🔴 Red** — Write a test for the desired behavior. Run it. It **must fail** (proving the behavior doesn't exist yet).
+2. **🟢 Green** — Write the **simplest code that makes the test pass**. No more, no less.
+3. **🔵 Refactor** — Clean up implementation and test code while keeping all tests green. Remove duplication, improve naming, extract methods.
+4. **Repeat** for the next behavior.
+
+#### Step-by-Step Workflow
+
+When implementing a feature or fixing a bug, follow these steps in order:
+
+1. Write a test that describes the expected behavior.
+2. Run the test suite — confirm the new test **fails** (Red).
+3. Write the **minimum implementation** to make the test pass.
+4. Run the test suite — confirm **all tests pass** (Green).
+5. Refactor both test and implementation code; re-run tests after each change (Refactor).
+6. Repeat for the next behavior.
+
+> **Never skip verification.** Always run tests after writing the test (to confirm failure) and after writing the implementation (to confirm success). If a new test passes immediately, either the test is wrong or the behavior already exists — investigate before proceeding.
+
+#### Bug Fix Protocol
+
+1. Write a test that **reproduces the bug** (it must fail before the fix).
+2. Verify the test fails for the expected reason.
+3. Fix the bug with the minimal change.
+4. Verify the test passes.
+5. Refactor if needed; re-run tests.
+
+This prevents regression — the bug can never silently return.
+
+#### Minimal Implementation Principle
+
+During the Green phase:
+
+- Write the **simplest code that works** — do not gold-plate or pre-optimize.
+- Do not add behavior that isn't demanded by a test.
+- Add new tests to drive new behavior.
+
+#### What to TDD
+
+- Validation logic (tier ranges, synergy constraints, cross-references)
+- JSON parsing and data transformation logic
+- File path resolution and existence checks
+- Synergy calculation logic
+- Error handling paths in scripts
+- HTTP endpoint handlers (`StartVisualEditor.ps1`)
+
+#### Exclusions (What Not to TDD)
+
+- Excel COM automation (requires Windows + Excel, can't run in CI)
+- Simple parameter declarations with defaults
+- Static configuration/constant definitions
+- `Write-Host` output formatting (cosmetic-only logic)
+
+### Testing Standards (Pester 5.x)
+
+- Use Pester's **`Describe`/`Context`/`It`** block structure to organize tests:
+    - `Describe` — groups tests for a script or major function
+    - `Context` — groups tests for a specific scenario or condition within the `Describe`
+    - `It` — defines a single test case
+
+- Follow **AAA pattern** with explicit comments: `# Arrange`, `# Act`, `# Assert` (clearly separated sections).
+
+- Use descriptive `It` names that state the expected behavior:
+
+```powershell
+Describe 'ValidateCharacterData' {
+    Context 'When baseTier is out of range' {
+        It 'Should return error when baseTier exceeds 19' { }
+        It 'Should return error when baseTier is less than 1' { }
+    }
+
+    Context 'When synergy cross-references are invalid' {
+        It 'Should return error when referenced character does not exist' { }
+    }
+}
+```
+
+- Test **one logical concept** per `It` block; avoid multi-assertion tests.
+
+- Name test files: **`{ScriptName}.Tests.ps1`** (e.g., `ValidateCharacterData.Tests.ps1`).
+
+- Place all test files in the **`Tests\`** directory at repository root.
+
+- Use **`-TestCases @(...)`** for parameterized tests:
+
+```powershell
+It "Should reject baseTier value <Tier> as out of range" -TestCases @(
+    @{ Tier = 0 }
+    @{ Tier = 20 }
+    @{ Tier = -1 }
+) {
+    param($Tier)
+    # Arrange
+    $testData = @{ characterBaseData = @(@{ id = "TEST_CHAR"; baseTier = $Tier }) }
+    $testData | ConvertTo-Json -Depth 5 | Set-Content "TestDrive:\test.json"
+
+    # Act & Assert
+    { .\Tools\ValidateCharacterData.ps1 -CharacterBaseDataPath "TestDrive:\test.json" } | Should -Throw
+}
+```
+
+- Mock **only external dependencies** (file system, external tools, network), not internal logic:
+
+```powershell
+Mock Get-Command { $null } -ParameterFilter { $Name -eq 'ajv' }
+Mock Test-Path { $true } -ParameterFilter { $Path -like '*characterBaseData.json' }
+```
+
+- Use **`Should`** assertions for readable, expressive checks:
+
+```powershell
+$result | Should -Be 0
+$output | Should -Contain "VALIDATION PASSED"
+$errors | Should -BeNullOrEmpty
+$characters | Should -HaveCount 200
+{ Invoke-Expression $badCommand } | Should -Throw -ExpectedMessage "*Invalid*"
+```
+
+- Use **`TestDrive:\`** for file system isolation — Pester auto-creates and cleans up a temporary directory per test run.
+
+- Use **`BeforeAll`/`BeforeEach`** for setup and **`AfterAll`/`AfterEach`** for teardown.
+
+- Keep tests **deterministic and isolated**; avoid:
+    - Shared mutable state between tests
+    - Dependency on execution order
+    - Network calls (mock `Invoke-RestMethod`/`Invoke-WebRequest`)
+    - Real file system dependencies outside `TestDrive:\`
+
+- Aim for **80%+ code coverage** on validation and business logic; 100% on critical paths.
+- Test **edge cases and boundaries**: empty arrays, missing fields, boundary values (`baseTier` 1, `baseTier` 19, `synergyEnhancement` 0, `synergyEnhancement` 10).
+
+### Testing Tools
+
+- **Pester 5.x** — PowerShell testing framework for unit and integration tests
+- **`TestDrive:\`** — Pester's built-in isolated temp file system for test data
+- **`Mock`** — Pester's built-in mocking for cmdlets and functions
+- **`Invoke-Pester`** — Test runner with configuration support
+- **`New-PesterConfiguration`** — Programmatic test configuration
+
+### Running Tests
+
+```powershell
+# Run all tests
+Invoke-Pester -Path .\Tests\
+
+# Run specific test file
+Invoke-Pester -Path .\Tests\ValidateCharacterData.Tests.ps1
+
+# Run with detailed output
+Invoke-Pester -Path .\Tests\ -Output Detailed
+
+# Run with code coverage
+$config = New-PesterConfiguration
+$config.Run.Path = '.\Tests\'
+$config.CodeCoverage.Enabled = $true
+$config.CodeCoverage.Path = @('.\Tools\ValidateCharacterData.ps1')
+Invoke-Pester -Configuration $config
 ```
 
 ---
@@ -378,15 +544,15 @@ npm install -g ajv-cli ajv-formats
 
 **When to comment:**
 
--   Complex synergy logic or calculations
--   Non-obvious tier assignment reasoning
--   Workarounds for Excel COM limitations
--   Data migration or schema changes
+- Complex synergy logic or calculations
+- Non-obvious tier assignment reasoning
+- Workarounds for Excel COM limitations
+- Data migration or schema changes
 
 **What NOT to comment:**
 
--   Self-explanatory code (`$tier = 1` doesn't need explanation)
--   Redundant descriptions of what code literally does
+- Self-explanatory code (`$tier = 1` doesn't need explanation)
+- Redundant descriptions of what code literally does
 
 ### Commit Messages
 
@@ -422,11 +588,11 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Required information:**
 
--   Character(s) affected
--   Tier changes with justification
--   Synergy changes with reasoning
--   Validation checklist completion
--   Testing performed (if applicable)
+- Character(s) affected
+- Tier changes with justification
+- Synergy changes with reasoning
+- Validation checklist completion
+- Testing performed (if applicable)
 
 ---
 
@@ -438,9 +604,9 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Ask for clarification when:**
 
--   No justification provided for tier value
--   Tier seems inconsistent with similar characters
--   Large tier change (±3 or more) without explanation
+- No justification provided for tier value
+- Tier seems inconsistent with similar characters
+- Large tier change (±3 or more) without explanation
 
 **Example prompt:**
 
@@ -450,10 +616,10 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Ask for clarification when:**
 
--   `synergyEnhancement` value seems high (>4) without explanation
--   Category definitions are very broad or very narrow
--   Specific character list doesn't align with category tags
--   `numberMatchesRequired` seems unusual for the categories
+- `synergyEnhancement` value seems high (>4) without explanation
+- Category definitions are very broad or very narrow
+- Specific character list doesn't align with category tags
+- `numberMatchesRequired` seems unusual for the categories
 
 **Example prompt:**
 
@@ -463,9 +629,9 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Ask for clarification when:**
 
--   Character ID doesn't match obvious naming patterns
--   Multiple possible IDs for same character (e.g., `DARTHVADER` vs `VADER`)
--   Ambiguous character reference (multiple versions exist)
+- Character ID doesn't match obvious naming patterns
+- Multiple possible IDs for same character (e.g., `DARTHVADER` vs `VADER`)
+- Ambiguous character reference (multiple versions exist)
 
 **Example prompt:**
 
@@ -475,9 +641,9 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Ask for clarification when:**
 
--   Multiple characters might need similar changes
--   Change affects synergy calculations for other characters
--   Unclear if change is temporary/experimental or permanent
+- Multiple characters might need similar changes
+- Change affects synergy calculations for other characters
+- Unclear if change is temporary/experimental or permanent
 
 **Example prompt:**
 
@@ -487,10 +653,10 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **ALWAYS ask when:**
 
--   Adding new external dependencies
--   Modifying workflow permissions
--   Handling sensitive data or credentials
--   Changing file access patterns
+- Adding new external dependencies
+- Modifying workflow permissions
+- Handling sensitive data or credentials
+- Changing file access patterns
 
 **Example prompt:**
 
@@ -500,10 +666,10 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 **Ask for confirmation when:**
 
--   Changing schema structure
--   Modifying validation rules
--   Altering PowerShell script interfaces
--   Updating CI/CD behavior
+- Changing schema structure
+- Modifying validation rules
+- Altering PowerShell script interfaces
+- Updating CI/CD behavior
 
 **Example prompt:**
 
@@ -515,29 +681,33 @@ unchanged. Tested with Palpatine/Thrawn teams.
 
 ### ✅ DO
 
--   Run `ValidateCharacterData.ps1` before every commit
--   Test changes in DEV environment before production
--   Use descriptive commit messages with justification
--   Keep character IDs sorted alphabetically
--   Follow 2-space JSON indentation
--   Validate all user inputs in PowerShell scripts
--   Clean up Excel COM objects properly
--   Use relative paths in scripts
--   Document complex synergy logic
--   Ask for clarification when requirements are ambiguous
+- Run `ValidateCharacterData.ps1` before every commit
+- Run `Invoke-Pester` before every commit to verify tests pass
+- Write Pester tests for new validation logic and bug fixes (TDD)
+- Test changes in DEV environment before production
+- Use descriptive commit messages with justification
+- Keep character IDs sorted alphabetically
+- Follow 2-space JSON indentation
+- Validate all user inputs in PowerShell scripts
+- Clean up Excel COM objects properly
+- Use relative paths in scripts
+- Document complex synergy logic
+- Ask for clarification when requirements are ambiguous
 
 ### ❌ DON'T
 
--   Commit without running validation
--   Hardcode absolute file paths
--   Skip error handling in PowerShell
--   Forget to clean up COM objects
--   Use inconsistent formatting
--   Commit Excel temp files or output folders
--   Expose secrets in code or logs
--   Make breaking changes without discussion
--   Assume tier/synergy values without justification
--   Merge PRs that fail validation
+- Commit without running validation
+- Commit without running Pester tests
+- Skip writing tests for new validation rules
+- Hardcode absolute file paths
+- Skip error handling in PowerShell
+- Forget to clean up COM objects
+- Use inconsistent formatting
+- Commit Excel temp files or output folders
+- Expose secrets in code or logs
+- Make breaking changes without discussion
+- Assume tier/synergy values without justification
+- Merge PRs that fail validation or Pester tests
 
 ---
 
@@ -554,13 +724,21 @@ Tools/
   ReadBaseDataToXLS.ps1        # Export base data to Excel
   ReadBaseDataSynergyToXLS.ps1 # Export with synergy calculations
   ReadXLStoBaseDataJson.ps1    # Import Excel changes to JSON
-  ValidateCharacterData.ps1    # Local validation script (NEW)
+  ValidateCharacterData.ps1    # Local validation script
+  StartVisualEditor.ps1        # Visual editor HTTP server
+  VisualEditorFunctions.psm1   # Shared functions for visual editor (testable module)
+  VisualEditor/                # Visual editor frontend (HTML/JS/CSS)
+
+Tests/
+  ValidateCharacterData.Tests.ps1  # Pester tests for validation script
+  StartVisualEditor.Tests.ps1      # Pester tests for visual editor functions
+  .pester.ps1                      # Pester configuration file
 
 .github/
   workflows/
     sync-to-azdo.yml           # Deploy to Azure DevOps on main merge
-    validate-pr.yml            # PR validation checks (NEW)
-  pull_request_template.md     # PR template with checklist (NEW)
+    validate-pr.yml            # PR validation checks + Pester tests
+  pull_request_template.md     # PR template with checklist
   copilot-instructions.md      # This file
 ```
 
@@ -572,6 +750,15 @@ Tools/
 
 # Validate with external schema validator
 .\Tools\ValidateCharacterData.ps1 -UseExternalValidator
+
+# Run all Pester tests
+Invoke-Pester -Path .\Tests\
+
+# Run Pester tests with detailed output
+Invoke-Pester -Path .\Tests\ -Output Detailed
+
+# Run Pester tests with configuration file
+Invoke-Pester -Configuration (& .\Tests\.pester.ps1)
 
 # Export to Excel (base tiers only)
 .\Tools\ReadBaseDataToXLS.ps1
@@ -597,14 +784,16 @@ ajv validate -s Data/characterBaseData.schema.json -d Data/characterBaseData.jso
 
 ## Additional Resources
 
--   **Contributing Guidelines**: [`CONTRIBUTING.md`](CONTRIBUTING.md)
--   **Code of Conduct**: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
--   **Tools Documentation**: [`Tools/index.md`](Tools/index.md)
--   **JSON Schema Spec**: [JSON Schema Draft 7](https://json-schema.org/draft-07/schema)
--   **Azure DevOps Pipeline**: (Internal Azure DevOps project)
+- **Contributing Guidelines**: [`CONTRIBUTING.md`](CONTRIBUTING.md)
+- **Code of Conduct**: [`CODE_OF_CONDUCT.md`](CODE_OF_CONDUCT.md)
+- **Tools Documentation**: [`Tools/index.md`](Tools/index.md)
+- **Pester Tests**: [`Tests/`](Tests/) — Test files and Pester configuration
+- **JSON Schema Spec**: [JSON Schema Draft 7](https://json-schema.org/draft-07/schema)
+- **Pester Documentation**: [Pester Docs](https://pester.dev/docs/quick-start)
+- **Azure DevOps Pipeline**: (Internal Azure DevOps project)
 
 ---
 
-**Last Updated**: 2025-11-24  
+**Last Updated**: 2026-04-14  
 **Schema Version**: 1.0  
 **Maintained By**: @NducTiOnomBi

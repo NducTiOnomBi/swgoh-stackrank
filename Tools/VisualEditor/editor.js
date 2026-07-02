@@ -1,4 +1,42 @@
 // ============================================
+// Theme Management
+// ============================================
+const VALID_THEMES = ['default', 'dark', 'swgoh'];
+
+function safeGetTheme() {
+    try {
+        return localStorage.getItem('swgoh-theme');
+    } catch (e) {
+        return null;
+    }
+}
+
+function initializeTheme() {
+    const saved = safeGetTheme();
+    const theme = VALID_THEMES.includes(saved) ? saved : 'default';
+    applyTheme(theme);
+    const themeSelect = document.getElementById('themeSelect');
+    if (themeSelect) {
+        themeSelect.value = theme;
+        themeSelect.addEventListener('change', (e) => changeTheme(e.target.value));
+    }
+}
+
+function changeTheme(theme) {
+    if (!VALID_THEMES.includes(theme)) theme = 'default';
+    applyTheme(theme);
+    try { localStorage.setItem('swgoh-theme', theme); } catch (e) { /* storage unavailable */ }
+}
+
+function applyTheme(theme) {
+    const themeClasses = VALID_THEMES.filter(t => t !== 'default').map(t => 'theme-' + t);
+    document.documentElement.classList.remove(...themeClasses);
+    if (theme !== 'default') {
+        document.documentElement.classList.add('theme-' + theme);
+    }
+}
+
+// ============================================
 // Application State
 // ============================================
 let characterData = [];
@@ -57,6 +95,9 @@ let filterOperatorCustomCategories = 'AND';
 // Initialization
 // ============================================
 document.addEventListener('DOMContentLoaded', async () => {
+    // Initialize theme first (sync the dropdown with the already-applied theme)
+    initializeTheme();
+
     // Initialize event listeners
     initializeEventListeners();
 
@@ -71,6 +112,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Build category tag index after both data sources are loaded
     buildCategoryTagIndex();
+
+    // Run validation automatically so users see data issues immediately
+    validateData();
 });
 
 function initializeEventListeners() {
@@ -565,7 +609,7 @@ function deepEqualDrafts(draft1, draft2) {
 
     // Compare primitives
     if (draft1.baseTier !== draft2.baseTier) return false;
-    if (draft1.omicronBoost !== draft2.omicronBoost) return false;
+    if (draft1.omicronEnhancement !== draft2.omicronEnhancement) return false;
     if (draft1.requiresAllZetas !== draft2.requiresAllZetas) return false;
     if (draft1.requiresAllOmicrons !== draft2.requiresAllOmicrons) return false;
 
@@ -775,7 +819,7 @@ function initializeDraft(character) {
     const draftSnapshot = {
         characterId: character.id,
         baseTier: character.baseTier,
-        omicronBoost: character.omicronBoost,
+        omicronEnhancement: character.omicronEnhancement,
         ignoreRequirements: character.ignoreRequirements ? { ...character.ignoreRequirements } : undefined,
         ignoreSynergyRequirements: character.ignoreSynergyRequirements ? { ...character.ignoreSynergyRequirements } : undefined,
         // Clone zeta/omicron requirements arrays (mirror character structure)
@@ -800,8 +844,8 @@ function updateDraftFromForm() {
     if (!selectedCharacter) return;
 
     const baseTier = parseInt(document.getElementById('inputBaseTier')?.value);
-    const hasOmicronBoost = document.getElementById('chkHasOmicronBoost')?.checked;
-    const omicronBoost = parseInt(document.getElementById('inputOmicronBoost')?.value);
+    const hasOmicronEnhancement = document.getElementById('chkHasomicronEnhancement')?.checked;
+    const omicronEnhancement = parseInt(document.getElementById('inputomicronEnhancement')?.value);
     const ignoreReqGear = document.getElementById('ignoreReqGear')?.checked;
     const ignoreReqRarity = document.getElementById('ignoreReqRarity')?.checked;
     const ignoreSynergyReqGear = document.getElementById('ignoreSynergyReqGear')?.checked;
@@ -812,7 +856,7 @@ function updateDraftFromForm() {
     }
 
     currentDraft.baseTier = baseTier;
-    currentDraft.omicronBoost = hasOmicronBoost ? omicronBoost : undefined;
+    currentDraft.omicronEnhancement = hasOmicronEnhancement ? omicronEnhancement : undefined;
 
     if (ignoreReqGear || ignoreReqRarity) {
         currentDraft.ignoreRequirements = {};
@@ -1086,7 +1130,7 @@ function showFilterModal() {
     if (sortedCustomCategories.length === 0) {
         const emptyMessage = document.createElement('p');
         emptyMessage.style.fontStyle = 'italic';
-        emptyMessage.style.color = '#888';
+        emptyMessage.style.color = 'var(--color-muted)';
         emptyMessage.textContent = 'No custom categories defined';
         customCategoriesContainer.appendChild(emptyMessage);
     } else {
@@ -1526,8 +1570,8 @@ function computeTierDistribution() {
 
             // Personal omicron
             let personalOmicron = 0;
-            if (character.omicronBoost !== undefined && hasOmicronAbilities) {
-                personalOmicron = character.omicronBoost;
+            if (character.omicronEnhancement !== undefined && hasOmicronAbilities) {
+                personalOmicron = character.omicronEnhancement;
             } else if (hasOmicronAbilities) {
                 personalOmicron = 1;
             }
@@ -1698,8 +1742,8 @@ function calculateFinalTier(character) {
 
         // Personal omicron: use defined value, or default to 1 if character has matching omicron abilities, otherwise 0
         let personalOmicron = 0;
-        if (character.omicronBoost !== undefined && hasOmicronAbilities) {
-            personalOmicron = character.omicronBoost;
+        if (character.omicronEnhancement !== undefined && hasOmicronAbilities) {
+            personalOmicron = character.omicronEnhancement;
         } else if (hasOmicronAbilities) {
             // StackRank service auto-applies 1 tier boost for characters with omicron abilities
             personalOmicron = 1;
@@ -1989,7 +2033,7 @@ function calculateSynergyTiers(character) {
     let bestOmicron = null;
 
     // Use ?? to treat undefined as 0, but preserve explicit 0 value
-    const omicronBoost = character.omicronBoost ?? 0;
+    const omicronEnhancement = character.omicronEnhancement ?? 0;
 
     if (!character.synergySets || character.synergySets.length === 0) {
         return { bestStandard, bestOmicron };
@@ -2017,14 +2061,14 @@ function calculateSynergyTiers(character) {
 
         // For omicron mode, use character's own omicron + standard synergy
         // Note: synergyEnhancementOmicron does NOT apply to the owning character
-        if (omicronBoost > 0 && standardEnhancement > 0) {
-            const omicronTier = character.baseTier - omicronBoost - standardEnhancement;
+        if (omicronEnhancement > 0 && standardEnhancement > 0) {
+            const omicronTier = character.baseTier - omicronEnhancement - standardEnhancement;
 
             if (bestOmicron === null || omicronTier < bestOmicron.finalTier) {
                 bestOmicron = {
                     finalTier: omicronTier,
                     baseTier: character.baseTier,
-                    appliedOmicronBonus: omicronBoost,
+                    appliedOmicronBonus: omicronEnhancement,
                     omicronSource: 'character',
                     synergyEnhancement: standardEnhancement,
                     synergySet: synergySet,
@@ -2612,7 +2656,7 @@ function renderCharacterDetails(character) {
             </div>
             <div class="info-row">
                 <span class="info-label">Omicron Boost</span>
-                <span class="info-value">${character.omicronBoost ?? 1}${character.omicronBoost === undefined ? ' (default)' : ''}</span>
+                <span class="info-value">${character.omicronEnhancement ?? 1}${character.omicronEnhancement === undefined ? ' (default)' : ''}</span>
             </div>
             <div class="info-row">
                 <span class="info-label">Synergy Sets</span>
@@ -2640,14 +2684,14 @@ function renderCharacterDetails(character) {
         
         <div class="form-group">
             <label class="form-label">
-                <input type="checkbox" id="chkHasomicronBoost" 
-                       ${draftValues.omicronBoost !== undefined ? 'checked' : ''}
-                       onchange="toggleomicronBoost()" style="margin-right: 8px;">
+                <input type="checkbox" id="chkHasomicronEnhancement" 
+                       ${draftValues.omicronEnhancement !== undefined ? 'checked' : ''}
+                       onchange="toggleomicronEnhancement()" style="margin-right: 8px;">
                 Omicron Boost (0-10)
             </label>
-            <input type="number" class="form-input" id="inputomicronBoost" 
-                   value="${draftValues.omicronBoost ?? 1}" min="0" max="10"
-                   ${draftValues.omicronBoost === undefined ? 'readonly' : ''}>
+            <input type="number" class="form-input" id="inputomicronEnhancement" 
+                   value="${draftValues.omicronEnhancement ?? 1}" min="0" max="10"
+                   ${draftValues.omicronEnhancement === undefined ? 'readonly' : ''}>
             <div class="form-help">If a character has an Omicron and meets the requirements, StackRank will automatically apply a default boost of 1. When checked, the defined value will override the default boost.</div>
         </div>
         
@@ -2703,7 +2747,7 @@ function renderCharacterDetails(character) {
 
     // Add event listeners to capture form changes into draft
     setTimeout(() => {
-        ['inputBaseTier', 'chkHasomicronBoost', 'inputomicronBoost', 'ignoreReqGear', 'ignoreReqRarity', 'ignoreSynergyReqGear', 'ignoreSynergyReqRarity'].forEach(id => {
+        ['inputBaseTier', 'chkHasomicronEnhancement', 'inputomicronEnhancement', 'ignoreReqGear', 'ignoreReqRarity', 'ignoreSynergyReqGear', 'ignoreSynergyReqRarity'].forEach(id => {
             const element = document.getElementById(id);
             if (element) {
                 element.addEventListener('input', updateDraftFromForm);
@@ -2713,9 +2757,9 @@ function renderCharacterDetails(character) {
     }, 0);
 }
 
-function toggleomicronBoost() {
-    const checkbox = document.getElementById('chkHasomicronBoost');
-    const input = document.getElementById('inputomicronBoost');
+function toggleomicronEnhancement() {
+    const checkbox = document.getElementById('chkHasomicronEnhancement');
+    const input = document.getElementById('inputomicronEnhancement');
 
     if (checkbox.checked) {
         // Enable input - user wants to set a specific value
@@ -2738,7 +2782,7 @@ function updateCharacter() {
         return;
     }
 
-    if (currentDraft.omicronBoost !== undefined && (currentDraft.omicronBoost < 0 || currentDraft.omicronBoost > 10)) {
+    if (currentDraft.omicronEnhancement !== undefined && (currentDraft.omicronEnhancement < 0 || currentDraft.omicronEnhancement > 10)) {
         alert('Omicron Boost must be between 0 and 10');
         return;
     }
@@ -2770,10 +2814,10 @@ function updateCharacter() {
     // Apply draft to character - basics
     selectedCharacter.baseTier = currentDraft.baseTier;
 
-    if (currentDraft.omicronBoost !== undefined) {
-        selectedCharacter.omicronBoost = currentDraft.omicronBoost;
+    if (currentDraft.omicronEnhancement !== undefined) {
+        selectedCharacter.omicronEnhancement = currentDraft.omicronEnhancement;
     } else {
-        delete selectedCharacter.omicronBoost;
+        delete selectedCharacter.omicronEnhancement;
     }
 
     if (currentDraft.ignoreRequirements) {
@@ -2885,7 +2929,7 @@ function renderZetaEditor(character) {
     const requiredZetas = draftValues.requiredZetas || [];
 
     let zetaEditorHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label" style="display: flex; align-items: center; cursor: pointer;">
                 <input type="checkbox" id="chkRequiresAllZetas" 
                        ${requiresAllChecked ? 'checked' : ''} 
@@ -2903,7 +2947,7 @@ function renderZetaEditor(character) {
         if (requiredZetas.length === 0) {
             zetaEditorHtml += `
                 <div class="empty-state" style="margin: 10px 0;">
-                    <p style="font-size: 0.9em; color: #888;">No specific zetas required (None case)</p>
+                    <p style="font-size: 0.9em; color: var(--color-muted);">No specific zetas required (None case)</p>
                 </div>
             `;
         } else {
@@ -2945,9 +2989,9 @@ function renderZetaEditor(character) {
         `;
 
         if (!hasAvailableZetas && requiredZetas.length === 0) {
-            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No zeta abilities available for this character</div>';
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">No zeta abilities available for this character</div>';
         } else if (!hasAvailableZetas && requiredZetas.length > 0) {
-            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available zetas have been added</div>';
+            zetaEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">All available zetas have been added</div>';
         }
 
         zetaEditorHtml += '</div>';
@@ -3121,7 +3165,7 @@ function showZetaDropdown(inputElement, zetaIndex) {
         const emptyOption = document.createElement('div');
         emptyOption.className = 'dropdown-option';
         emptyOption.style.fontStyle = 'italic';
-        emptyOption.style.color = '#888';
+        emptyOption.style.color = 'var(--color-muted)';
         emptyOption.textContent = 'No zeta abilities available for this character';
         dropdown.appendChild(emptyOption);
     } else if (filteredAbilities.length === 0) {
@@ -3129,7 +3173,7 @@ function showZetaDropdown(inputElement, zetaIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = 'No matching abilities found';
         dropdown.appendChild(noMatch);
     } else {
@@ -3271,7 +3315,7 @@ function renderOmicronEditor(character) {
     const requiredOmicrons = draftValues.requiredOmicrons || [];
 
     let omicronEditorHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label" style="display: flex; align-items: center; cursor: pointer;">
                 <input type="checkbox" id="chkRequiresAllOmicrons" 
                        ${requiresAllChecked ? 'checked' : ''} 
@@ -3289,7 +3333,7 @@ function renderOmicronEditor(character) {
         if (requiredOmicrons.length === 0) {
             omicronEditorHtml += `
                 <div class="empty-state" style="margin: 10px 0;">
-                    <p style="font-size: 0.9em; color: #888;">No specific omicrons required (None case)</p>
+                    <p style="font-size: 0.9em; color: var(--color-muted);">No specific omicrons required (None case)</p>
                 </div>
             `;
         } else {
@@ -3331,9 +3375,9 @@ function renderOmicronEditor(character) {
         `;
 
         if (!hasAvailableOmicrons && requiredOmicrons.length === 0) {
-            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">No omicron abilities available for this character</div>';
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">No omicron abilities available for this character</div>';
         } else if (!hasAvailableOmicrons && requiredOmicrons.length > 0) {
-            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: #888;">All available omicrons have been added</div>';
+            omicronEditorHtml += '<div class="form-help" style="margin-top: 8px; color: var(--color-muted);">All available omicrons have been added</div>';
         }
 
         omicronEditorHtml += '</div>';
@@ -3506,7 +3550,7 @@ function showOmicronDropdown(inputElement, omicronIndex) {
         const emptyOption = document.createElement('div');
         emptyOption.className = 'dropdown-option';
         emptyOption.style.fontStyle = 'italic';
-        emptyOption.style.color = '#888';
+        emptyOption.style.color = 'var(--color-muted)';
         emptyOption.textContent = 'No omicron abilities available for this character';
         dropdown.appendChild(emptyOption);
     } else if (filteredAbilities.length === 0) {
@@ -3514,7 +3558,7 @@ function showOmicronDropdown(inputElement, omicronIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = 'No matching abilities found';
         dropdown.appendChild(noMatch);
     } else {
@@ -3653,7 +3697,7 @@ function renderCustomCategoriesEditor(character) {
     const categories = draftValues.categories || [];
 
     let customCategoriesHtml = `
-        <div class="form-group" style="margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+        <div class="form-group" style="margin-top: 20px; border-top: 1px solid var(--color-border); padding-top: 20px;">
             <label class="form-label">Custom Character Categories</label>
             <div class="form-help">Assign custom categories to this character for filtering and synergy matching</div>
         </div>
@@ -3662,7 +3706,7 @@ function renderCustomCategoriesEditor(character) {
     if (categories.length === 0) {
         customCategoriesHtml += `
             <div class="empty-state" style="margin: 10px 0;">
-                <p style="font-size: 0.9em; color: #888;">No custom categories assigned</p>
+                <p style="font-size: 0.9em; color: var(--color-muted);">No custom categories assigned</p>
             </div>
         `;
     } else {
@@ -3793,7 +3837,7 @@ function showCustomCategoryDropdown(inputElement, categoryIndex) {
         const reservedOption = document.createElement('div');
         reservedOption.className = 'dropdown-option';
         reservedOption.style.fontStyle = 'italic';
-        reservedOption.style.color = '#d9534f';
+        reservedOption.style.color = 'var(--color-danger)';
         reservedOption.textContent = `"${inputValue}" conflicts with existing Category, Role, or Alignment`;
         dropdown.appendChild(reservedOption);
     }
@@ -3802,7 +3846,7 @@ function showCustomCategoryDropdown(inputElement, categoryIndex) {
         const noMatch = document.createElement('div');
         noMatch.className = 'dropdown-option';
         noMatch.style.fontStyle = 'italic';
-        noMatch.style.color = '#888';
+        noMatch.style.color = 'var(--color-muted)';
         noMatch.textContent = inputValue ? 'Type to create a new category' : 'No categories available';
         dropdown.appendChild(noMatch);
     } else if (filteredCategories.length > 0) {
@@ -4095,7 +4139,7 @@ function renderSynergyCharactersEditor(synergyIndex, synergySet) {
             </button>`;
     } else {
         html += `
-            <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
+            <div style="margin-top: 8px; font-size: 12px; color: var(--color-muted); font-style: italic;">
                 Cannot add more characters (limit: characters + required matches = 4)
             </div>`;
     }
@@ -4160,7 +4204,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
 
     categoryDefs.forEach((catDef, catIndex) => {
         html += `
-                <div style="border: 1px solid #ddd; padding: 12px; border-radius: 4px; background: #f9f9f9;">
+                <div style="border: 1px solid var(--color-border); padding: 12px; border-radius: 4px; background: var(--color-bg-secondary);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                         <strong>Definition #${catIndex + 1}</strong>
                         <button class="btn btn-danger btn-small" 
@@ -4171,7 +4215,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 8px;">
                         <div>
-                            <label style="font-size: 12px; color: #666;">Include Tags (comma-separated):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Include Tags (comma-separated):</label>
                             <input type="text" 
                                    class="tag-input"
                                    data-synergy-index="${synergyIndex}"
@@ -4183,7 +4227,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                                    placeholder="Empire, Sith, Dark Side">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666;">Exclude Tags (comma-separated, optional):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Exclude Tags (comma-separated, optional):</label>
                             <input type="text" 
                                    class="tag-input"
                                    data-synergy-index="${synergyIndex}"
@@ -4195,7 +4239,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
                                    placeholder="Jedi, Light Side">
                         </div>
                         <div>
-                            <label style="font-size: 12px; color: #666;">Number Matches Required (1-4):</label>
+                            <label style="font-size: 12px; color: var(--color-text-secondary);">Number Matches Required (1-4):</label>
                             <input type="number" 
                                    min="1" 
                                    max="4" 
@@ -4220,7 +4264,7 @@ function renderSynergyCategoryDefinitionsEditor(synergyIndex, synergySet) {
             </button>`;
     } else {
         html += `
-            <div style="margin-top: 8px; font-size: 12px; color: #999; font-style: italic;">
+            <div style="margin-top: 8px; font-size: 12px; color: var(--color-muted); font-style: italic;">
                 Cannot add more category definitions (limit: characters + required matches = 4)
             </div>`;
     }
@@ -4294,7 +4338,7 @@ function renderSynergyEditor(character) {
                     <label class="form-label">
                         <input type="checkbox" id="chkSynergyOmicron_${index}" 
                                ${synergySet.synergyEnhancementOmicron !== undefined ? 'checked' : ''}
-                               onchange="toggleSynergyomicronBoost(${index})" style="margin-right: 8px;">
+                               onchange="toggleSynergyomicronEnhancement(${index})" style="margin-right: 8px;">
                         Omicron Boost (0-10)
                     </label>
                     <input type="number" 
@@ -4304,7 +4348,7 @@ function renderSynergyEditor(character) {
                            max="10" 
                            value="${synergySet.synergyEnhancementOmicron ?? 0}"
                            ${synergySet.synergyEnhancementOmicron === undefined ? 'readonly' : ''}
-                           oninput="updateSynergyomicronBoost(${index}, this.value)">
+                           oninput="updateSynergyomicronEnhancement(${index}, this.value)">
                     <div class="form-help">When checked, the specified Omicron boost will be applied to the synergy characters specified below. NOTE: This will only apply if ${character.id} has an Omicron ability.</div>
                 </div>
                 ${renderSynergyCharactersEditor(index, synergySet)}
@@ -4409,7 +4453,7 @@ function updateSynergyEnhancement(index, value) {
     updateStatus('Synergy enhancement updated - click Update Character to apply', 'warning');
 }
 
-function toggleSynergyomicronBoost(index) {
+function toggleSynergyomicronEnhancement(index) {
     if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
 
     const checkbox = document.getElementById(`chkSynergyOmicron_${index}`);
@@ -4433,20 +4477,20 @@ function toggleSynergyomicronBoost(index) {
     updateStatus('Omicron boost toggled - click Update Character to apply', 'warning');
 }
 
-function updateSynergyomicronBoost(index, value) {
+function updateSynergyomicronEnhancement(index, value) {
     if (!selectedCharacter || !currentDraft || !currentDraft.synergySets || !currentDraft.synergySets[index]) return;
 
-    const hasomicronBoost = document.getElementById(`chkSynergyOmicron_${index}`).checked;
+    const hasomicronEnhancement = document.getElementById(`chkSynergyOmicron_${index}`).checked;
     const numValue = parseInt(value, 10);
 
-    if (hasomicronBoost && (isNaN(numValue) || numValue < 0 || numValue > 10)) {
+    if (hasomicronEnhancement && (isNaN(numValue) || numValue < 0 || numValue > 10)) {
         alert('Omicron Boost must be between 0 and 10');
         renderSynergyEditor(selectedCharacter);
         return;
     }
 
     // Use checkbox state to determine whether to set the value
-    if (hasomicronBoost) {
+    if (hasomicronEnhancement) {
         currentDraft.synergySets[index].synergyEnhancementOmicron = numValue;
     } else {
         delete currentDraft.synergySets[index].synergyEnhancementOmicron;
@@ -5463,7 +5507,7 @@ function updateMissingCharacters() {
         missingElement.style.color = '';
     } else {
         missingElement.textContent = `${missingCount} missing character${missingCount === 1 ? '' : 's'}`;
-        missingElement.style.color = '#f0ad4e';
+        missingElement.style.color = 'var(--color-warning-accent)';
     }
 }
 
