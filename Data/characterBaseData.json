@@ -852,6 +852,26 @@
       ]
     },
     {
+      "id": "BISHOP",
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CARSONTEVA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "New Republic"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "BISTAN",
       "baseTier": 17,
       "synergySets": [
@@ -1311,6 +1331,15 @@
               "numberMatchesRequired": 2
             }
           ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "RACCOON",
+            "GAMORREANGUARD",
+            "GREEDO",
+            "HUMANTHUG"
+          ]
         }
       ]
     },
@@ -1634,6 +1663,23 @@
             "HOTHHAN",
             "HOTHLEIA",
             "STORMTROOPERHAN"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "CARSONTEVA",
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "New Republic"
+              ],
+              "numberMatchesRequired": 4
+            }
           ]
         }
       ]
@@ -3523,6 +3569,15 @@
               "numberMatchesRequired": 2
             }
           ]
+        },
+        {
+          "synergyEnhancement": 10,
+          "characters": [
+            "RACCOON",
+            "GREEDO",
+            "CADBANE",
+            "HUMANTHUG"
+          ]
         }
       ]
     },
@@ -3759,6 +3814,26 @@
       ]
     },
     {
+      "id": "GOPHERANTS",
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CARSONTEVA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "New Republic"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "GRANDADMIRALTHRAWN",
       "baseTier": 7,
       "requiresAllZetas": false,
@@ -3895,6 +3970,20 @@
                 "Hutt Cartel"
               ],
               "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "RACCOON"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Hutt Cartel"
+              ],
+              "numberMatchesRequired": 3
             }
           ]
         }
@@ -4366,6 +4455,20 @@
                 "Hutt Cartel"
               ],
               "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 10,
+          "characters": [
+            "RACCOON"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Hutt Cartel"
+              ],
+              "numberMatchesRequired": 3
             }
           ]
         }
@@ -7023,6 +7126,66 @@
       ]
     },
     {
+      "id": "R5D4",
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CARSONTEVA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "New Republic"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "RACCOON",
+      "baseTier": 4,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "CADBANE",
+            "GREEDO",
+            "GAMORREANGUARD",
+            "HUMANTHUG"
+          ],
+          "synergyEnhancementOmicron": 1
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      }
+    },
+    {
+      "id": "RANGERZEB",
+      "baseTier": 10,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "CARSONTEVA"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "New Republic"
+              ],
+              "numberMatchesRequired": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "RANGETROOPER",
       "baseTier": 15,
       "synergySets": [
@@ -7072,6 +7235,24 @@
               "numberMatchesRequired": 2
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "REMNANTSNOWCOMMANDER",
+      "baseTier": 12,
+      "synergySets": [
+        {
+          "synergyEnhancementOmicron": 1,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Imperial Remnant"
+              ],
+              "numberMatchesRequired": 4
+            }
+          ],
+          "synergyEnhancement": 3
         }
       ]
     },
