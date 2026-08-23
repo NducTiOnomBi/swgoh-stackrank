@@ -5904,9 +5904,8 @@
       "baseTier": 15,
       "synergySets": [
         {
-          "synergyEnhancement": 0,
+          "synergyEnhancement": 3,
           "categoryDefinitions": [
-            {
               "include": [
                 "ISB"
               ],
