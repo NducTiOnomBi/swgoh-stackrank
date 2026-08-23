@@ -23,7 +23,7 @@ jobs:
             AZDO_ORG: ${{ secrets.AZDO_ORG }}
             AZDO_PROJECT: ${{ secrets.AZDO_PROJECT }}
             AZDO_REPO: ${{ secrets.AZDO_REPO }}
-            AZDO_DEST_PATH: swgoh-stackrank-webapp/swgoh-stackrank-webapp/Data/characterBaseData.json
+            AZDO_DEST_PATH: src/swgoh-stackrank-webapp/Data/characterBaseData.json
 
         steps:
             - name: Checkout GitHub repo
