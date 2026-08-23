@@ -5906,6 +5906,7 @@
         {
           "synergyEnhancement": 3,
           "categoryDefinitions": [
+            {
               "include": [
                 "ISB"
               ],
