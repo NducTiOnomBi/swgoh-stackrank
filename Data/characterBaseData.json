@@ -3976,15 +3976,10 @@
         {
           "synergyEnhancement": 4,
           "characters": [
-            "RACCOON"
-          ],
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Hutt Cartel"
-              ],
-              "numberMatchesRequired": 3
-            }
+            "RACCOON",
+            "GAMORREANGUARD",
+            "CADBANE",
+            "HUMANTHUG"
           ]
         }
       ]
