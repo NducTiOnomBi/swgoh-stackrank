@@ -2022,62 +2022,22 @@
       "synergySets": [
         {
           "synergyEnhancement": 5,
-          "synergyEnhancementOmicron": 4,
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Constable"
-              ],
-              "numberMatchesRequired": 2
-            },
-            {
-              "include": [
-                "Tusken"
-              ],
-              "numberMatchesRequired": 2
-            }
+          "synergyEnhancementOmicron": 1,
+          "characters": [
+            "LOBOT",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
           ]
         },
         {
           "synergyEnhancement": 5,
-          "synergyEnhancementOmicron": 4,
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Constable"
-              ],
-              "numberMatchesRequired": 2
-            },
-            {
-              "include": [
-                "Jawa"
-              ],
-              "numberMatchesRequired": 2
-            }
-          ]
-        },
-        {
-          "synergyEnhancement": 5,
-          "synergyEnhancementOmicron": 4,
-          "categoryDefinitions": [
-            {
-              "include": [
-                "Constable"
-              ],
-              "numberMatchesRequired": 2
-            },
-            {
-              "include": [
-                "Tusken"
-              ],
-              "numberMatchesRequired": 1
-            },
-            {
-              "include": [
-                "Jawa"
-              ],
-              "numberMatchesRequired": 1
-            }
+          "synergyEnhancementOmicron": 1,
+          "characters": [
+            "LOBOT",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
           ]
         }
       ]
