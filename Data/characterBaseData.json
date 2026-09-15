@@ -2016,6 +2016,73 @@
       ]
     },
     {
+      "id": "COBBVANTH",
+      "baseTier": 14,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "synergyEnhancementOmicron": 4,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Tusken"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "synergyEnhancementOmicron": 4,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Jawa"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 5,
+          "synergyEnhancementOmicron": 4,
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Tusken"
+              ],
+              "numberMatchesRequired": 1
+            },
+            {
+              "include": [
+                "Jawa"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "COLONELSTARCK",
       "baseTier": 14,
       "synergySets": [
