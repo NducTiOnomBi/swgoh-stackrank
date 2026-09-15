@@ -2112,7 +2112,41 @@
     },
     {
       "id": "CORUSCANTUNDERWORLDPOLICE",
-      "baseTier": 19
+      "baseTier": 19,
+      "synergySets": [
+        {
+          "synergyEnhancement": 7,
+          "characters": [
+            "COBBVANTH",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 7,
+          "characters": [
+            "COBBVANTH",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "COUNTDOOKU",
