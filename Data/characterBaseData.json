@@ -5782,7 +5782,41 @@
     },
     {
       "id": "LOBOT",
-      "baseTier": 18
+      "baseTier": 18,
+      "synergySets": [
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "COBBVANTH",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "COBBVANTH",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "LOGRAY",
