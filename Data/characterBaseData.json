@@ -2038,12 +2038,12 @@
     },
     {
       "id": "COBBVANTH",
-      "baseTier": 14,
+      "baseTier": 16,
       "requiresAllOmicrons": false,
       "synergySets": [
         {
-          "synergyEnhancement": 5,
-          "synergyEnhancementOmicron": 1,
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
           "characters": [
             "LOBOT",
             "CORUSCANTUNDERWORLDPOLICE",
@@ -2052,16 +2052,57 @@
           ]
         },
         {
-          "synergyEnhancement": 5,
-          "synergyEnhancementOmicron": 1,
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CARADUNE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "CARADUNE",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
           "characters": [
             "LOBOT",
             "CORUSCANTUNDERWORLDPOLICE",
             "CHIEFNEBIT",
             "TUSKENHUNTRESS"
           ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CARADUNE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "CARADUNE",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ]
         }
-      ]
+      ],
+      "omicronEnhancement": 4
     },
     {
       "id": "COLONELSTARCK",
