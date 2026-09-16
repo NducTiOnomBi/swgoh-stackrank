@@ -5081,6 +5081,27 @@
               "numberMatchesRequired": 4
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "COBBVANTH"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Jawa",
+                "Tusken"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
         }
       ]
     },
