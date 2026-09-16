@@ -2136,11 +2136,9 @@
       "baseTier": 19,
       "synergySets": [
         {
-          "synergyEnhancement": 7,
+          "synergyEnhancement": 6,
           "characters": [
-            "COBBVANTH",
-            "CHIEFNEBIT",
-            "JAWASCAVENGER"
+            "COBBVANTH"
           ],
           "categoryDefinitions": [
             {
@@ -2148,22 +2146,13 @@
                 "Constable"
               ],
               "numberMatchesRequired": 1
-            }
-          ]
-        },
-        {
-          "synergyEnhancement": 7,
-          "characters": [
-            "COBBVANTH",
-            "CHIEFNEBIT",
-            "TUSKENHUNTRESS"
-          ],
-          "categoryDefinitions": [
+            },
             {
               "include": [
-                "Constable"
+                "Jawa",
+                "Tusken"
               ],
-              "numberMatchesRequired": 1
+              "numberMatchesRequired": 2
             }
           ]
         }
