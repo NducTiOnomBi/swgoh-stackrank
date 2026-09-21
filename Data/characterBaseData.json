@@ -1894,6 +1894,27 @@
               "numberMatchesRequired": 4
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "COBBVANTH"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Jawa",
+                "Tusken"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
         }
       ]
     },
@@ -2016,6 +2037,74 @@
       ]
     },
     {
+      "id": "COBBVANTH",
+      "baseTier": 16,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CARADUNE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "CARADUNE",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "JAWASCAVENGER"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "LOBOT",
+            "CARADUNE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "synergyEnhancementOmicron": 4,
+          "characters": [
+            "CARADUNE",
+            "CORUSCANTUNDERWORLDPOLICE",
+            "CHIEFNEBIT",
+            "TUSKENHUNTRESS"
+          ]
+        }
+      ],
+      "omicronEnhancement": 4
+    },
+    {
       "id": "COLONELSTARCK",
       "baseTier": 14,
       "synergySets": [
@@ -2085,7 +2174,30 @@
     },
     {
       "id": "CORUSCANTUNDERWORLDPOLICE",
-      "baseTier": 19
+      "baseTier": 19,
+      "synergySets": [
+        {
+          "synergyEnhancement": 6,
+          "characters": [
+            "COBBVANTH"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            },
+            {
+              "include": [
+                "Jawa",
+                "Tusken"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "COUNTDOOKU",
@@ -4999,6 +5111,27 @@
               "numberMatchesRequired": 4
             }
           ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "COBBVANTH"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 2
+            },
+            {
+              "include": [
+                "Jawa",
+                "Tusken"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
         }
       ]
     },
@@ -5721,7 +5854,30 @@
     },
     {
       "id": "LOBOT",
-      "baseTier": 18
+      "baseTier": 18,
+      "synergySets": [
+        {
+          "synergyEnhancement": 5,
+          "characters": [
+            "COBBVANTH"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Constable"
+              ],
+              "numberMatchesRequired": 1
+            },
+            {
+              "include": [
+                "Jawa",
+                "Tusken"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "LOGRAY",
