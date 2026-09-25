@@ -4033,6 +4033,12 @@
           "characters": [
             "JEDIKNIGHTCAL"
           ]
+        },
+        {
+          "synergyEnhancement": 1,
+          "characters": [
+            "LEIAJEDITRAINING"
+          ]
         }
       ]
     },
@@ -5848,6 +5854,19 @@
               ],
               "numberMatchesRequired": 1
             }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "LEIAJEDITRAINING",
+      "baseTier": 9,
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "GRANDMASTERLUKE"
           ]
         }
       ]
