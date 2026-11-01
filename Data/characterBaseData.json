@@ -2453,6 +2453,34 @@
       "omicronEnhancement": 1
     },
     {
+      "id": "DARTHJARJAR",
+      "baseTier": 9,
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      },
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "YODADSV",
+            "THERONIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "DARTHMALAK",
       "baseTier": 5,
       "synergySets": [
@@ -5142,6 +5170,60 @@
       ]
     },
     {
+      "id": "JAXXON",
+      "baseTier": 14,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "DASHRENDAR",
+            "YOUNGCHEWBACCA",
+            "YOUNGLANDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Prepared"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "DASHRENDAR",
+            "YOUNGCHEWBACCA",
+            "ADMINISTRATORLANDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Prepared"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "DASHRENDAR",
+            "YOUNGCHEWBACCA",
+            "UNDERCOVERLANDO"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Prepared"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "JEDIKNIGHTCAL",
       "baseTier": 9,
       "synergySets": [
@@ -5969,6 +6051,21 @@
       "requiredZetas": []
     },
     {
+      "id": "LUKESTARKILLER",
+      "baseTier": 13,
+      "synergySets": [
+        {
+          "synergyEnhancement": 4,
+          "characters": [
+            "COMMANDERLUKESKYWALKER",
+            "CHEWBACCALEGENDARY",
+            "HANSOLO",
+            "C3POCHEWBACCA"
+          ]
+        }
+      ]
+    },
+    {
       "id": "LUMINARAUNDULI",
       "baseTier": 17,
       "requiresAllZetas": false,
@@ -6222,6 +6319,50 @@
           "synergyEnhancementOmicron": 1
         }
       ]
+    },
+    {
+      "id": "MARAJADESKYWALKER",
+      "baseTier": 10,
+      "omicronEnhancement": 3,
+      "synergySets": [
+        {
+          "synergyEnhancement": 2,
+          "characters": [
+            "JEDIKNIGHTLUKE",
+            "MACEWINDU"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Jedi"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        },
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "STRANGER",
+            "STARKILLER",
+            "MAULHATEFUELED"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Unaligned Force User"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "MARROK",
@@ -8599,6 +8740,28 @@
       ]
     },
     {
+      "id": "STORMTROOPERCONCEPT",
+      "baseTier": 15,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "VEERS",
+            "DARKTROOPER",
+            "RANGETROOPER"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Imperial Trooper"
+              ],
+              "numberMatchesRequired": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
       "id": "STORMTROOPERHAN",
       "baseTier": 14,
       "synergySets": [
@@ -8935,6 +9098,33 @@
           ]
         }
       ]
+    },
+    {
+      "id": "THERONIN",
+      "baseTier": 9,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "DARTHJARJAR",
+            "YODADSV"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ],
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      }
     },
     {
       "id": "THIRDSISTER",
@@ -9488,6 +9678,34 @@
       "ignoreSynergyRequirements": {
         "rarity": true
       }
+    },
+    {
+      "id": "YODADSV",
+      "baseTier": 9,
+      "ignoreRequirements": {
+        "rarity": true
+      },
+      "ignoreSynergyRequirements": {
+        "rarity": true
+      },
+      "requiresAllOmicrons": false,
+      "synergySets": [
+        {
+          "synergyEnhancement": 3,
+          "characters": [
+            "DARTHJARJAR",
+            "THERONIN"
+          ],
+          "categoryDefinitions": [
+            {
+              "include": [
+                "Sith"
+              ],
+              "numberMatchesRequired": 2
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "YOUNGCHEWBACCA",
